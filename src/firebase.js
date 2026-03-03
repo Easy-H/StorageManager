@@ -1,17 +1,19 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, runTransaction, doc, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBZEJ2RCpKc3ZYO8yjKyTk6PaMgOXzewk8",
-  authDomain: "storagemanager-6344f.firebaseapp.com",
-  projectId: "storagemanager-6344f",
-  storageBucket: "storagemanager-6344f.firebasestorage.app",
-  messagingSenderId: "320610344139",
-  appId: "1:320610344139:web:52036c32016ffd6bbf4f4e",
-  measurementId: "G-YE15BHZL3E"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+const auth = getAuth();
 
 // 재고 이벤트 처리 함수 (핵심 로직)
 export const processInventoryEvent = async (barcode, type, qty = 1, userId = "user1") => {
@@ -48,4 +50,4 @@ export const processInventoryEvent = async (barcode, type, qty = 1, userId = "us
   }
 };
 
-export { db }
+export { db, auth }

@@ -1,181 +1,242 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { db } from './firebase';
+import React, { useState, useEffect } from 'react';
+import './App.css'; // 추출한 CSS 임포트
+import { auth, db } from './firebase';
 import { 
-  collection, onSnapshot, doc, updateDoc, increment, 
-  addDoc, setDoc, serverTimestamp 
+  onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword 
+} from 'firebase/auth';
+import { 
+  doc, setDoc, getDoc, updateDoc, arrayUnion, serverTimestamp, 
+  collection, query, where, onSnapshot, increment 
 } from 'firebase/firestore';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
-function App() {
-  const [products, setProducts] = useState([]);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
-  const [mode, setMode] = useState(null); // 'IN', 'OUT', 'SEARCH'
-  const [statusMsg, setStatusMsg] = useState('시스템 준비 완료');
-  const [mainSearchTerm, setMainSearchTerm] = useState(""); // 메인 화면 검색어
+// --- [컴포넌트 1] 인증 페이지 ---
+const AuthPage = () => {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
 
-  // 1. 실시간 데이터 불러오기
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "products"), (snapshot) => {
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setProducts(data);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // 2. 스캐너 로직 (입고/출고/조회 공용)
-  useEffect(() => {
-    if (!isScannerOpen) return;
-
-    const scanner = new Html5QrcodeScanner("reader", { 
-      fps: 20, 
-      qrbox: { width: 300, height: 150 },
-      showTorchButtonIfSupported: true 
-    });
-
-    scanner.render(async (decodedText) => {
-      if (mode === 'SEARCH') {
-        setMainSearchTerm(decodedText); // 조회 모드일 땐 검색어에 입력
-        setIsScannerOpen(false);
-      } else {
-        await handleInventoryUpdate(decodedText);
-        setIsScannerOpen(false);
-      }
-    }, () => {});
-
-    return () => { scanner.clear().catch(() => {}); };
-  }, [isScannerOpen, mode]);
-
-  // 3. 재고 업데이트 (입/출고 전용)
-  const handleInventoryUpdate = async (barcode) => {
-    const product = products.find(p => p.barcode === barcode || p.id === barcode);
-    const changeQty = mode === 'IN' ? 1 : -1;
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSignUp && !agreed) return alert("약관에 동의해주세요.");
     try {
-      if (!product) {
-        await setDoc(doc(db, "products", barcode), {
-          name: `🆕 미등록 (${barcode})`,
-          barcode: barcode,
-          currentStock: changeQty > 0 ? changeQty : 0,
-          safetyStock: 5,
-          lastEventAt: serverTimestamp(),
-          lastCheckedAt: serverTimestamp(),
-          isTemporary: true
-        });
+      if (isSignUp) {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert("가입되었습니다! 조직을 생성하거나 참여하세요.");
       } else {
-        await updateDoc(doc(db, "products", product.id), {
-          currentStock: increment(changeQty),
-          lastEventAt: serverTimestamp()
-        });
+        await signInWithEmailAndPassword(auth, email, password);
       }
-      await addDoc(collection(db, "events"), { productId: barcode, type: mode, quantity: 1, timestamp: serverTimestamp() });
-      new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3').play();
-    } catch (err) { console.error(err); }
+    } catch (err) { alert("오류: " + err.message); }
   };
-
-  // 4. 관리자 전용: 실사 확인 업데이트
-  const handleCheckUpdate = async (id) => {
-    await updateDoc(doc(db, "products", id), {
-      lastCheckedAt: serverTimestamp()
-    });
-    setStatusMsg("✅ 실사 확인 기록 완료");
-  };
-
-  // 5. 검색 필터링 로직
-  const displayProducts = products.filter(p => 
-    p.name.toLowerCase().includes(mainSearchTerm.toLowerCase()) || 
-    p.barcode.includes(mainSearchTerm)
-  );
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h2>🏢 재고 마스터</h2>
-        <button onClick={() => setIsAdmin(!isAdmin)} style={styles.adminBtn}>
-          {isAdmin ? "🔓 관리자" : "🔒 일반"}
-        </button>
+    <div className="auth-box">
+      <h2>🛒 Shop-Link Stock</h2>
+      <p className="sub-title">{isSignUp ? "회원가입" : "로그인"}</p>
+      <form onSubmit={handleSubmit} className="form-stack">
+        <input type="email" placeholder="이메일" required onChange={e => setEmail(e.target.value)} className="input-basic" />
+        <input type="password" placeholder="비밀번호" required onChange={e => setPassword(e.target.value)} className="input-basic" />
+        {isSignUp && (
+          <div className="checkbox-row">
+            <input type="checkbox" id="ag" onChange={e => setAgreed(e.target.checked)} />
+            <label htmlFor="ag" style={{fontSize: '12px', marginLeft: '5px'}}>구매내역 연동 및 개인정보 활용 동의</label>
+          </div>
+        )}
+        <button type="submit" className="primary-button">{isSignUp ? "가입하기" : "로그인"}</button>
+      </form>
+      <button onClick={() => setIsSignUp(!isSignUp)} className="link-button">
+        {isSignUp ? "이미 계정이 있나요? 로그인" : "처음이신가요? 회원가입"}
+      </button>
+    </div>
+  );
+};
+
+// --- [컴포넌트 2] 메인 애플리케이션 ---
+function App() {
+  const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [currentOrg, setCurrentOrg] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [inputQty, setInputQty] = useState(1);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (currentUser) => {
+      setLoading(true);
+      if (currentUser) {
+        const userRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userRef);
+        if (!userDoc.exists()) {
+          const init = { email: currentUser.email, orgs: [], orgIds: [] };
+          await setDoc(userRef, init);
+          setUserProfile(init);
+        } else { setUserProfile(userDoc.data()); }
+        setUser(currentUser);
+      } else {
+        setUser(null);
+        setCurrentOrg(null);
+      }
+      setLoading(false);
+    });
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    if (!currentOrg) return;
+    const q = query(collection(db, "products"), where("orgId", "==", currentOrg.id));
+    const unsub = onSnapshot(q, (snap) => {
+      setProducts(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+    return unsub;
+  }, [currentOrg]);
+
+  useEffect(() => {
+    if (!isScannerOpen || selectedItem) return;
+    const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 150 } });
+    scanner.render((decodedText) => {
+      const found = products.find(p => p.barcode === decodedText);
+      setSelectedItem(found || { barcode: decodedText, name: `새 품목(${decodedText})`, isNew: true, currentStock: 0 });
+      setIsScannerOpen(false);
+      scanner.clear();
+    }, () => {});
+    return () => scanner.clear().catch(() => {});
+  }, [isScannerOpen, selectedItem, products]);
+
+  const handleCreateOrg = async () => {
+    const name = prompt("새 조직 이름을 입력하세요.");
+    if (!name) return;
+    const newId = `ORG_${Math.random().toString(36).substr(2, 9)}`;
+    await setDoc(doc(db, "organizations", newId), { name, adminUid: user.uid, members: [user.uid] });
+    await updateDoc(doc(db, "users", user.uid), {
+      orgs: arrayUnion({ id: newId, name, role: 'admin' }),
+      orgIds: arrayUnion(newId)
+    });
+    window.location.reload();
+  };
+
+  const handleJoinOrg = async () => {
+    const code = prompt("조직 코드를 입력하세요.");
+    if (!code) return;
+    const orgSnap = await getDoc(doc(db, "organizations", code));
+    if (!orgSnap.exists()) return alert("유효하지 않은 코드입니다.");
+    await updateDoc(doc(db, "organizations", code), { members: arrayUnion(user.uid) });
+    await updateDoc(doc(db, "users", user.uid), {
+      orgs: arrayUnion({ id: code, name: orgSnap.data().name, role: 'member' }),
+      orgIds: arrayUnion(code)
+    });
+    window.location.reload();
+  };
+
+  const processStock = async (type) => {
+    const changeQty = type === 'IN' ? Number(inputQty) : -Number(inputQty);
+    const docRef = doc(db, "products", selectedItem.barcode);
+    try {
+      if (selectedItem.isNew) {
+        await setDoc(docRef, {
+          name: selectedItem.name, barcode: selectedItem.barcode,
+          currentStock: Math.max(0, changeQty), orgId: currentOrg.id,
+          safetyStock: 2, mallLink: `https://your-shop.com/search?q=${selectedItem.barcode}`,
+          lastUpdated: serverTimestamp()
+        });
+      } else {
+        await updateDoc(docRef, { currentStock: increment(changeQty), lastUpdated: serverTimestamp() });
+      }
+      setSelectedItem(null);
+      setInputQty(1);
+    } catch (err) { alert("권한이 없거나 오류가 발생했습니다."); }
+  };
+
+  if (loading) return <div className="center-container">로딩 중...</div>;
+  if (!user) return <AuthPage />;
+
+  if (!currentOrg) {
+    return (
+      <div className="org-container">
+        <h2>🏢 조직 선택</h2>
+        <div className="org-list">
+          {userProfile?.orgs?.map(org => (
+            <div key={org.id} onClick={() => setCurrentOrg(org)} className="org-card">
+              <strong>{org.name}</strong> <span className="role-tag">{org.role}</span>
+            </div>
+          ))}
+        </div>
+        <div className="button-row">
+          <button onClick={handleCreateOrg} className="green-button">+ 새 조직</button>
+          <button onClick={handleJoinOrg} className="blue-button">🔗 코드 합류</button>
+        </div>
+        <button onClick={() => signOut(auth)} className="logout-link">로그아웃</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app-wrapper">
+      <header className="app-header">
+        <button onClick={() => setCurrentOrg(null)} className="back-button">◀</button>
+        <div style={{ textAlign: 'right' }}>
+          <div className="active-org-text">{currentOrg.name}</div>
+          <div className="user-email-text">{user.email}</div>
+        </div>
       </header>
 
-      {/* 상단 통합 검색바 */}
-      <div style={styles.searchBox}>
-        <input 
-          type="text" 
-          placeholder="상품명 또는 바코드 검색..." 
-          value={mainSearchTerm}
-          onChange={(e) => setMainSearchTerm(e.target.value)}
-          style={styles.searchInput}
-        />
-        <button 
-          onClick={() => { setMode('SEARCH'); setIsScannerOpen(true); }}
-          style={styles.searchScanBtn}
-        >📷</button>
+      <div className="search-section">
+        <input placeholder="검색..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="search-input" />
       </div>
 
-      {/* 재고 리스트 */}
-      <section style={styles.listSection}>
-        {displayProducts.length === 0 ? (
-          <p style={{textAlign:'center', color:'#999'}}>검색 결과가 없습니다.</p>
-        ) : (
-          displayProducts.map(p => (
-            <div key={p.id} style={{...styles.card, borderLeft: p.isTemporary ? '5px solid #ffc107' : '5px solid #007bff'}}>
-              <div style={{flex: 1}}>
-                <div style={styles.pName}>{p.name}</div>
-                <div style={styles.pBarcode}>{p.barcode}</div>
-                <div style={styles.pDate}>마지막 실사: {p.lastCheckedAt?.toDate().toLocaleDateString() || '-'}</div>
-              </div>
-              <div style={styles.stockArea}>
-                <div style={{fontSize:'1.5rem', fontWeight:'bold', color: p.currentStock <= p.safetyStock ? 'red' : '#333'}}>
-                  {p.currentStock}
-                </div>
-                {isAdmin && (
-                  <button onClick={() => handleCheckUpdate(p.id)} style={styles.checkBtn}>실사완료</button>
-                )}
-              </div>
+      <div className="product-list">
+        {products.filter(p => p.name.includes(searchTerm)).map(p => (
+          <div key={p.id} onClick={() => {setSelectedItem(p); setInputQty(1);}} className="product-item">
+            <div>
+              <div style={{ fontWeight: 'bold' }}>{p.name}</div>
+              <div style={{ fontSize: '11px', color: '#888' }}>{p.barcode}</div>
             </div>
-          ))
-        )}
-      </section>
-
-      {/* 하단 입출고 버튼 */}
-      <div style={styles.footer}>
-        <button onClick={() => { setMode('IN'); setIsScannerOpen(true); }} style={styles.inBtn}>입고(+)</button>
-        <button onClick={() => { setMode('OUT'); setIsScannerOpen(true); }} style={styles.outBtn}>출고(-)</button>
+            <div style={{ color: p.currentStock <= p.safetyStock ? 'red' : '#333' }}>
+              <strong>{p.currentStock}</strong> 개
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* 스캐너 모달 */}
-      {isScannerOpen && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
-            <h3>[{mode === 'SEARCH' ? '조회 스캔' : mode === 'IN' ? '입고' : '출고'}]</h3>
-            <div id="reader"></div>
-            <button onClick={() => setIsScannerOpen(false)} style={styles.closeBtn}>취소</button>
+      <button onClick={() => setIsScannerOpen(true)} className="floating-scan-btn">📷 스캔하기</button>
+
+      {(isScannerOpen || selectedItem) && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            {isScannerOpen && !selectedItem ? (
+              <div style={{ width: '100%' }}>
+                <h3 style={{ textAlign: 'center' }}>바코드 스캔</h3>
+                <div id="reader"></div>
+                <button onClick={() => setIsScannerOpen(false)} className="close-modal-btn" style={{width: '100%', marginTop: '10px'}}>취소</button>
+              </div>
+            ) : (
+              <div className="editor-container">
+                <h3 style={{ margin: 0 }}>{selectedItem.name}</h3>
+                <p style={{ fontSize: '12px', color: '#888' }}>현재 재고: {selectedItem.currentStock}개</p>
+                <div className="qty-row">
+                  <button onClick={() => setInputQty(q => Math.max(1, q-1))} className="circle-qty-btn">-</button>
+                  <input type="number" value={inputQty} onChange={e => setInputQty(Number(e.target.value))} className="qty-display-input" />
+                  <button onClick={() => setInputQty(q => q+1)} className="circle-qty-btn">+</button>
+                </div>
+                <div className="button-row">
+                  <button onClick={() => processStock('IN')} className="green-button">입고 (+)</button>
+                  <button onClick={() => processStock('OUT')} className="blue-button">출고 (-)</button>
+                </div>
+                {selectedItem.currentStock <= 2 && (
+                  <button onClick={() => window.open(selectedItem.mallLink, '_blank')} className="mall-order-btn">🛒 쇼핑몰에서 주문</button>
+                )}
+                <button onClick={() => setSelectedItem(null)} className="close-modal-btn">닫기</button>
+              </div>
+            )}
           </div>
         </div>
       )}
     </div>
   );
 }
-
-const styles = {
-  container: { maxWidth: '500px', margin: '0 auto', padding: '15px', paddingBottom: '100px' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' },
-  adminBtn: { padding: '5px 10px', borderRadius: '15px', border: '1px solid #ccc', fontSize: '12px' },
-  searchBox: { display: 'flex', gap: '5px', marginBottom: '20px' },
-  searchInput: { flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '16px' },
-  searchScanBtn: { padding: '0 15px', backgroundColor: '#333', color: '#fff', borderRadius: '8px', border: 'none' },
-  listSection: { display: 'flex', flexDirection: 'column', gap: '10px' },
-  card: { display: 'flex', padding: '15px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', alignItems: 'center' },
-  pName: { fontWeight: 'bold', fontSize: '1.1rem' },
-  pBarcode: { fontSize: '12px', color: '#666' },
-  pDate: { fontSize: '11px', color: '#999', marginTop: '4px' },
-  stockArea: { textAlign: 'right', minWidth: '80px' },
-  checkBtn: { marginTop: '5px', fontSize: '11px', padding: '4px 8px', backgroundColor: '#e7f3ff', color: '#007bff', border: 'none', borderRadius: '4px' },
-  footer: { position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', padding: '15px', gap: '10px', backgroundColor: '#333', borderTop: '1px solid #eee' },
-  inBtn: { flex: 1, padding: '15px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 'bold' },
-  outBtn: { flex: 1, padding: '15px', backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 'bold' },
-  modal: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  modalContent: { backgroundColor: '#fff', padding: '20px', borderRadius: '15px', width: '90%', maxWidth: '400px' },
-  closeBtn: { width: '100%', marginTop: '15px', padding: '10px', border: 'none', borderRadius: '8px', backgroundColor: '#eee', color: 'black' }
-};
 
 export default App;

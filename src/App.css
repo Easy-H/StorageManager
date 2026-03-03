@@ -1,42 +1,275 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+:root {
+  --primary-color: #6799fa;
+  --secondary-color: #242424;
+}
+/* 공통 레이아웃 */
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* 인증 페이지 (AuthPage) */
+.auth-box {
+  max-width: 350px;
+  margin: 80px auto;
+  padding: 30px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-basic {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.primary-button {
+  padding: 14px;
+  background-color: #1890ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.checkbox-row {
+  text-align: left;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #1890ff;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+/* 조직 선택 화면 */
+.org-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.org-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.org-card {
+  padding: 15px;
+  border: 1px solid #1890ff;
+  color: var(--secondary-color);
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f0f7ff;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.role-tag {
+  font-size: 10px;
+  background: #fff;
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid #1890ff;
 }
 
-.card {
-  padding: 2em;
+.button-row {
+  display: flex;
+  gap: 10px;
 }
 
-.read-the-docs {
+.green-button {
+  flex: 1;
+  padding: 12px;
+  background-color: #52c41a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.blue-button {
+  flex: 1;
+  padding: 12px;
+  background-color: #1890ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.logout-link {
+  margin-top: 30px;
+  background: none;
+  border: none;
+  color: #999;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 메인 앱 화면 */
+.app-wrapper {
+  /*max-width: 500px;*/
+  margin: 0 auto;
+  font-family: sans-serif;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.back-button {
+  font-size: 11px;
+  padding: 5px 10px;
+  background: #eee;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--secondary-color);
+}
+
+.active-org-text {
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.user-email-text {
+  font-size: 11px;
   color: #888;
+}
+
+.search-section {
+  padding: 10px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.product-list {
+  padding-bottom: 100px;
+}
+
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  border-bottom: 1px solid #f9f9f9;
+  cursor: pointer;
+}
+
+/* 플로팅 버튼 */
+.floating-scan-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  padding: 18px;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 16px;
+  z-index: 10;
+  cursor: pointer;
+}
+
+/* 모달 오버레이 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 380px;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: center;
+}
+
+.qty-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.circle-qty-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.qty-display-input {
+  width: 60px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  border-bottom: 2px solid #1890ff;
+}
+
+.mall-order-btn {
+  padding: 12px;
+  background: #ff4d4f;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-modal-btn {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
 }
