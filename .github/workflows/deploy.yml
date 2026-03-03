@@ -2,33 +2,29 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]  # 코드가 main 브랜치에 push될 때마다 실행됩니다.
+    branches: [ main ]
 
-# 배포를 위한 권한 설정
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. 소스 코드 가져오기
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Node.js 환경 설정
-      - name: Set up Node.js
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20  # 최신 안정화 버전 사용
-          cache: 'npm'      # 빌드 속도를 위해 npm 캐시 사용
+          node-version: 20
+          cache: 'npm'
 
-      # 3. 의존성 설치
       - name: Install dependencies
         run: npm install
 
-      # 4. 프로젝트 빌드 (이때 Secrets가 환경 변수로 주입됨)
       - name: Build
         run: npm run build
         env:
@@ -39,10 +35,19 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
 
-      # 5. gh-pages 브랜치로 배포
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+      # 빌드 결과물(dist)을 Artifact로 업로드
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          folder: dist      # Vite 빌드 결과물이 저장되는 폴더
-          branch: gh-pages  # 배포용 브랜치 (자동으로 생성됨)
-          clean: true       # 배포 시 이전 파일 정리
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
