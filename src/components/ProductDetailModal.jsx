@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { doc, setDoc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
+import { 
+  doc, 
+  setDoc, 
+  updateDoc, 
+  serverTimestamp, 
+  deleteDoc, 
+  collection, 
+  addDoc 
+} from 'firebase/firestore';
 
 const ProductDetailModal = ({ item, orgId, onClose }) => {
   const [editMode, setEditMode] = useState(item.isNew || false);
@@ -11,26 +19,24 @@ const ProductDetailModal = ({ item, orgId, onClose }) => {
   const [formSafety, setFormSafety] = useState(item.safetyStock || 2);
 
   // 재고 조절 상태
-  // 증감 모드(isDirectInput: false)일 때는 초기값을 1로, 직접 수정 모드일 때는 현재 재고로 설정
   const [inputQty, setInputQty] = useState(item.isNew ? 0 : 1);
   const [isDirectInput, setIsDirectInput] = useState(false);
 
   // 실사 날짜 실시간 반영을 위한 로컬 상태
   const [lastAuditDisplay, setLastAuditDisplay] = useState(item.lastAudit);
 
-  // item이 변경될 때(실시간 업데이트 등) 로컬 실사 상태 동기화
+  // item이 변경될 때 로컬 실사 상태 동기화
   useEffect(() => {
     setLastAuditDisplay(item.lastAudit);
   }, [item.lastAudit]);
 
-  // 증감 모드 전환 시 최소값 1 보장 로직
+  // 증감 모드 전환 시 최소값 1 보장
   useEffect(() => {
     if (!editMode && !isDirectInput && inputQty < 1) {
       setInputQty(1);
     }
-  }, [isDirectInput, editMode]);
+  }, [isDirectInput, editMode, inputQty]);
 
-  // 변경 사항 체크 함수 (편집 모드에서 취소 시 경고용)
   const hasChanges = () => {
     return (
       formName !== (item.name || "") ||
@@ -57,55 +63,104 @@ const ProductDetailModal = ({ item, orgId, onClose }) => {
 
     try {
       await setDoc(docRef, payload, { merge: true });
+      
+      // 신규 등록 시 로그 남기기
+      if (item.isNew) {
+        await addDoc(collection(db, "inventory_logs"), {
+          orgId: orgId,
+          productId: docId,
+          productName: formName,
+          type: 'CREATE',
+          changeQty: Number(inputQty),
+          finalStock: Number(inputQty),
+          timestamp: serverTimestamp()
+        });
+      }
+      
       onClose();
     } catch (e) { alert("저장 실패"); }
   };
 
-  // [2] 삭제 로직 (편집 모드에서만 접근 가능)
+  // [2] 삭제 로직
   const handleDeleteItem = async () => {
-    if (!window.confirm(`[${item.name}] 품목을 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
+    if (!window.confirm(`[${item.name}] 품목을 삭제하시겠습니까? 기록은 남지만 품목은 사라집니다.`)) return;
     
     try {
+      // 삭제 로그 먼저 기록
+      await addDoc(collection(db, "inventory_logs"), {
+        orgId: orgId,
+        productId: item.id,
+        productName: item.name,
+        type: 'DELETE',
+        timestamp: serverTimestamp()
+      });
+
       await deleteDoc(doc(db, "products", item.id));
       alert("품목이 삭제되었습니다.");
       onClose();
-    } catch (e) { 
-      console.error(e);
-      alert("삭제 실패"); 
-    }
+    } catch (e) { alert("삭제 실패"); }
   };
 
-  // [3] 재고 업데이트 로직 (입고/출고/직접수정)
+  // [3] 재고 업데이트 로직 (로그 생성 통합)
   const handleUpdateStock = async (type) => {
-    // 증감 모드일 때 1 미만 값 방어 로직
     if (!isDirectInput && Number(inputQty) < 1) {
       alert("입/출고 수량은 최소 1개 이상이어야 합니다.");
       return;
     }
 
     const docRef = doc(db, "products", item.id);
+    const prevStock = item.currentStock || 0;
+    const changeAmount = Number(inputQty);
+    
     let newVal = isDirectInput
-      ? Number(inputQty)
-      : item.currentStock + (type === 'IN' ? Number(inputQty) : -Number(inputQty));
+      ? changeAmount
+      : prevStock + (type === 'IN' ? changeAmount : -changeAmount);
+
+    newVal = Math.max(0, newVal); // 재고는 0 미만으로 내려갈 수 없음
 
     try {
+      // 1. 제품 재고 업데이트
       await updateDoc(docRef, {
-        currentStock: Math.max(0, newVal),
+        currentStock: newVal,
         lastUpdated: serverTimestamp(),
         lastAudit: serverTimestamp() 
       });
-      alert(`${isDirectInput ? '재고 수정' : (type === 'IN' ? '입고' : '출고')} 및 실사 확인 완료`);
+
+      // 2. 활동 로그 추가
+      await addDoc(collection(db, "inventory_logs"), {
+        orgId: orgId,
+        productId: item.id,
+        productName: item.name,
+        type: isDirectInput ? 'ADJUST' : type, // ADJUST(직접수정), IN(입고), OUT(출고)
+        prevStock: prevStock,
+        changeQty: isDirectInput ? (newVal - prevStock) : (type === 'IN' ? changeAmount : -changeAmount),
+        finalStock: newVal,
+        timestamp: serverTimestamp()
+      });
+
+      alert(`${isDirectInput ? '재고 수정' : (type === 'IN' ? '입고' : '출고')} 완료`);
       onClose();
     } catch (e) { alert("업데이트 실패"); }
   };
 
-  // [4] 단순 실사 확인 핸들러
+  // [4] 단순 실사 확인
   const handleAuditItem = async () => {
     if (!window.confirm("현재 수량이 실제 재고와 일치함을 확인하셨습니까?")) return;
     const docRef = doc(db, "products", item.id);
     const now = new Date();
     try {
       await updateDoc(docRef, { lastAudit: serverTimestamp() });
+      
+      // 실사 로그 기록
+      await addDoc(collection(db, "inventory_logs"), {
+        orgId: orgId,
+        productId: item.id,
+        productName: item.name,
+        type: 'AUDIT',
+        finalStock: item.currentStock,
+        timestamp: serverTimestamp()
+      });
+
       setLastAuditDisplay({ toDate: () => now });
       alert("실사 확인이 완료되었습니다.");
     } catch (e) { alert("업데이트 실패"); }
@@ -129,7 +184,6 @@ const ProductDetailModal = ({ item, orgId, onClose }) => {
     <div className="modal-overlay">
       <div className="modal-content editor-container">
         {editMode ? (
-          /* --- 정보 편집 모드 --- */
           <div className="form-stack">
             <h3>{item.isNew ? "신규 품목 등록" : "정보 수정"}</h3>
             <input value={formName} onChange={e => setFormName(e.target.value)} placeholder="품목 이름" className="input-basic" />
@@ -140,12 +194,11 @@ const ProductDetailModal = ({ item, orgId, onClose }) => {
             <div className="button-row" style={{ marginTop: '10px', gap: '8px' }}>
               <button onClick={handleSaveItem} className="green-button" style={{ flex: 2 }}>저장하기</button>
               {!item.isNew && (
-                <button onClick={handleDeleteItem} className="link-button" style={{ color: '#ff4d4f', textDecoration: 'none', border: '1px solid #ff4d4f', borderRadius: '8px', fontSize: '14px' }}>삭제</button>
+                <button onClick={handleDeleteItem} className="link-button" style={{ color: '#ff4d4f', border: '1px solid #ff4d4f', borderRadius: '8px', fontSize: '14px' }}>삭제</button>
               )}
             </div>
           </div>
         ) : (
-          /* --- 재고 관리 모드 --- */
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3 style={{ margin: 0 }}>{item.name}</h3>
