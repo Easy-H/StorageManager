@@ -1,7 +1,7 @@
 import React from 'react';
 
 const SearchBar = ({ value, onChange }) => (
-  <div className="search-section">
+  <div className="search-section" style={{flex: "1 1 0"}}>
     <input 
       placeholder="품목 이름 검색..." 
       value={value}

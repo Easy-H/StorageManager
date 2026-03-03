@@ -18,12 +18,14 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="auth-box">
+    <div className="org-container">
       <div className='app-header'>
       <h2>🛒 Storage Manager</h2>
       </div>
       <form onSubmit={handleSubmit} className="form-stack">
+        <p style={{textAlign:"left"}}>이메일</p>
         <input type="email" placeholder="이메일" required onChange={e => setEmail(e.target.value)} className="input-basic" />
+        <p style={{textAlign:"left"}}>비밀번호</p>
         <input type="password" placeholder="비밀번호" required onChange={e => setPassword(e.target.value)} className="input-basic" />
         {isSignUp && (
           <div className="checkbox-row">

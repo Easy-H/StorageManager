@@ -1,56 +1,27 @@
 import React, { useState } from 'react';
 import './App.css';
-import * as XLSX from 'xlsx'; // npm install xlsx 필요
 
 // 파이어베이스 관련
 import { auth, db } from './firebase';
 import { signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 
-// 훅 및 컴포넌트
+// 훅 및 페이지 분리
 import { useAuth } from './hooks/useAuth';
 import { useProducts } from './hooks/useProducts';
-import AuthPage from './components/AuthPage';
-import ScannerModal from './components/ScannerModal';
-import ProductDetailModal from './components/ProductDetailModal';
-import OrgSelector from './components/OrgSelector';
-import SearchBar from './components/SearchBar';
-import ProductList from './components/ProductList';
+import AuthPage from './pages/AuthPage';
+import OrgSelector from './pages/OrgSelector';
+import StoragePage from './pages/StoragePage';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   const { user, userProfile, loading } = useAuth();
   const [currentOrg, setCurrentOrg] = useState(null);
   const products = useProducts(currentOrg?.id);
-  
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
 
-  // --- [신규] 엑셀 다운로드 기능 ---
-  const handleDownloadExcel = () => {
-    if (!products || products.length === 0) return alert("다운로드할 데이터가 없습니다.");
+  // 현재 활성화된 탭 상태
+  const [activeTab, setActiveTab] = useState("storage");
 
-    // 엑셀에 들어갈 데이터 행 구성
-    const excelData = products.map(p => ({
-      "품목명": p.name,
-      "바코드": p.barcode || "N/A",
-      "현재재고": p.currentStock,
-      "안전재고": p.safetyStock || 0,
-      "상태": p.currentStock <= (p.safetyStock || 0) ? "재고부족" : "정상",
-      "최종업데이트": p.lastUpdated?.toDate().toLocaleString() || "-"
-    }));
-
-    // 워크북 및 시트 생성
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "재고현황");
-
-    // 파일 저장
-    const dateStr = new Date().toISOString().split('T')[0];
-    XLSX.writeFile(workbook, `${currentOrg.name}_재고현황_${dateStr}.xlsx`);
-  };
-
-  // 로그아웃
   const handleLogout = async () => {
     if (window.confirm("로그아웃 하시겠습니까?")) {
       await signOut(auth);
@@ -58,13 +29,11 @@ function App() {
     }
   };
 
-  // 조직 액션
   const handleOrgAction = async (action) => {
-    const val = prompt(action === 'create' ? "조직 이름:" : "조직 코드:");
+    const val = prompt(action === 'create' ? "새 조직 이름:" : "참여할 조직 코드:");
     if (!val) return;
     const id = action === 'create' ? `ORG_${Math.random().toString(36).substr(2, 6)}` : val;
     const userRef = doc(db, "users", user.uid);
-    
     try {
       if (action === 'create') {
         await setDoc(doc(db, "organizations", id), { name: val, members: [user.uid] });
@@ -81,65 +50,81 @@ function App() {
   if (loading) return <div className="center-container">로딩 중...</div>;
   if (!user) return <AuthPage />;
   if (!currentOrg) return (
-    <OrgSelector 
-      user={user} userProfile={userProfile} 
-      onSelectOrg={setCurrentOrg} onOrgAction={handleOrgAction} onLogout={handleLogout} 
+    <OrgSelector
+      user={user} userProfile={userProfile}
+      onSelectOrg={setCurrentOrg} onOrgAction={handleOrgAction} onLogout={handleLogout}
     />
   );
 
   return (
-    <div className="app-wrapper">
-      <header className="app-header">
-        <button onClick={() => setCurrentOrg(null)} className="back-button">◀</button>
-        <div style={{ textAlign: 'right' }}>
-          <div className="active-org-text">{currentOrg.name}</div>
-        </div>
-      </header>
+    <div className="main-container" style={{ minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
 
-      <SearchBar value={searchTerm} onChange={setSearchTerm} />
+      {/* 1. 메인 콘텐츠 영역 (하단 탭 높이만큼 여백 확보) */}
+      <main className="tab-content" style={{ paddingBottom: '70px' }}>
+        {activeTab === "dashboard" ? (
+          <Dashboard
+            products={products}
+            currentOrg={currentOrg}
+            onBackToOrgSelector={() => setCurrentOrg(null)}
+          />
+        ) : (
+          <StoragePage
+            products={products}
+            currentOrg={currentOrg}
+            onBackToOrgSelector={() => setCurrentOrg(null)}
+          />
+        )}
+      </main>
 
-      <ProductList 
-        products={products} 
-        searchTerm={searchTerm} 
-        onSelectProduct={setSelectedItem} 
-      />
-
-      <div className="button-row-floating">
-        <button 
-          onClick={() => setSelectedItem({barcode:'', name:'', isNew:true, currentStock:0})} 
-          className="green-button-pill"
+      {/* 2. 하단 고정 탭 네비게이션 */}
+      <nav className="bottom-nav" style={{
+        display: 'flex',
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '65px',
+        backgroundColor: '#fff',
+        borderTop: '1px solid #eee',
+        boxShadow: '0 -2px 10px rgba(0,0,0,0.05)',
+        zIndex: 50
+      }}>
+        <button
+          onClick={() => setActiveTab("dashboard")}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: 'none',
+            background: 'none',
+            color: activeTab === 'dashboard' ? '#4a90e2' : '#bbb',
+            transition: 'all 0.2s'
+          }}
         >
-          ➕ 직접 추가
+          <span style={{ fontSize: '20px', marginBottom: '2px' }}>📊</span>
+          <span style={{ fontSize: '11px', fontWeight: activeTab === 'dashboard' ? 'bold' : 'normal' }}>대시보드</span>
         </button>
-        <button onClick={() => setIsScannerOpen(true)} className="floating-scan-btn">
-          📷 바코드 스캔
+
+        <button
+          onClick={() => setActiveTab("storage")}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: 'none',
+            background: 'none',
+            color: activeTab === 'storage' ? '#4a90e2' : '#bbb',
+            transition: 'all 0.2s'
+          }}
+        >
+          <span style={{ fontSize: '20px', marginBottom: '2px' }}>📦</span>
+          <span style={{ fontSize: '11px', fontWeight: activeTab === 'storage' ? 'bold' : 'normal' }}>재고관리</span>
         </button>
-          {/* Admin일 때만 엑셀 버튼 노출 */}
-          {currentOrg.role === 'admin' && (
-            <button onClick={handleDownloadExcel} className="excel-download-btn">
-              📊 엑셀 저장
-            </button>
-          )}
-        
-      </div>
-
-      {isScannerOpen && (
-        <ScannerModal 
-          onScan={(text) => {
-            const found = products.find(p => p.barcode === text);
-            setSelectedItem(found || { barcode: text, name: "", isNew: true, currentStock: 0 });
-            setIsScannerOpen(false);
-          }} 
-          onClose={() => setIsScannerOpen(false)} 
-        />
-      )}
-
-      {selectedItem && (
-        <ProductDetailModal 
-          item={selectedItem} orgId={currentOrg.id} 
-          onClose={() => setSelectedItem(null)} 
-        />
-      )}
+      </nav>
     </div>
   );
 }

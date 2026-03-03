@@ -1,7 +1,7 @@
 :root {
   --primary-color: #1890ff; /* 포인트 파란색 */
   --secondary-color: #242424; /* 기본 진한 글자색 */
-  --bg-white: #ffffff;
+  --bg-white: #f9f9f9;
   --bg-light: #f0f7ff;
   --border-color: #dddddd;
   --error-red: #ff4d4f;
@@ -34,7 +34,6 @@ body {
   max-width: 500px;
   margin: 0 auto;
   background-color: var(--bg-white);
-  min-height: 100vh;
   position: relative;
 }
 
@@ -55,15 +54,24 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 12px 0;
 }
 
 .input-basic {
   padding: 14px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
-  font-size: 14px;
+  font-size: 20px;
   background-color: var(--bg-white);
   color: var(--secondary-color); /* 글자색 강제 지정 */
+}
+
+.select-basic {
+    background: white;
+    color: black;
+    border-radius: 10px;
+    height: 40px;
+    border: 1px solid var(--border-color);
 }
 
 /* 4. 조직 선택 화면 */
@@ -109,7 +117,7 @@ body {
 
 /* 5. 버튼 스타일 */
 .primary-button {
-  padding: 15px;
+  padding: 14px;
   background-color: var(--primary-color);
   color: #ffffff; /* 파란 배경엔 흰색 글자 */
   border: none;
@@ -150,7 +158,6 @@ body {
   border: none;
   color: #888888;
   text-decoration: underline;
-  margin-top: 15px;
   cursor: pointer;
   font-size: 14px;
 }
@@ -194,11 +201,12 @@ body {
 
 .search-input {
   width: 100%;
-  padding: 12px;
+  padding: 8px;
   border-radius: 10px;
   border: 1px solid var(--border-color);
   background-color: #fcfcfc;
   color: var(--secondary-color);
+  font-size: 20px;
 }
 
 /* 7. 품목 리스트 */
@@ -221,9 +229,10 @@ body {
 
 .button-row-floating {
   position: fixed;
-  bottom: 25px;
+  bottom: 80px;
   left: 20px;
   right: 20px;
+  gap: 10px;
   display: flex;
   justify-content: space-between;
   z-index: 10;
