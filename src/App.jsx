@@ -67,30 +67,40 @@ function AppContent() {
     if (!val) return;
     try {
       if (action === 'create') {
-        await OrgAPI.createOrg(val, user.email, user.uid);
+        await OrgAPI.createOrg(val, user.email, user);
       } else {
-        await OrgAPI.joinOrg(val, user.uid, userProfile.name);
+        await OrgAPI.joinOrg(val, user.email, user);
       }
       showToast("완료되었습니다. 다시 로그인하거나 페이지를 새로고침하세요.");
       window.location.reload();
     } catch (e) {
       showToast("오류가 발생했습니다.");
+      console.log(e);
     }
   };
 
   if (loading) return <div className="center-container">로딩 중...</div>;
-  if (!user) return <AuthPage notice={showToast} />;
+  if (!user) return (
+    <>
+      <AuthPage notice={showToast} />
+      <Toast message={toast.message} show={toast.show} />
+    </>
+    );
 
   // 1. 조직 선택 전
   if (!currentOrg) {
     return (
+    <>
       <OrgSelectPage
         user={user}
         userProfile={userProfile}
         onSelectOrg={handleSelectOrg}
         onOrgAction={handleOrgAction}
         onLogout={handleLogout}
+        notice={showToast}
       />
+      <Toast message={toast.message} show={toast.show} />
+    </>
     );
   }
 

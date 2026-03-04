@@ -1,6 +1,6 @@
 import React from 'react';
 
-const OrgSelectPage = ({ user, userProfile, onSelectOrg, onOrgAction, onLogout }) => (
+const OrgSelectPage = ({ user, userProfile, onSelectOrg, onOrgAction, onLogout, notice }) => (
   <div className="org-container">
     <div className="app-header">
         <h2>🏢 내 조직 목록</h2>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { FirebaseAuthRepository as AuthAPI}
+from "../api/FirebaseAuthRepository"
 
-const AuthPage = (notice) => {
+const AuthPage = ({notice}) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,9 +12,12 @@ const AuthPage = (notice) => {
     e.preventDefault();
     if (isSignUp && !agreed) return notice("약관에 동의해주세요.");
     try {
-      if (isSignUp) await createUserWithEmailAndPassword(auth, email, password);
-      else await signInWithEmailAndPassword(auth, email, password);
-    } catch (err) { notice(err.message); }
+      if (isSignUp)
+          await AuthAPI.signUp(email, password)
+      else await AuthAPI.signIn(email, password)
+    } catch (err) { notice(err.message); 
+      alert(err);
+    }
   };
 
   return (

@@ -74,7 +74,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
                 <section style={sectionStyle}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {members.map(member => {
-                            const role = member.orgs?.find(o => o.id === currentOrg.id)?.role;
+                            const role = member?.role;
                             const isMe = member.uid === user.uid;
 
                             return (
@@ -88,7 +88,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
                                             <button onClick={() => handleChangeRole(member, role)} style={roleBtnStyle}>
                                                 {role === 'admin' ? '멤버로 강등' : '관리자로 승격'}
                                             </button>
-                                            <button onClick={() => OrgAPI.removeMember(currentOrg.id, member.uid).then(fetchMembers)} style={{ ...roleBtnStyle, color: 'red' }}>내보내기</button>
+                                            <button onClick={() => OrgAPI.removeMember(currentOrg.id, member.uid).then(fetchMembers)} style={{ ...removeBtnStyle, color: 'red' }}>내보내기</button>
                                         </div>
                                     )}
                                 </div>
@@ -111,6 +111,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
 const sectionStyle = { background: '#fff', padding: '16px', borderRadius: '12px', marginBottom: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' };
 const titleStyle = { marginTop: 0, marginBottom: '12px', fontSize: '14px', fontWeight: 'bold' };
 const memberItemStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f0f0f0' };
-const roleBtnStyle = { padding: '4px 8px', fontSize: '12px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ddd', background: '#fff' };
+const roleBtnStyle = { padding: '4px 8px', fontSize: '12px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ddd', background: 'var(--success-green)' };
+const removeBtnStyle = { padding: '4px 8px', fontSize: '12px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ddd', background: 'white' };
 
 export default AdminPage;
