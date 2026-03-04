@@ -5,7 +5,7 @@ import ScannerModal from '../components/ScannerModal';
 import ProductDetailModal from '../components/ProductDetailModal';
 import Header from '../components/Header';
 
-const StoragePage = ({ products, currentOrg, onBackToOrgSelector }) => {
+const StoragePage = ({ products, currentOrg, onBack, notice }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortBy, setSortBy] = useState("name");
     const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -15,13 +15,13 @@ const StoragePage = ({ products, currentOrg, onBackToOrgSelector }) => {
     const handleCopyOrgId = (id) => {
         if (!id) return;
         navigator.clipboard.writeText(id)
-            .then(() => alert("조직 코드가 복사되었습니다!"))
-            .catch(() => alert("복사 실패"));
+            .then(() => notice("조직 코드가 복사되었습니다!"))
+            .catch(() => notice("복사 실패"));
     };
 
     return (
         <>
-            <Header currentOrg={currentOrg} onBackToOrgSelector={onBackToOrgSelector} />
+            <Header currentOrg={currentOrg} onBack={onBack} notice={notice}/>
             <div className="app-wrapper">
 
                 <div className="search-sort-section" style={{ padding: '10px 15px 0', display: 'flex' }}>
@@ -54,7 +54,7 @@ const StoragePage = ({ products, currentOrg, onBackToOrgSelector }) => {
                 )}
 
                 {selectedItem && (
-                    <ProductDetailModal item={selectedItem} orgId={currentOrg.id} onClose={() => setSelectedItem(null)} />
+                    <ProductDetailModal item={selectedItem} orgId={currentOrg.id} onClose={() => setSelectedItem(null)} notice={notice} />
                 )}
             </div>
         </>

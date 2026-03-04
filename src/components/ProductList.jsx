@@ -1,5 +1,17 @@
 import React from 'react';
 
+const getAuditStatus = (lastAuditDate) => {
+  if (!lastAuditDate) return { text: "실사필요", color: "#fa8c16", bg: "#fff7e6" };
+  
+  // lastAuditDate는 이제 이미 Date 객체입니다.
+  const diffTime = Math.abs(new Date() - lastAuditDate);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays <= 7) return { text: "실사완료", color: "#52c41a", bg: "#f6ffed" };
+  if (diffDays <= 30) return { text: "점검예정", color: "#1890ff", bg: "#e6f7ff" };
+  return { text: "실사필요", color: "#fa8c16", bg: "#fff7e6" };
+};
+
 const ProductList = ({ products, searchTerm, onSelectProduct, sortBy }) => {
   const s = searchTerm.toLowerCase();
 
@@ -20,22 +32,13 @@ const ProductList = ({ products, searchTerm, onSelectProduct, sortBy }) => {
     }
     if (sortBy === "oldAudit") {
       // 실사 날짜 비교 (기록 없으면 가장 과거로 처리)
-      const aTime = a.lastAudit ? a.lastAudit.toDate().getTime() : 0;
-      const bTime = b.lastAudit ? b.lastAudit.toDate().getTime() : 0;
+      const aTime = a.lastAudit ? a.lastAudit.getTime() : 0;
+      const bTime = b.lastAudit ? b.lastAudit.getTime() : 0;
       return aTime - bTime; // 오래된 게 위로
     }
     // 기본: 이름순
     return a.name.localeCompare(b.name);
   });
-
-  // 실사 상태 배지 로직 (이전과 동일)
-  const getAuditStatus = (lastAudit) => {
-    if (!lastAudit) return { text: "실사필요", color: "#fa8c16", bg: "#fff7e6" };
-    const diffDays = Math.ceil(Math.abs(new Date() - lastAudit.toDate()) / (1000 * 60 * 60 * 24));
-    if (diffDays <= 7) return { text: "실사완료", color: "#52c41a", bg: "#f6ffed" };
-    if (diffDays <= 30) return { text: "점검예정", color: "#1890ff", bg: "#e6f7ff" };
-    return { text: "실사필요", color: "#fa8c16", bg: "#fff7e6" };
-  };
 
   return (
     <div className="product-list">

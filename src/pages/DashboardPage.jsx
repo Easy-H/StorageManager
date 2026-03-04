@@ -1,98 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import * as XLSX from 'xlsx';
-import { db } from '../firebase';
-import { collection, query, where, orderBy, limit, onSnapshot, getDocs } from 'firebase/firestore';
+// Firebase 관련 import가 사라지고 Repository만 남습니다.
+import { FirebaseProductRepository as Repository } from '../api/FirebaseProductRepository';
 
-const Dashboard = ({ products, currentOrg, onBackToOrgSelector }) => {
+const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
   const [logs, setLogs] = useState([]);
 
-  // [1] 최근 활동 로그 5개 실시간 리스너
+  // [1] 최근 활동 로그 구독 (추상화된 API 사용)
   useEffect(() => {
     if (!currentOrg?.id) return;
-
-    const q = query(
-      collection(db, "inventory_logs"),
-      where("orgId", "==", currentOrg.id),
-      orderBy("timestamp", "desc"),
-      limit(5)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const logData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setLogs(logData);
+    const unsubscribe = Repository.subscribeRecentLogs(currentOrg.id, (data) => {
+      setLogs(data);
     });
-
     return () => unsubscribe();
   }, [currentOrg.id]);
 
-  // [2] 통계 데이터 계산
-  const totalItems = products.length;
-  const lowStockItems = products.filter(p => p.currentStock <= (p.safetyStock || 0)).length;
+  // [2] 데이터 계산 (p.lastAudit은 이제 Date 객체임)
+  const lowStockList = products.filter(p => p.currentStock <= (p.safetyStock || 0));
+  const lowStockItems = lowStockList.length;
+
   const overdueAuditItems = products.filter(p => {
     if (!p.lastAudit) return true;
-    const diffDays = Math.ceil(Math.abs(new Date() - p.lastAudit.toDate()) / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil(Math.abs(new Date() - p.lastAudit) / (1000 * 60 * 60 * 24));
     return diffDays > 30;
   }).length;
 
   // [3] 재고 현황 엑셀 다운로드
   const handleDownloadExcel = () => {
-    if (!products || products.length === 0) return alert("데이터가 없습니다.");
+    if (!products || products.length === 0) return notice("데이터가 없습니다.");
     const excelData = products.map(p => ({
       "품목명": p.name,
       "바코드": p.barcode || "N/A",
       "현재재고": p.currentStock,
       "안전재고": p.safetyStock || 0,
-      "최근실사일": p.lastAudit ? p.lastAudit.toDate().toLocaleString() : "기록없음"
+      "최근실사일": p.lastAudit ? p.lastAudit.toLocaleDateString() : "기록없음"
     }));
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "재고현황");
-    XLSX.writeFile(workbook, `${currentOrg.name}_재고현황.xlsx`);
+    downloadFile(excelData, `${currentOrg.name}_재고현황`);
   };
 
   // [4] 전체 로그 엑셀 다운로드
   const handleDownloadLogs = async () => {
     try {
-      // 전체 로그를 가져오기 위해 다시 쿼리 (제한 없음)
-      const q = query(
-        collection(db, "inventory_logs"),
-        where("orgId", "==", currentOrg.id),
-        orderBy("timestamp", "desc")
-      );
-      const querySnapshot = await getDocs(q);
-      
-      if (querySnapshot.empty) return alert("기록된 로그가 없습니다.");
+      const allLogs = await Repository.getAllLogs(currentOrg.id);
+      if (allLogs.length === 0) return notice("기록된 로그가 없습니다.");
 
-      const logExcelData = querySnapshot.docs.map(doc => {
-        const d = doc.data();
-        return {
-          "일시": d.timestamp?.toDate().toLocaleString() || "N/A",
-          "품목명": d.productName,
-          "구분": d.type === 'IN' ? '입고' : d.type === 'OUT' ? '출고' : d.type === 'ADJUST' ? '수정' : d.type === 'CREATE' ? '신규등록' : d.type === 'DELETE' ? '삭제' : '실사',
-          "변동수량": d.changeQty || 0,
-          "최종재고": d.finalStock || 0
-        };
-      });
-
-      const worksheet = XLSX.utils.json_to_sheet(logExcelData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "활동기록");
-      XLSX.writeFile(workbook, `${currentOrg.name}_활동로그.xlsx`);
+      const logExcelData = allLogs.map(d => ({
+        "일시": d.timestamp ? d.timestamp.toLocaleString() : "N/A",
+        "품목명": d.productName,
+        "구분": mapLogType(d.type),
+        "변동수량": d.changeQty || 0,
+        "최종재고": d.finalStock || 0
+      }));
+      downloadFile(logExcelData, `${currentOrg.name}_활동로그`);
     } catch (e) {
-      alert("로그를 불러오는 중 오류가 발생했습니다.");
+      notice("로그를 불러오는 중 오류가 발생했습니다.");
     }
+  };
+
+  // 헬퍼 함수: 엑셀 파일 생성 및 다운로드
+  const downloadFile = (data, fileName) => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
+  };
+
+  // 헬퍼 함수: 로그 타입 한글 변환
+  const mapLogType = (type) => {
+    const types = { IN: '입고', OUT: '출고', ADJUST: '수정', CREATE: '신규등록', DELETE: '삭제', AUDIT: '실사' };
+    return types[type] || '기타';
   };
 
   return (
     <>
-      <Header currentOrg={currentOrg} onBackToOrgSelector={onBackToOrgSelector} />
+      <Header currentOrg={currentOrg} onBack={onBack} notice={notice} />
       <div className="app-wrapper" style={{ padding: '20px', paddingBottom: '80px' }}>
 
         {/* 주요 지표 카드 */}
+
+        <h3 style={{ fontSize: '16px', marginBottom: '12px' }}>🚨 요약</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '30px' }}>
           <div className="stat-card" style={{ background: '#fff7e6', padding: '15px', borderRadius: '12px', border: '1px solid #ffd591' }}>
             <div style={{ fontSize: '12px', color: '#fa8c16' }}>재고 부족</div>
@@ -104,35 +91,44 @@ const Dashboard = ({ products, currentOrg, onBackToOrgSelector }) => {
           </div>
         </div>
 
-        {/* 빠른 조치 섹션 */}
+        {/* 🚀 발주 필요 리스트 섹션 (수정된 부분) */}
+
+        <h3 style={{ fontSize: '16px', marginBottom: '12px' }}>🚨 발주 필요 품목</h3>
         <div style={{ background: '#fff', padding: '20px', borderRadius: '15px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', marginBottom: '25px' }}>
-          <h3 style={{ fontSize: '16px', marginBottom: '15px', marginTop: 0 }}>🚀 조치 알림</h3>
           {lowStockItems > 0 ? (
-            <p style={{ fontSize: '14px', color: '#666', margin: 0 }}>
-              현재 <strong>{lowStockItems}개</strong> 품목이 발주가 필요합니다.
-            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {lowStockList.map(item => (
+                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: '#fff1f0', borderRadius: '8px', border: '1px solid #ffa39e' }}>
+                  <div style={{ fontSize: '14px', fontWeight: '500' }}>{item.name}</div>
+                  <div style={{ fontSize: '12px', color: '#cf1322' }}>
+                    현재: <strong>{item.currentStock}</strong> / 기준: {item.safetyStock}
+                  </div>
+                </div>
+              ))}
+              <p style={{ fontSize: '12px', color: '#999', marginTop: '5px' }}>* 안전 재고 기준보다 낮거나 같은 품목입니다.</p>
+            </div>
           ) : (
-            <p style={{ fontSize: '14px', color: '#52c41a', margin: 0 }}>✅ 재고 상태가 양호합니다.</p>
+            <p style={{ fontSize: '14px', color: '#52c41a', margin: 0 }}>✅ 모든 품목의 재고가 충분합니다.</p>
           )}
         </div>
 
-        {/* 최근 활동 로그 (최근 5개 미리보기) */}
+        {/* 최근 활동 로그 */}
         <div style={{ marginBottom: '25px' }}>
           <h3 style={{ fontSize: '16px', marginBottom: '12px' }}>🕒 최근 활동</h3>
           <div style={{ background: '#fff', borderRadius: '15px', border: '1px solid #eee', overflow: 'hidden' }}>
             {logs.length > 0 ? (
               logs.map((log, index) => (
-                <div key={log.id} style={{ 
-                  padding: '12px 15px', 
+                <div key={log.id} style={{
+                  padding: '12px 15px',
                   borderBottom: index !== logs.length - 1 ? '1px solid #f5f5f5' : 'none',
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                 }}>
                   <div style={{ fontSize: '14px' }}>
                     <div style={{ fontWeight: '500' }}>{log.productName}</div>
-                    <div style={{ fontSize: '11px', color: '#999' }}>{log.timestamp?.toDate().toLocaleString('ko-KR', { hour12: false })}</div>
+                    <div style={{ fontSize: '11px', color: '#999' }}>{log.timestamp?.toLocaleString('ko-KR', { hour12: false })}</div>
                   </div>
                   <div style={{ textAlign: 'right', fontSize: '13px', fontWeight: 'bold', color: log.type === 'IN' ? '#52c41a' : log.type === 'OUT' ? '#ff4d4f' : '#1890ff' }}>
-                    {log.type === 'IN' ? `+${log.changeQty}` : log.type === 'OUT' ? `${log.changeQty}` : '기록'}
+                    {log.type === 'IN' ? `+${log.changeQty}` : log.type === 'OUT' ? `-${log.changeQty}` : '기록'}
                   </div>
                 </div>
               ))
@@ -156,4 +152,4 @@ const Dashboard = ({ products, currentOrg, onBackToOrgSelector }) => {
   );
 };
 
-export default Dashboard;
+export default DashboardPage;

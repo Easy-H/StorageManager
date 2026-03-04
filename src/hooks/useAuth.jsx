@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import { auth, db } from '../firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { FirebaseAuthRepository as AuthAPI } from '../api/FirebaseAuthRepository';
 
 export function useAuth() {
   const [user, setUser] = useState(null);
@@ -9,10 +7,12 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (currentUser) => {
+    // 1. 상태 변화 감시 시작
+    const unsub = AuthAPI.onAuthStateChanged(async (currentUser) => {
       if (currentUser) {
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        setUserProfile(userDoc.data());
+        // 2. 구현체 내부의 로직을 통해 프로필 획득
+        const profile = await AuthAPI.getUserProfile(currentUser.uid);
+        setUserProfile(profile);
         setUser(currentUser);
       } else {
         setUser(null);
@@ -20,6 +20,7 @@ export function useAuth() {
       }
       setLoading(false);
     });
+
     return unsub;
   }, []);
 

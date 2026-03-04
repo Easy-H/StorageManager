@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
-const AuthPage = () => {
+const AuthPage = (notice) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,11 +9,11 @@ const AuthPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSignUp && !agreed) return alert("약관에 동의해주세요.");
+    if (isSignUp && !agreed) return notice("약관에 동의해주세요.");
     try {
       if (isSignUp) await createUserWithEmailAndPassword(auth, email, password);
       else await signInWithEmailAndPassword(auth, email, password);
-    } catch (err) { alert(err.message); }
+    } catch (err) { notice(err.message); }
   };
 
   return (

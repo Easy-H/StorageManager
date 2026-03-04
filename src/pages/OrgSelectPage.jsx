@@ -1,6 +1,6 @@
 import React from 'react';
 
-const OrgSelector = ({ user, userProfile, onSelectOrg, onOrgAction, onLogout }) => (
+const OrgSelectPage = ({ user, userProfile, onSelectOrg, onOrgAction, onLogout }) => (
   <div className="org-container">
     <div className="app-header">
         <h2>🏢 내 조직 목록</h2>
@@ -54,4 +54,4 @@ const OrgSelector = ({ user, userProfile, onSelectOrg, onOrgAction, onLogout }) 
   </div>
 );
 
-export default OrgSelector;
+export default OrgSelectPage;
