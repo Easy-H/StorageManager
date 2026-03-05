@@ -1,81 +1,82 @@
 import { db } from './firebase';
 import {
-  collection, doc, setDoc, updateDoc, deleteDoc, where, documentId,
-  getDocs, query, orderBy, serverTimestamp, getDoc, arrayUnion, writeBatch
+  collection, doc, setDoc, updateDoc, deleteDoc, 
+  getDocs, query, serverTimestamp, getDoc, writeBatch
 } from 'firebase/firestore';
 
 export const FirebaseOrgRepository = {
+  
+  // 권한 레벨 정의 (참고용)
+  ROLES: {
+    PENDING: 0,
+    MEMBER: 10,
+    MANAGER: 50,
+    ADMIN: 100
+  },
 
-  // 1. 모든 조직 목록 가져오기 (가나다순)
-  // 1. 내가 소속된(또는 신청한) 조직 목록만 가져오기
-  async getAllOrgs(userProfile) {
-    // 유저 프로필이 없거나 참여 중인 조직 ID 리스트가 없으면 빈 배열 반환
-    if (!userProfile || !userProfile.orgIds || userProfile.orgIds.length === 0) {
-      return [];
-    }
-
+  /**
+   * 1. 내 소속 조직 목록 가져오기
+   */
+  async getMyOrgs(userId) {
+    if (!userId) return [];
     try {
-      // 내 orgIds 배열에 포함된 문서만 가져오는 쿼리
-      // 'in' 연산자는 최대 30개까지 지원합니다.
-      const q = query(
-        collection(db, "organizations"),
-        where(documentId(), "in", userProfile.orgIds.slice(0, 30))
-      );
-
-      const snap = await getDocs(q);
-
-      // 불러온 조직 데이터와 내 프로필에 저장된 role 정보를 결합하여 반환
-      return snap.docs.map(doc => {
-        const orgData = doc.data();
-        // 내 프로필의 orgs 배열에서 해당 조직의 내 역할을 찾음
-        const myRelation = userProfile.orgs?.find(o => o.id === doc.id);
-
-        return {
-          id: doc.id,
-          ...orgData,
-          myRole: myRelation?.role || 'member' // 내 역할 정보 추가
-        };
-      });
+      const snap = await getDocs(collection(db, "users", userId, "organizations"));
+      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
       console.error("소속 조직 로드 실패:", error);
       return [];
     }
   },
 
-  // 2. 신규 조직 생성
-  async createOrg(name, adminEmail, uerProfile) {
+  /**
+   * 2. 신규 조직 생성
+   */
+  async createOrg(name, admin, adminProfile) {
+    const batch = writeBatch(db);
     const newOrgRef = doc(collection(db, "organizations"));
     const orgId = newOrgRef.id;
-    const userRef = doc(db, "users", uerProfile.uid);
+    
+    const userRef = doc(db, "users", admin.uid);
+    const userOrgRef = doc(db, "users", admin.uid, "organizations", orgId);
+    const memberRef = doc(db, "organizations", orgId, "members", admin.uid);
+
+    const userName = adminProfile?.name || admin.email.split('@')[0];
 
     try {
-      // 1) 조직 기본 문서 생성
-      await setDoc(newOrgRef, {
-        name,
-        adminEmail,
-        uid: uerProfile.uid,
-        createdAt: serverTimestamp(),
-        isActive: true,
-      });
-
-      // 2) [관계 객체] members 서브 컬렉션에 관리자 등록
-      const memberRef = doc(db, "organizations", orgId, "members", uerProfile.uid);
-      await setDoc(memberRef, {
-        uid: uerProfile.uid,
-        email: adminEmail,
-        role: 'admin',
-        status: 'approved', // 생성자는 즉시 승인
-        joinedAt: serverTimestamp()
-      });
-
-      // 3) 유저 문서 업데이트 (내가 속한 조직 목록에 추가)
-      const newOrgInfo = { id: orgId, name: name, role: 'admin' };
-      await setDoc(userRef, {
-        orgs: arrayUnion(newOrgInfo),
-        orgIds: arrayUnion(orgId),
+      batch.set(userRef, {
+        email: admin.email,
+        name: userName, // 사용자 마스터 이름
         updatedAt: serverTimestamp()
       }, { merge: true });
 
+      batch.set(newOrgRef, {
+        name: name, // 조직 이름
+        adminEmail: admin.email,
+        adminUid: admin.uid,
+        isActive: true,
+        createdAt: serverTimestamp()
+      });
+
+      // 유저 개인 공간용 데이터 (조직 정보 위주)
+      const userOrgData = {
+        name: name, // 💡 name 대신 orgName으로 명확히 지정
+        level: this.ROLES.ADMIN,
+        joinedAt: serverTimestamp()
+      };
+      
+      // 조직 멤버십용 데이터 (사용자 정보 위주)
+      const memberData = {
+        uid: admin.uid,
+        email: admin.email,
+        name: userName,
+        level: this.ROLES.ADMIN,
+        joinedAt: serverTimestamp()
+      };
+
+      batch.set(userOrgRef, userOrgData);
+      batch.set(memberRef, memberData);
+
+      await batch.commit();
       return { id: orgId, name };
     } catch (error) {
       console.error("조직 생성 실패:", error);
@@ -83,139 +84,133 @@ export const FirebaseOrgRepository = {
     }
   },
 
-  // 3. 조직 참여 신청 (이메일 및 유저 정보 포함)
-  async joinOrg(orgId, userEmail, userProfile) {
-    const orgRef = doc(db, "organizations", orgId);
-    const memberRef = doc(db, "organizations", orgId, "members", userProfile.uid);
-    const userRef = doc(db, "users", userProfile.uid);
+  /**
+   * 3. 조직 참여 신청 (수정 버전)
+   */
+  async joinOrg(orgId, user, userProfile) {
+    const orgSnap = await getDoc(doc(db, "organizations", orgId));
+    if (!orgSnap.exists()) throw new Error("존재하지 않는 조직입니다.");
+
+    const orgName = orgSnap.data().name; // 조직 마스터에서 이름 가져옴
+    const userName = userProfile?.name || user.email.split('@')[0];
+
+    const batch = writeBatch(db);
+    const userRef = doc(db, "users", user.uid);
+    const userOrgRef = doc(db, "users", user.uid, "organizations", orgId);
+    const memberRef = doc(db, "organizations", orgId, "members", user.uid);
 
     try {
-      // 조직 존재 및 이름 확인
-      const orgSnap = await getDoc(orgRef);
-      if (!orgSnap.exists()) throw new Error("존재하지 않는 조직 코드입니다.");
-      const orgName = orgSnap.data().name;
-
-      // 1) [관계 객체] members 서브 컬렉션에 신청 정보 생성
-      await setDoc(memberRef, {
-        uid: userProfile.uid,
-        email: userEmail,
-        name: userProfile?.name || userEmail.split('@')[0],
-        role: 'member',
-        status: 'pending', // 기본값은 대기 상태
-        requestedAt: serverTimestamp()
-      });
-
-      // 2) 유저 문서 업데이트 (신청한 조직 ID 기록)
-      const newOrgInfo = { id: orgId, name: orgName, role: 'member' };
-      await setDoc(userRef, {
-        orgs: arrayUnion(newOrgInfo),
-        orgIds: arrayUnion(orgId),
+      batch.set(userRef, {
+        email: user.email,
+        name: userName,
         updatedAt: serverTimestamp()
       }, { merge: true });
 
+      const commonData = {
+        name: orgName,
+        level: this.ROLES.PENDING,
+        requestedAt: serverTimestamp()
+      };
+
+      // 유저 쪽에는 조직 이름을, 조직 쪽에는 유저 이름을 명확히 저장
+      batch.set(userOrgRef, commonData);
+      batch.set(memberRef, {
+        uid: user.uid,
+        email: user.email,
+        userName: userName, // 💡 멤버의 이름
+        ...commonData
+      });
+
+      await batch.commit();
     } catch (error) {
       console.error("조직 참여 신청 실패:", error);
       throw error;
     }
   },
-  // FirebaseOrgRepository.js 수정 버전 (정렬 제거)
+
+  /**
+   * 4. 멤버 레벨 승인 및 변경 (관리자 전용)
+   */
+  async updateMemberLevel(orgId, targetUserId, newLevel) {
+    const batch = writeBatch(db);
+    const userOrgRef = doc(db, "users", targetUserId, "organizations", orgId);
+    const memberRef = doc(db, "organizations", orgId, "members", targetUserId);
+    
+    try {
+      const updateData = { 
+        level: newLevel, 
+        updatedAt: serverTimestamp() 
+      };
+
+      batch.update(userOrgRef, updateData);
+      batch.update(memberRef, updateData);
+
+      await batch.commit();
+    } catch (error) {
+      console.error("레벨 변경 실패:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * 5. 멤버 삭제/내보내기
+   */
+  async removeMember(orgId, targetUserId) {
+    const batch = writeBatch(db);
+    batch.delete(doc(db, "users", targetUserId, "organizations", orgId));
+    batch.delete(doc(db, "organizations", orgId, "members", targetUserId));
+    await batch.commit();
+  },
+
   async getOrgMembers(orgId) {
     if (!orgId) return [];
     try {
+      // 조직 문서 하위의 members 서브 컬렉션 참조
       const membersRef = collection(db, "organizations", orgId, "members");
-
-      // ✨ 정렬(orderBy)을 제거하여 인덱스 에러 위험을 없앰
-      const querySnapshot = await getDocs(membersRef);
-
-      const members = querySnapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
+      const snap = await getDocs(membersRef);
+      
+      return snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
       }));
-
-      // ✨ 필요하다면 클라이언트에서 정렬 (선택 사항)
-      // 예: 관리자(admin)를 위로, 그다음 이름순으로
-      return members.sort((a, b) => {
-        if (a.role === 'admin' && b.role !== 'admin') return -1;
-        if (a.role !== 'admin' && b.role === 'admin') return 1;
-        return (a.name || '').localeCompare(b.name || '');
-      });
-
     } catch (error) {
-      console.error("멤버 로드 에러:", error);
+      console.error("멤버 목록 로드 실패:", error);
       throw error;
     }
   },
-
-  // 5. 멤버 승인 처리 (pending -> approved)
-  async approveMember(orgId, userId) {
-    const memberRef = doc(db, "organizations", orgId, "members", userId);
-    try {
-      await updateDoc(memberRef, {
-        status: 'approved',
-        approvedAt: serverTimestamp()
-      });
-    } catch (error) {
-      console.error("멤버 승인 실패:", error);
-      throw error;
-    }
-  },
-
-  // 6. 멤버 권한 변경 (admin <-> member)
-  async updateMemberRole(orgId, userId, newRole) {
-    try {
-      // 1) 관계 객체(members) 수정
-      const memberRef = doc(db, "organizations", orgId, "members", userId);
-      await updateDoc(memberRef, { role: newRole });
-
-      // 2) 유저 프로필 내 복사된 정보도 수정 (Denormalization 데이터 동기화)
-      const userRef = doc(db, "users", userId);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const userData = userSnap.data();
-        const updatedOrgs = userData.orgs.map(o =>
-          o.id === orgId ? { ...o, role: newRole } : o
-        );
-        await updateDoc(userRef, { orgs: updatedOrgs });
-      }
-    } catch (error) {
-      console.error("권한 변경 실패:", error);
-      throw error;
-    }
-  },
-
-  // 7. 조직에서 멤버 내보내기 (또는 탈퇴)
-  async removeMember(orgId, userId) {
-    try {
-      // 1) 관계 객체(members) 삭제
-      const memberRef = doc(db, "organizations", orgId, "members", userId);
-      await deleteDoc(memberRef);
-
-      // 2) 유저 프로필에서 해당 조직 정보 제거
-      const userRef = doc(db, "users", userId);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const userData = userSnap.data();
-        const updatedOrgs = userData.orgs.filter(o => o.id !== orgId);
-        const updatedOrgIds = userData.orgIds.filter(id => id !== orgId);
-        await updateDoc(userRef, { orgs: updatedOrgs, orgIds: updatedOrgIds });
-      }
-    } catch (error) {
-      console.error("멤버 삭제 실패:", error);
-      throw error;
-    }
-  },
-
-  // 8. 조직 정보 수정 (이름 등)
-  async updateOrg(orgId, data) {
-    const docRef = doc(db, "organizations", orgId);
-    await updateDoc(docRef, { ...data, updatedAt: serverTimestamp() });
-  },
-
-  // 9. 조직 삭제
   async deleteOrg(orgId) {
-    // 주의: 실제 구현 시에는 하위 members, products 컬렉션도 모두 지워야 완벽합니다.
-    // 여기서는 조직 기본 문서만 삭제하는 로직입니다.
-    const orgRef = doc(db, "organizations", orgId);
-    await deleteDoc(orgRef);
+    const batch = writeBatch(db);
+    
+    try {
+      // 1. 조직 마스터 비활성화
+      const orgRef = doc(db, "organizations", orgId);
+      batch.update(orgRef, {
+        isActive: false,
+        deletedAt: serverTimestamp()
+      });
+
+      // 2. 조직 내 모든 멤버 목록 가져오기
+      const membersRef = collection(db, "organizations", orgId, "members");
+      const membersSnap = await getDocs(membersRef);
+
+      // 3. 데이터 처리
+      membersSnap.forEach((mDoc) => {
+        const memberUid = mDoc.id;
+        
+        // A. 조직 원본 멤버십은 '비활성화' (복구용 데이터 보존)
+        const masterMemberRef = doc(db, "organizations", orgId, "members", memberUid);
+        batch.update(masterMemberRef, { isActive: false });
+
+        // B. 유저 개인 공간에서는 '삭제' (목록에서 즉시 제거)
+        const userOrgRef = doc(db, "users", memberUid, "organizations", orgId);
+        batch.delete(userOrgRef);
+      });
+
+      await batch.commit();
+      console.log(`조직 ${orgId} 비활성화 및 유저 목록 정리 완료.`);
+    } catch (error) {
+      console.error("조직 삭제 중 오류 발생:", error);
+      throw error;
+    }
   }
 };

@@ -4,7 +4,6 @@ import './App.css';
 
 // 추상화된 API
 import { FirebaseAuthRepository as AuthAPI } from './api/FirebaseAuthRepository';
-import { FirebaseOrgRepository as OrgAPI } from './api/FirebaseOrgRepository';
 
 // 훅 및 페이지
 import { useAuth } from './hooks/useAuth';
@@ -37,15 +36,8 @@ function AppContent() {
 
   // 권한 체크: 현재 조직의 role이 admin이거나 시스템 전체 admin인 경우
   const hasAdminAccess = useMemo(() => {
-    return currentOrg?.role === 'admin' || userProfile?.role === 'admin';
+    return currentOrg?.level >= 100 || userProfile?.level >= 100 === 'admin';
   }, [currentOrg, userProfile]);
-
-  // 💡 조직 선택 핸들러: 선택 정보를 세션에 저장
-  const handleSelectOrg = (org) => {
-    setCurrentOrg(org);
-    sessionStorage.setItem('currentOrg', JSON.stringify(org));
-    navigate('/storage');
-  };
 
   // 💡 조직 나가기 핸들러: 세션 정보 삭제 및 루트로 이동
   const handleExitOrg = () => {
@@ -59,23 +51,6 @@ function AppContent() {
       sessionStorage.removeItem('currentOrg'); // 로그아웃 시 세션 비우기
       await AuthAPI.signOut();
       window.location.reload();
-    }
-  };
-
-  const handleOrgAction = async (action) => {
-    const val = prompt(action === 'create' ? "새 조직 이름:" : "참여할 조직 코드:");
-    if (!val) return;
-    try {
-      if (action === 'create') {
-        await OrgAPI.createOrg(val, user.email, user);
-      } else {
-        await OrgAPI.joinOrg(val, user.email, user);
-      }
-      showToast("완료되었습니다. 다시 로그인하거나 페이지를 새로고침하세요.");
-      window.location.reload();
-    } catch (e) {
-      showToast("오류가 발생했습니다.");
-      console.log(e);
     }
   };
 
@@ -94,10 +69,10 @@ function AppContent() {
       <OrgSelectPage
         user={user}
         userProfile={userProfile}
-        onSelectOrg={handleSelectOrg}
-        onOrgAction={handleOrgAction}
         onLogout={handleLogout}
         notice={showToast}
+        navigate={navigate}
+        setCurrentOrg={setCurrentOrg}
       />
       <Toast message={toast.message} show={toast.show} />
     </>

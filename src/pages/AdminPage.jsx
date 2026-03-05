@@ -49,9 +49,12 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
             try {
                 const uids = members.map(m => m.uid);
                 await OrgAPI.deleteOrg(currentOrg.id, uids);
+                onBack();
                 notice("조직이 삭제되었습니다.");
-                window.location.reload(); // 초기 화면으로 이동
-            } catch (e) { notice("삭제 중 오류 발생"); }
+            } catch (e) {
+                console.log(e);
+                notice("삭제 중 오류 발생");
+             }
         }
     };
 
@@ -74,9 +77,8 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
                 <section style={sectionStyle}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {members.map(member => {
-                            const role = member?.role;
+                            const role = member.level == 100 ? 'admin' : 'member';
                             const isMe = member.uid === user.uid;
-
                             return (
                                 <div key={member.uid} style={memberItemStyle}>
                                     <div>

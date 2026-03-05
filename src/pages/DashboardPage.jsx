@@ -79,7 +79,7 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 
         {/* 주요 지표 카드 */}
 
-        <h3 style={{ fontSize: '16px', marginBottom: '12px' }}>🚨 요약</h3>
+        <h3 style={{ fontSize: '16px', marginBottom: '12px' }}>📌 요약</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '30px' }}>
           <div className="stat-card" style={{ background: '#fff7e6', padding: '15px', borderRadius: '12px', border: '1px solid #ffd591' }}>
             <div style={{ fontSize: '12px', color: '#fa8c16' }}>재고 부족</div>
@@ -89,6 +89,12 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
             <div style={{ fontSize: '12px', color: '#2f54eb' }}>실사 필요</div>
             <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1d39c4' }}>{overdueAuditItems} <span style={{ fontSize: '14px' }}>건</span></div>
           </div>
+          <button onClick={handleDownloadExcel} className="excel-btn" style={{ width: '100%', margin: 0 }}>
+            📦 재고현황 받기
+          </button>
+          <button onClick={handleDownloadLogs} className="excel-btn" style={{ width: '100%', margin: 0, backgroundColor: '#52c41a' }}>
+            📋 활동로그 받기
+          </button>
         </div>
 
         {/* 🚀 발주 필요 리스트 섹션 (수정된 부분) */}
@@ -136,16 +142,6 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
               <div style={{ padding: '30px', textAlign: 'center', color: '#999', fontSize: '13px' }}>기록이 없습니다.</div>
             )}
           </div>
-        </div>
-
-        {/* 다운로드 버튼 2개 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-          <button onClick={handleDownloadExcel} className="excel-btn" style={{ width: '100%', margin: 0 }}>
-            📦 재고현황 받기
-          </button>
-          <button onClick={handleDownloadLogs} className="excel-btn" style={{ width: '100%', margin: 0, backgroundColor: '#52c41a' }}>
-            📋 활동로그 받기
-          </button>
         </div>
       </div>
     </>
