@@ -1,11 +1,11 @@
 import { db } from './firebase';
 import {
-  collection, doc, setDoc, updateDoc, deleteDoc, 
+  collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot,
   getDocs, query, serverTimestamp, getDoc, writeBatch
 } from 'firebase/firestore';
 
 export const FirebaseOrgRepository = {
-  
+
   // 권한 레벨 정의 (참고용)
   ROLES: {
     PENDING: 0,
@@ -35,7 +35,7 @@ export const FirebaseOrgRepository = {
     const batch = writeBatch(db);
     const newOrgRef = doc(collection(db, "organizations"));
     const orgId = newOrgRef.id;
-    
+
     const userRef = doc(db, "users", admin.uid);
     const userOrgRef = doc(db, "users", admin.uid, "organizations", orgId);
     const memberRef = doc(db, "organizations", orgId, "members", admin.uid);
@@ -63,7 +63,7 @@ export const FirebaseOrgRepository = {
         level: this.ROLES.ADMIN,
         joinedAt: serverTimestamp()
       };
-      
+
       // 조직 멤버십용 데이터 (사용자 정보 위주)
       const memberData = {
         uid: admin.uid,
@@ -135,11 +135,11 @@ export const FirebaseOrgRepository = {
     const batch = writeBatch(db);
     const userOrgRef = doc(db, "users", targetUserId, "organizations", orgId);
     const memberRef = doc(db, "organizations", orgId, "members", targetUserId);
-    
+
     try {
-      const updateData = { 
-        level: newLevel, 
-        updatedAt: serverTimestamp() 
+      const updateData = {
+        level: newLevel,
+        updatedAt: serverTimestamp()
       };
 
       batch.update(userOrgRef, updateData);
@@ -161,26 +161,24 @@ export const FirebaseOrgRepository = {
     batch.delete(doc(db, "organizations", orgId, "members", targetUserId));
     await batch.commit();
   },
+  subscribeMembers(orgId, callback) {
+    if (!orgId) return null;
+    const membersRef = collection(db, "organizations", orgId, "members");
 
-  async getOrgMembers(orgId) {
-    if (!orgId) return [];
-    try {
-      // 조직 문서 하위의 members 서브 컬렉션 참조
-      const membersRef = collection(db, "organizations", orgId, "members");
-      const snap = await getDocs(membersRef);
-      
-      return snap.docs.map(doc => ({
+    // 실시간 리스너 연결
+    return onSnapshot(membersRef, (snap) => {
+      const members = snap.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-    } catch (error) {
-      console.error("멤버 목록 로드 실패:", error);
-      throw error;
-    }
+      callback(members);
+    }, (error) => {
+      console.error("멤버 구독 실패:", error);
+    });
   },
   async deleteOrg(orgId) {
     const batch = writeBatch(db);
-    
+
     try {
       // 1. 조직 마스터 비활성화
       const orgRef = doc(db, "organizations", orgId);
@@ -196,7 +194,7 @@ export const FirebaseOrgRepository = {
       // 3. 데이터 처리
       membersSnap.forEach((mDoc) => {
         const memberUid = mDoc.id;
-        
+
         // A. 조직 원본 멤버십은 '비활성화' (복구용 데이터 보존)
         const masterMemberRef = doc(db, "organizations", orgId, "members", memberUid);
         batch.update(masterMemberRef, { isActive: false });
@@ -212,5 +210,24 @@ export const FirebaseOrgRepository = {
       console.error("조직 삭제 중 오류 발생:", error);
       throw error;
     }
-  }
+  },
+  async updateOrgName(orgId, newName) {
+    const batch = writeBatch(db);
+    try {
+      // 1. 조직 마스터 정보 수정
+      batch.update(doc(db, "organizations", orgId), { name: newName });
+
+      // 2. 모든 멤버의 개인 공간(users/{uid}/organizations/{orgId}) 내 이름 정보도 수정해야 함
+      const membersSnap = await getDocs(collection(db, "organizations", orgId, "members"));
+      membersSnap.forEach((mDoc) => {
+        const userOrgRef = doc(db, "users", mDoc.id, "organizations", orgId);
+        batch.update(userOrgRef, { orgName: newName }); // 필드명 orgName 유지
+      });
+
+      await batch.commit();
+    } catch (error) {
+      console.error("조직명 변경 실패:", error);
+      throw error;
+    }
+  },
 };

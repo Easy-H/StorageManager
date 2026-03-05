@@ -26,27 +26,31 @@ export const FirebaseProductRepository = {
   saveItem: async (orgId, item, formData, initialQty) => {
     if (!orgId) throw new Error("조직 ID가 필요합니다.");
 
-    // ✨ 수정: item 객체가 있고, 그 안에 id 필드까지 있어야 '수정'으로 간주
     const isEdit = !!(item && item.id);
-
     const colRef = collection(db, "organizations", orgId, "products");
-
-    // isEdit이 true일 때만 5번째 인자로 item.id를 전달함
     const docRef = isEdit
       ? doc(db, "organizations", orgId, "products", item.id)
-      : doc(colRef); // id가 없으면 여기서 새로운 경로와 ID가 생성됨
+      : doc(colRef);
 
+    // 1. 공통 데이터 (이름, 카테고리 등)
     const data = {
       ...formData,
-      currentStock: Number(initialQty) || 0,
       updatedAt: serverTimestamp(),
     };
 
+    // 2. 신규 등록 시에만 초기 재고와 생성일 설정
     if (!isEdit) {
+      data.currentStock = Number(initialQty) || 0;
       data.createdAt = serverTimestamp();
+
+      await setDoc(docRef, data); // 신규는 setDoc
+    } else {
+      // 3. 수정 시에는 currentStock을 건드리지 않음
+      // 💡 만약 데이터 구조상 currentStock이 필수라면, 여기서 제외하거나 
+      // updateDoc을 사용하여 특정 필드만 교체합니다.
+      await updateDoc(docRef, data);
     }
 
-    await setDoc(docRef, data, { merge: true });
     return docRef.id;
   },
 
@@ -58,7 +62,7 @@ export const FirebaseProductRepository = {
     const logColRef = collection(db, "organizations", orgId, "inventory_logs");
 
     const change = Number(inputQty);
-    
+
     let newStock;
 
     if (isDirectInput) {
@@ -111,7 +115,7 @@ export const FirebaseProductRepository = {
       lastAudit: serverTimestamp()
     });
   },
-subscribeProducts: (orgId, callback) => {
+  subscribeProducts: (orgId, callback) => {
     if (!orgId) return () => { };
 
     const q = query(
