@@ -1,14 +1,16 @@
 import React from 'react';
+import { styles } from '../../styles';
+import { View, TextInput } from 'react-native';
 
 const SearchBar = ({ value, onChange }) => (
-  <div className="search-section" style={{flex: "1 1 0"}}>
-    <input 
+  <View style={{flex: 1}}>
+    <TextInput
       placeholder="품목 이름 검색..." 
       value={value}
       onChange={e => onChange(e.target.value)} 
-      className="search-input" 
+      style={styles.searchInput}
     />
-  </div>
+  </View>
 );
 
 export default SearchBar;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FirebaseOrgRepository as OrgAPI } from '../api/FirebaseOrgRepository';
+import { FirebaseOrgRepository as OrgAPI } from '../../features/org/api/FirebaseOrgRepository';
 
 export function useAdmin(notice) {
   const [loading, setLoading] = useState(false);

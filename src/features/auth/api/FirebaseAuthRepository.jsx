@@ -1,4 +1,4 @@
-import { auth, db } from './firebase';
+import { auth, db } from '../../../common/api/firebase/firebase';
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'; // ✨ signOut 추가
 import { doc, getDoc } from 'firebase/firestore';
 
@@ -19,7 +19,6 @@ export const FirebaseAuthRepository = {
     }
   },
   async signIn(email, password) {
-    console.log(email);
     return await signInWithEmailAndPassword(auth, email, password);
   },
 

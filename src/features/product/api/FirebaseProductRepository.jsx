@@ -1,4 +1,4 @@
-import { db } from './firebase';
+import { db } from '../../../common/api/firebase/firebase';
 import {
   collection,
   doc,

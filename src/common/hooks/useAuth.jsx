@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FirebaseAuthRepository as AuthAPI } from '../api/FirebaseAuthRepository';
+import { FirebaseAuthRepository as AuthAPI } from '../../features/auth/api/FirebaseAuthRepository';
 
 export function useAuth() {
   const [user, setUser] = useState(null);

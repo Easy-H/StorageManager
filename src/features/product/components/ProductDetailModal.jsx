@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useProductActions } from '../hooks/useProductActions';
-import ProductEditor from './ProductEditor';
-import StockManager from './StockManager';
+import { View, ScrollView, Text } from 'react-native';
+import { useProductActions } from '../hooks/useProductActions.jsx';
+import ProductEditor from './ProductEditor.jsx';
+import StockManager from './StockManager.jsx';
+import { styles } from '../../../styles.js'
 
 const ProductDetailModal = ({ item, orgId, onClose, notice }) => {
   const [editMode, setEditMode] = useState(item.isNew || false);
@@ -25,7 +27,7 @@ const ProductDetailModal = ({ item, orgId, onClose, notice }) => {
   };
 
   return (
-    <div className="modal-overlay">
+    <View style={styles.modalOverlay}>
       <div className="modal-content editor-container">
         {editMode ? (
           <ProductEditor 
@@ -55,7 +57,7 @@ const ProductDetailModal = ({ item, orgId, onClose, notice }) => {
           {editMode && !item.isNew ? "이전으로" : "닫기"}
         </button>
       </div>
-    </div>
+    </View>
   );
 };
 

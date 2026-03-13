@@ -1,4 +1,6 @@
 import React from 'react';
+import { styles } from '../../../styles.js'
+import { View, ScrollView, Text } from 'react-native';
 
 const getAuditStatus = (lastAuditDate) => {
   if (!lastAuditDate) return { text: "실사필요", color: "#fa8c16", bg: "#fff7e6" };
@@ -41,35 +43,33 @@ const ProductList = ({ products, searchTerm, onSelectProduct, sortBy }) => {
   });
 
   return (
-    <div className="product-list">
+    <ScrollView showsVerticalScrollIndicator={false}
+    style={styles.productList}>
       {displayList.map(p => {
         const isLow = p.currentStock <= (p.safetyStock || 0);
         const audit = getAuditStatus(p.lastAudit);
 
         return (
-          <div key={p.id} onClick={() => onSelectProduct(p)} className="product-item" style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '12px 15px', borderBottom: '1px solid #eee', cursor: 'pointer'
-          }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <b style={{ fontSize: '16px' }}>{p.name}</b>
-                <span style={{ fontSize: '10px', color: audit.color, backgroundColor: audit.bg, padding: '2px 5px', borderRadius: '4px' }}>
+          <View key={p.id} onClick={() => onSelectProduct(p)} style={styles.productItem}>
+            <View style={{ flex: 1 }}>
+              <View style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: 'row'}}>
+                <Text style={{ fontSize: '16px', fontWeight:'bold' }}>{p.name}</Text>
+                <Text style={{ fontSize: '10px', color: audit.color, backgroundColor: audit.bg, padding: '2px 5px', borderRadius: '4px' }}>
                   {audit.text}
-                </span>
-              </div>
-              <div style={{ fontSize: '12px', color: '#999' }}>{p.barcode || "N/A"}</div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '18px', fontWeight: 'bold', color: isLow ? '#ff4d4f' : '#333' }}>
+                </Text>
+              </View>
+              <Text style={{ fontSize: '12px', color: '#999' }}>{p.barcode || "N/A"}</Text>
+            </View>
+            <View style={{ textAlign: 'right' }}>
+              <Text style={{ fontSize: '18px', fontWeight: 'bold', color: isLow ? '#ff4d4f' : '#333' }}>
                 {p.currentStock}개
-              </div>
-              {isLow && <div style={{ fontSize: '9px', color: '#ff4d4f', fontWeight: 'bold' }}>재고부족</div>}
-            </div>
-          </div>
+              </Text>
+              {isLow && <Text style={{ fontSize: '9px', color: '#ff4d4f', fontWeight: 'bold' }}>재고부족</Text>}
+            </View>
+          </View>
         );
       })}
-    </div>
+    </ScrollView>
   );
 };
 

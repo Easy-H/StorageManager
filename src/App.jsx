@@ -1,45 +1,42 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import './App.css';
+import { View, Text, TouchableOpacity, SafeAreaView, Platform, Alert, StyleSheet, Dimensions } from 'react-native';
 
-// 추상화된 API
-import { FirebaseAuthRepository as AuthAPI } from './api/FirebaseAuthRepository';
+// 아까 만든 styles.js 임포트
+import { styles, Colors } from './styles';
+import './App.css'
 
-// 훅 및 페이지
-import { useAuth } from './hooks/useAuth';
-import { useProducts } from './hooks/useProducts';
-import { useToast } from './hooks/useToast';
+// 기존 API 및 훅 (그대로 유지)
+import { FirebaseAuthRepository as AuthAPI } from './features/auth/api/FirebaseAuthRepository';
+import { useAuth } from './common/hooks/useAuth';
+import { useProducts } from './features/product/hooks/useProducts';
+import { useToast } from './common/hooks/useToast';
+
+// 페이지 및 컴포넌트
 import AuthPage from './pages/AuthPage';
 import OrgSelectPage from './pages/OrgSelectPage';
 import StoragePage from './pages/StoragePage';
 import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
-import Toast from './components/Toast';
+import Toast from './common/components/Toast';
 
-/**
- * 라우팅 로직이 포함된 실제 앱 콘텐츠
- */
 function AppContent() {
   const { user, userProfile, loading } = useAuth();
   const { toast, showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 💡 초기값 로드: sessionStorage에서 이전에 선택한 조직 정보를 가져옴
   const [currentOrg, setCurrentOrg] = useState(() => {
     const savedOrg = sessionStorage.getItem('currentOrg');
     return savedOrg ? JSON.parse(savedOrg) : null;
   });
 
-  // 현재 조직 아이디로 상품 구독
   const products = useProducts(currentOrg?.id);
 
-  // 권한 체크: 현재 조직의 role이 admin이거나 시스템 전체 admin인 경우
   const hasAdminAccess = useMemo(() => {
-    return currentOrg?.level >= 100 || userProfile?.level >= 100 === 'admin';
+    return currentOrg?.level >= 100 || userProfile?.level >= 100;
   }, [currentOrg, userProfile]);
 
-  // 💡 조직 나가기 핸들러: 세션 정보 삭제 및 루트로 이동
   const handleExitOrg = () => {
     setCurrentOrg(null);
     sessionStorage.removeItem('currentOrg');
@@ -47,52 +44,63 @@ function AppContent() {
   };
 
   const handleLogout = async () => {
-    if (window.confirm("로그아웃 하시겠습니까?")) {
-      sessionStorage.removeItem('currentOrg'); // 로그아웃 시 세션 비우기
+    // 웹/앱 호환성을 위해 window.confirm 대신 간단한 처리 또는 RN Alert 사용
+    const proceed = window.confirm("로그아웃 하시겠습니까?");
+    if (proceed) {
+      sessionStorage.removeItem('currentOrg');
       await AuthAPI.signOut();
       window.location.reload();
     }
   };
 
-  if (loading) return <div className="center-container">로딩 중...</div>;
-  if (!user) return (
-    <>
-      <AuthPage notice={showToast} />
-      <Toast message={toast.message} show={toast.show} />
-    </>
+  // 로딩 화면
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text>로딩 중...</Text>
+      </View>
     );
+  }
+
+  // 비로그인 상태
+  if (!user) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <AuthPage notice={showToast} />
+        <Toast message={toast.message} show={toast.show} />
+      </SafeAreaView>
+    );
+  }
 
   // 1. 조직 선택 전
   if (!currentOrg) {
     return (
-    <>
-      <OrgSelectPage
-        user={user}
-        userProfile={userProfile}
-        onLogout={handleLogout}
-        notice={showToast}
-        navigate={navigate}
-        setCurrentOrg={setCurrentOrg}
-      />
-      <Toast message={toast.message} show={toast.show} />
-    </>
+      <SafeAreaView style={{ flex: 1 }}>
+        <OrgSelectPage
+          user={user}
+          userProfile={userProfile}
+          onLogout={handleLogout}
+          notice={showToast}
+          navigate={navigate}
+          setCurrentOrg={setCurrentOrg}
+        />
+        <Toast message={toast.message} show={toast.show} />
+      </SafeAreaView>
     );
   }
 
-  // 2. 조직 선택 후 메인 화면 레이아웃
+  // 2. 조직 선택 후 (메인 레이아웃)
   return (
-    <div className="main-container" style={{ minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
-
-      <main className="tab-content" style={{ paddingBottom: '70px' }}>
+    <View style={styles.appWrapper}>
+      {/* 메인 콘텐츠 영역 (TabContent 역할) */}
+      <View style={{ flex: 1, paddingBottom: 65 }}>
         <Routes>
           <Route path="/dashboard" element={
             <DashboardPage products={products} currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} />
           } />
-
           <Route path="/storage" element={
             <StoragePage products={products} currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} />
           } />
-
           <Route path="/admin" element={
             hasAdminAccess ? (
               <AdminPage onBack={handleExitOrg} currentOrg={currentOrg} user={user} notice={showToast} onExitOrg={handleExitOrg} />
@@ -100,42 +108,79 @@ function AppContent() {
               <Navigate to="/storage" replace />
             )
           } />
-
-          {/* 기본 경로 처리 */}
           <Route path="/" element={<Navigate to="/storage" replace />} />
           <Route path="*" element={<Navigate to="/storage" replace />} />
         </Routes>
+      </View>
 
-        <Toast message={toast.message} show={toast.show} />
-      </main>
-
-      {/* 하단 네비게이션 */}
-      <nav className="bottom-nav" style={bottomNavStyle}>
+      {/* 하단 네비게이션 (Bottom Nav) */}
+      <View style={navStyles.bottomNav}>
         <TabButton
           active={location.pathname === '/dashboard'}
-          onClick={() => navigate("/dashboard")}
+          onPress={() => navigate("/dashboard")}
           icon="📊" label="현황"
         />
         <TabButton
           active={location.pathname === '/storage'}
-          onClick={() => navigate("/storage")}
+          onPress={() => navigate("/storage")}
           icon="📦" label="재고"
         />
         {hasAdminAccess && (
           <TabButton
             active={location.pathname === '/admin'}
-            onClick={() => navigate("/admin")}
+            onPress={() => navigate("/admin")}
             icon="⚙️" label="관리"
           />
         )}
-      </nav>
-    </div>
+      </View>
+
+      <Toast message={toast.message} show={toast.show} />
+    </View>
   );
 }
 
 /**
- * HashRouter를 사용하여 GitHub Pages 새로고침 이슈 해결
+ * 탭 버튼 컴포넌트 (RN 스타일)
  */
+const TabButton = ({ active, onPress, icon, label }) => (
+  <TouchableOpacity 
+    onPress={onPress} 
+    style={navStyles.tabButton}
+    activeOpacity={0.7}
+  >
+    <Text style={{ fontSize: 20, marginBottom: 2 }}>{icon}</Text>
+    <Text style={{ 
+      fontSize: 11, 
+      fontWeight: active ? 'bold' : 'normal',
+      color: active ? Colors.primary : '#bbb'
+    }}>
+      {label}
+    </Text>
+  </TouchableOpacity>
+);
+
+// 네비게이션 전용 추가 스타일
+const navStyles = StyleSheet.create({
+  bottomNav: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 65,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    // 그림자 효과 (iOS/Android/Web 공통 대응은 styles.js 참고)
+    zIndex: 50,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
+});
+
 function App() {
   return (
     <HashRouter>
@@ -143,23 +188,5 @@ function App() {
     </HashRouter>
   );
 }
-
-// 스타일 및 공통 버튼 컴포넌트
-const bottomNavStyle = {
-  display: 'flex', position: 'fixed', bottom: 0, left: 0, right: 0,
-  height: '65px', backgroundColor: '#fff', borderTop: '1px solid #eee',
-  boxShadow: '0 -2px 10px rgba(0,0,0,0.05)', zIndex: 50
-};
-
-const TabButton = ({ active, onClick, icon, label }) => (
-  <button onClick={onClick} style={{
-    flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-    border: 'none', background: 'none', color: active ? '#4a90e2' : '#bbb', transition: 'all 0.2s',
-    cursor: 'pointer'
-  }}>
-    <span style={{ fontSize: '20px', marginBottom: '2px' }}>{icon}</span>
-    <span style={{ fontSize: '11px', fontWeight: active ? 'bold' : 'normal' }}>{label}</span>
-  </button>
-);
 
 export default App;
