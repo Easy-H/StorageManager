@@ -2,13 +2,13 @@
 import { FirebaseProductRepository as Repository } from '../api/FirebaseProductRepository';
 
 export const useProductActions = (orgId, notice, onClose) => {
-  
+
   const saveItem = async (item, formData, initialQty) => {
     try {
       await Repository.saveItem(orgId, item, formData, initialQty);
       onClose();
     } catch (e) {
-        notice("저장 실패");
+      notice("저장 실패");
     }
   };
 
@@ -28,5 +28,17 @@ export const useProductActions = (orgId, notice, onClose) => {
     } catch (e) { notice("삭제 실패"); }
   };
 
-  return { saveItem, updateStock, deleteItem };
+  const auditItem = async (item) => {
+    if (!window.confirm("현재 수량이 실제 재고와 일치함을 확인하셨습니까?")) return;
+    try {
+      await Repository.auditItem(orgId, item);
+
+      notice("실사 확인이 완료되었습니다.");
+    } catch (e) {
+      console.log(e);
+      notice("업데이트 실패");
+    }
+  };
+
+  return { saveItem, updateStock, deleteItem, auditItem };
 };

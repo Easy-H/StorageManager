@@ -22,7 +22,7 @@ const ProductDetailModal = ({ item, orgId, onClose, notice }) => {
   }, [item.lastAudit]);
 
   const handleAuditClick = async () => {
-    const success = await auditItem(orgId, item);
+    const success = await auditItem(item);
     if (success) setLastAuditDisplay(new Date());
   };
 

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { styles } from '../styles';
+import { styles } from '../../styles';
 
 const ScannerModal = ({ onScan, onClose }) => {
   useEffect(() => {
