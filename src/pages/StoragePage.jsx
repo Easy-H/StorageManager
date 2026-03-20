@@ -15,8 +15,8 @@ const StoragePage = ({ products, currentOrg, onBack, notice }) => {
 
     return (
         <>
-            <Header currentOrg={currentOrg} onBack={onBack} notice={notice}/>
-            <View style={ styles.appContent } >
+            <Header currentOrg={currentOrg} onBack={onBack} notice={notice} />
+            <View style={styles.appContent} >
 
                 <View style={styles.searchSection}>
                     <SearchBar
@@ -49,6 +49,7 @@ const StoragePage = ({ products, currentOrg, onBack, notice }) => {
                         <Text style={styles.buttonText}>📷 바코드 스캔</Text>
                     </TouchableOpacity>
                 </View>
+            </View>
 
                 {isScannerOpen && (
                     <ScannerModal
@@ -61,14 +62,13 @@ const StoragePage = ({ products, currentOrg, onBack, notice }) => {
                     />
                 )}
 
-                {selectedItem && (
-                    <ProductDetailModal
-                        item={selectedItem}
-                        orgId={currentOrg.id}
-                        onClose={() => setSelectedItem(null)}
-                        notice={notice} />
-                )}
-            </View>
+            {selectedItem && (
+                <ProductDetailModal
+                    item={selectedItem}
+                    orgId={currentOrg.id}
+                    onClose={() => setSelectedItem(null)}
+                    notice={notice} />
+            )}
         </>
     );
 };

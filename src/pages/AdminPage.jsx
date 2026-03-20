@@ -26,7 +26,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
                             style={{ flex: 1 }}
                         />
                         <TouchableOpacity
-                            onClick={() => updateOrgName(currentOrg.id, newName)}
+                            onPress={() => updateOrgName(newName)}
                             style={[styles.greenButton]}
                         >
                             <Text style={styles.buttonText}>수정</Text>
@@ -50,7 +50,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
                 </View>
 
                 {/* 3. 위험 구역 */}
-                <Text style={{ ...styles.h3, color: '#ff4d4f'}}>🚨 위험 구역</Text>
+                <Text style={[styles.h3, {color: '#ff4d4f'}]}>🚨 위험 구역</Text>
                 <View style={{ ...ViewStyle, border: '1px solid #ffccc7', backgroundColor: '#fff2f0' }}>
                     <p style={{ fontSize: '12px', color: '#ff7875', marginBottom: '10px' }}>
                         조직을 삭제하면 재고 데이터와 모든 로그가 영구 삭제됩니다.

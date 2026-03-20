@@ -26,19 +26,19 @@ const OrgList = ({ user, navigate, setCurrentOrg, onLoading, notice }) => {
 
         fetchOrgs();
     }, [user?.uid]);
-    
-    
-      // 💡 2. 조직 선택 핸들러
-      const handleSelectOrg = (org) => {
+
+
+    // 💡 2. 조직 선택 핸들러
+    const handleSelectOrg = (org) => {
         // level이 0(Pending)이면 입장 불가 처리
         if (org.level === -1) {
-          notice("승인 대기 중인 조직입니다. 관리자의 승인을 기다려주세요.");
-          return;
+            notice("승인 대기 중인 조직입니다. 관리자의 승인을 기다려주세요.");
+            return;
         }
         setCurrentOrg(org);
         sessionStorage.setItem('currentOrg', JSON.stringify(org));
         navigate('/storage');
-      };
+    };
 
     return (
 

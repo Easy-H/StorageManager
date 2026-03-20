@@ -221,7 +221,7 @@ export const FirebaseOrgRepository = {
       const membersSnap = await getDocs(collection(db, "organizations", orgId, "members"));
       membersSnap.forEach((mDoc) => {
         const userOrgRef = doc(db, "users", mDoc.id, "organizations", orgId);
-        batch.update(userOrgRef, { orgName: newName }); // 필드명 orgName 유지
+        batch.update(userOrgRef, { name: newName }); // 필드명 orgName 유지
       });
 
       await batch.commit();

@@ -6,7 +6,7 @@ import { styles } from '../../styles';
 const ScannerModal = ({ onScan, onClose }) => {
   useEffect(() => {
     const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-    
+
     scanner.render(
       (text) => {
         onScan(text); // 부모 컴포넌트에 바코드 값 전달
@@ -21,18 +21,18 @@ const ScannerModal = ({ onScan, onClose }) => {
   }, [onScan]);
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content editor-container">
-        <h2>바코드 스캐너</h2>
+    <View style={styles.modalOverlay}>
+      <View style={styles.modalContent}>
+        <Text style={styles.h2}>바코드 스캐너</Text>
         <div id="reader"></div>
-        <button 
-          onClick={onClose} 
+        <button
+          onClick={onClose}
           className="close-modal-btn"
         >
           ✕ 스캔 취소
         </button>
-      </div>
-    </div>
+        </View>
+    </View>
   );
 };
 

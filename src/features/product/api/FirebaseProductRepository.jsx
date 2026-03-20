@@ -12,6 +12,7 @@ import {
   limit,
   onSnapshot,
   serverTimestamp,
+  runTransaction,
   writeBatch
 } from 'firebase/firestore';
 
@@ -23,13 +24,13 @@ import {
 export const FirebaseProductRepository = {
 
   // [C/U] 제품 저장 및 수정
-  saveItem: async (orgId, item, formData, initialQty) => {
+  saveItem: async (orgId, itemId, formData, initialQty) => {
     if (!orgId) throw new Error("조직 ID가 필요합니다.");
 
-    const isEdit = !!(item && item.id);
+    const isEdit = !!(item && itemId);
     const colRef = collection(db, "organizations", orgId, "products");
     const docRef = isEdit
-      ? doc(db, "organizations", orgId, "products", item.id)
+      ? doc(db, "organizations", orgId, "products", itemId)
       : doc(colRef);
 
     // 1. 공통 데이터 (이름, 카테고리 등)
@@ -54,63 +55,66 @@ export const FirebaseProductRepository = {
     return docRef.id;
   },
 
-  // [U] 재고 수량 업데이트 (입고/출고/직접수정) + 로그 기록
-  updateStock: async (orgId, item, inputQty, isDirectInput, type) => {
-    if (!orgId || !item.id) throw new Error("조직 ID와 상품 정보가 필요합니다.");
+  // [U] 재고 수량 업데이트 (currentStock 인자 제거 + 트랜잭션 적용)
+  updateStock: async (orgId, productId, inputQty, isDirectInput, type) => {
+    if (!orgId || !productId) throw new Error("필수 정보가 부족합니다.");
 
-    const docRef = doc(db, "organizations", orgId, "products", item.id);
+    const docRef = doc(db, "organizations", orgId, "products", productId);
     const logColRef = collection(db, "organizations", orgId, "inventory_logs");
+    
+    // runTransaction을 통해 읽기-쓰기를 하나의 작업으로 묶습니다.
+    await runTransaction(db, async (transaction) => {
+      // 1. 최신 데이터 읽기 (내부에서 직접 조회)
+      const productSnap = await transaction.get(docRef);
+      if (!productSnap.exists()) throw new Error("상품이 존재하지 않습니다.");
 
-    const change = Number(inputQty);
+      const productData = productSnap.data();
+      const currentStock = productData.currentStock || 0;
+      const productName = productData.name; // 기존 이름 그대로 사용
+      const change = Number(inputQty);
 
-    let newStock;
+      // 2. 새로운 재고 계산
+      let newStock;
+      if (isDirectInput) {
+        newStock = change;
+      } else if (type === 'IN') {
+        newStock = currentStock + change;
+      } else {
+        newStock = currentStock - change;
+      }
 
-    if (isDirectInput) {
-      newStock = change
-    }
-    else if (type === 'IN') {
-      newStock = item.currentStock + change;
-    }
-    else {
-      newStock = item.currentStock - change;
-    }
+      // 3. 상품 재고 업데이트
+      transaction.update(docRef, {
+        currentStock: newStock,
+        lastAudit: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
 
-    // 원자적 처리를 위해 Batch 사용 (권장)
-    const batch = writeBatch(db);
-
-    // 1. 상품 재고 업데이트
-    batch.update(docRef, {
-      currentStock: newStock,
-      lastAudit: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      // 4. 로그 기록 (당시의 productName 포함)
+      const newLogRef = doc(logColRef);
+      transaction.set(newLogRef, {
+        productId: productId,
+        productName: productName, // 비정규화 유지
+        type: type,
+        changeQty: isDirectInput ? (newStock - currentStock) : (type === 'IN' ? change : -change),
+        finalStock: newStock,
+        timestamp: serverTimestamp(),
+        userEmail: "" 
+      });
     });
-
-    // 2. 로그 기록 (해당 조직의 하위 로그 컬렉션)
-    const newLogRef = doc(logColRef);
-    batch.set(newLogRef, {
-      productId: item.id,
-      productName: item.name,
-      type: type, // 'IN', 'OUT', 'ADJUST', 'CREATE' 등
-      changeQty: isDirectInput ? (newStock - item.currentStock) : change,
-      finalStock: newStock,
-      timestamp: serverTimestamp(),
-      userEmail: "" // 필요한 경우 현재 유저 이메일 추가 가능
-    });
-
-    await batch.commit();
   },
 
   // [D] 제품 삭제
-  deleteItem: async (orgId, item) => {
-    if (!orgId || !item.id) throw new Error("삭제를 위한 정보가 부족합니다.");
-    const docRef = doc(db, "organizations", orgId, "products", item.id);
+  deleteItem: async (orgId, itemId) => {
+    if (!orgId || !itemId) throw new Error("삭제를 위한 정보가 부족합니다.");
+    const docRef = doc(db, "organizations", orgId, "products", itemId);
     await deleteDoc(docRef);
   },
 
   // [U] 실사 확인 기록 (수량 변동 없이 감사 일시만 업데이트)
-  auditItem: async (orgId, item) => {
-    if (!orgId || !item.id) return;
-    const docRef = doc(db, "organizations", orgId, "products", item.id);
+  auditItem: async (orgId, itemId) => {
+    if (!orgId || !itemId) return;
+    const docRef = doc(db, "organizations", orgId, "products", itemId);
     await updateDoc(docRef, {
       lastAudit: serverTimestamp()
     });

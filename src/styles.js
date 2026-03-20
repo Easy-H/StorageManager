@@ -23,7 +23,6 @@ export const styles = StyleSheet.create({
   // 기본 레이아웃 및 배경
   h3: {
     fontSize: 16,
-    marginBottom: 12,
     fontWeight: 'bold',
   },
   centerContainer: {
@@ -47,6 +46,7 @@ export const styles = StyleSheet.create({
     position: 'relative',
     color: 'black',
     padding: 10,
+    gap: 10,
   },
 
   // 인증(로그인/가입) 박스
@@ -156,8 +156,10 @@ export const styles = StyleSheet.create({
   },
   linkButton: {
     color: Colors.gray,
+    textAlign: 'center',
     textDecorationLine: 'underline',
     fontSize: 14,
+    alignContent: 'center',
   },
 
   // 헤더 및 검색
@@ -168,7 +170,6 @@ export const styles = StyleSheet.create({
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#eeeeee',
-    backgroundColor: Colors.white,
   },
   backButton: {
     fontSize: 12,
@@ -244,6 +245,7 @@ export const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 400,
     padding: 25,
+    gap: 20,
     borderRadius: 20,
   },
   qtyRow: {
@@ -252,6 +254,20 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 20,
     marginVertical: 10,
+  },
+  removeBtn: {
+    
+  },
+  closeModalBtn: {
+    backgroundColor: 'none',
+    borderColor: 'none',
+  },
+  closeModalBtnText: {
+    color: '#888',
+    textDecorationLine: 'underline',
+    cursor: 'pointer',
+    fontSize: 14,
+    textAlign: 'center'
   },
   circleQtyBtn: {
     width: 45,

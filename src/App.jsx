@@ -18,7 +18,9 @@ import OrgSelectPage from './pages/OrgSelectPage';
 import StoragePage from './pages/StoragePage';
 import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
+import TodoPage from './pages/TodoPage';
 import Toast from './common/components/Toast';
+import { TodoProvider } from './features/todo/contexts/TodoContext';
 
 function AppContent() {
   const { user, userProfile, loading } = useAuth();
@@ -108,6 +110,11 @@ function AppContent() {
               <Navigate to="/storage" replace />
             )
           } />
+          <Route path="/todo" element={
+            <TodoProvider orgId={ currentOrg.id }>
+              <TodoPage currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} products={products}/>
+            </TodoProvider>
+            }/>
           <Route path="/" element={<Navigate to="/storage" replace />} />
           <Route path="*" element={<Navigate to="/storage" replace />} />
         </Routes>
@@ -124,6 +131,11 @@ function AppContent() {
           active={location.pathname === '/storage'}
           onPress={() => navigate("/storage")}
           icon="📦" label="재고"
+        />
+        <TabButton
+          active={location.pathname === '/todo'}
+          onPress={() => navigate("/todo")}
+          icon="📦" label="할 일"
         />
         {hasAdminAccess && (
           <TabButton
