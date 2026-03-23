@@ -25,6 +25,7 @@ export default function ProductSearchModal({ visible, onClose, onSelect, product
           <FlatList
             data={filteredProducts}
             keyExtractor={(item) => item.id}
+            style={{ maxHeight: 300 }}
             contentContainerStyle={{gap : 20}}
             renderItem={({ item }) => (
               <TouchableOpacity
@@ -33,6 +34,20 @@ export default function ProductSearchModal({ visible, onClose, onSelect, product
                 <Text>{item.name}</Text>
                 <Text style={{ fontSize: 12, color: '#888' }}>현재 재고: {item.currentStock}</Text>
               </TouchableOpacity>
+            )}
+
+            ListEmptyComponent={() => (
+              <View style={{ padding: 20, alignItems: 'center' }}>
+                <Text style={{ color: '#888', marginBottom: 10 }}>검색 결과가 없습니다.</Text>
+                {keyword.trim().length > 0 && (
+                  <TouchableOpacity 
+                    style={styles.primaryButton}
+                    onPress={() => {onSelect({ id: null, name: keyword, isUnknown: true });  setKeyword(''); onClose();}}
+                  >
+                    <Text style={{ color: '#fff' }}>'{keyword}' (으)로 임시 추가</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             )}
           />
         </View>

@@ -27,7 +27,7 @@ const ProductEditor = ({ item, form, setForm, onSave, onDelete, inputQty }) => (
 
     
     <View style={[styles.buttonRow, { marginTop: '10px', gap: '8px' }]}>
-      <TouchableOpacity onPress={() => onSave(item, form, inputQty)}
+      <TouchableOpacity onPress={() => onSave(item.id, form, inputQty)}
         style={[styles.greenButton, { flex: 2 }]}>
         <Text style={styles.buttonText}>저장하기</Text>
       </TouchableOpacity>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../common/components/Header';
 import { useOrgManage } from '../features/org/hooks/useOrgManage';
 import { Member } from '../features/org/components/Member';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { ScrollView, View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { styles } from '../styles';
 
 const AdminPage = ({ currentOrg, notice, user, onBack }) => {
@@ -13,7 +13,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
     return (
         <>
             <Header currentOrg={currentOrg} onBack={onBack} notice={notice} />
-            <View style={ styles.appContent }>
+            <ScrollView contentContainerStyle={ styles.appContent }>
 
                 {/* 1. 조직 정보 수정 */}
                 <Text style={styles.h3}>🏷️ 조직 이름 변경</Text>
@@ -59,7 +59,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
                         <Text style={{ color: '#ff4d4f', fontWeight: 'bold', padding: 0 }}>조직 전체 삭제하기</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
+            </ScrollView>
         </>
     );
 };

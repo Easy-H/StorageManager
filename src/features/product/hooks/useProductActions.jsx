@@ -3,11 +3,12 @@ import { FirebaseProductRepository as Repository } from '../api/FirebaseProductR
 
 export const useProductActions = (orgId, notice, onClose) => {
 
-  const saveItem = async (item, formData, initialQty) => {
+  const saveItem = async (itemId, formData, initialQty) => {
     try {
-      await Repository.saveItem(orgId, item.id, formData, initialQty);
+      await Repository.saveItem(orgId, itemId, formData, initialQty);
       onClose();
     } catch (e) {
+      console.log(e);
       notice("저장 실패");
     }
   };

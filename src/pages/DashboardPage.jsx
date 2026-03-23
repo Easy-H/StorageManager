@@ -69,7 +69,7 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 		<>
 			<Header currentOrg={currentOrg} onBack={onBack} notice={notice} />
 			<ScrollView showsVerticalScrollIndicator={false}
-				style={styles.appContent}>
+				contentContainerStyle={ styles.appContent }>
 
 				{/* 주요 지표 카드 */}
 
@@ -114,8 +114,8 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 				</View>
 
 				{/* 최근 활동 로그 */}
-				<View style={{ marginBottom: '25px' }}>
 					<Text style={styles.h3}>🕒 최근 활동</Text>
+				<View style={{ marginBottom: '50px' }}>
 					<View style={{ background: '#fff', borderRadius: '15px', border: '1px solid #eee', overflow: 'hidden' }}>
 						{recentLogs.length > 0 ? (
 							recentLogs.map((log, index) => (

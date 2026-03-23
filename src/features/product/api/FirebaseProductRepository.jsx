@@ -26,8 +26,8 @@ export const FirebaseProductRepository = {
   // [C/U] 제품 저장 및 수정
   saveItem: async (orgId, itemId, formData, initialQty) => {
     if (!orgId) throw new Error("조직 ID가 필요합니다.");
-
-    const isEdit = !!(item && itemId);
+    
+    const isEdit = !!(itemId);
     const colRef = collection(db, "organizations", orgId, "products");
     const docRef = isEdit
       ? doc(db, "organizations", orgId, "products", itemId)
