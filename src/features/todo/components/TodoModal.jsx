@@ -102,7 +102,7 @@ export default function TodoModal({ visible, onClose, onSave, onExecute, onDelet
             </View>
             <ScrollView
               ref={scrollViewRef} // 2. ref 연결
-              style={{ maxHeight: 300 }}
+              style={{ maxHeight: 300, minHeight: 300, }}
               // 3. 컨텐츠 사이즈가 변할 때(아이템 추가 시) 자동으로 아래로 이동
               onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
             >

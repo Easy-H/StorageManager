@@ -26,8 +26,8 @@ export const FirebaseTodoRepository = {
         }
     },
 
-  // [D] 할 일 삭제
-  deleteTodo: async (orgId, todoId) => {
+    // [D] 할 일 삭제
+    deleteTodo: async (orgId, todoId) => {
         const docRef = doc(db, "organizations", orgId, "todos", todoId);
         await deleteDoc(docRef);
     }

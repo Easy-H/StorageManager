@@ -32,7 +32,10 @@ export const FirebaseProductRepository = {
     const docRef = isEdit
       ? doc(db, "organizations", orgId, "products", itemId)
       : doc(colRef);
-
+    if (formData.initialStock) {
+      initialQty = formData.initialStock;
+      delete(formData.initialStock);
+    }
     // 1. 공통 데이터 (이름, 카테고리 등)
     const data = {
       ...formData,

@@ -9,6 +9,12 @@ const StockManager = ({ item, lastAuditDisplay, onAudit, onEditMode, inputQty, s
                 <h3 style={{ margin: 0 }}>{item.name}</h3>
                 <button onClick={onEditMode} className="link-button">편집</button>
             </div>
+            
+            {item.memo && (
+                <div style={memoBoxStyle}>
+                    <p style={memoTextStyle}>{item.memo}</p>
+                </div>
+            )}
 
             <div style={{ background: '#f5f5f5', borderRadius: '10px', padding: '15px', textAlign: 'center', margin: '15px 0' }}>
                 <div style={{ fontSize: '12px', color: '#666' }}>현재 실재고</div>
@@ -30,6 +36,23 @@ const StockManager = ({ item, lastAuditDisplay, onAudit, onEditMode, inputQty, s
             <StockController inputQty={inputQty} setInputQty={setInputQty} currentStock={item.currentStock} item={item} updateStock={updateStock} />
         </>
     );
+};
+
+const memoBoxStyle = {
+    background: '#fff9db', // 연한 노란색 (포스트잇 느낌)
+    borderLeft: '4px solid #fab005', // 강조 선
+    borderRadius: '6px',
+    padding: '10px 14px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+};
+
+const memoTextStyle = {
+    margin: 0,
+    fontSize: '13px',
+    color: '#5c5f66',
+    lineHeight: '1.5',
+    whiteSpace: 'pre-wrap', // 줄바꿈 유지
+    textAlign: 'left'
 };
 
 const auditBtnStyle = {

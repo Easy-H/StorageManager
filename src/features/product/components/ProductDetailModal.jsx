@@ -12,6 +12,7 @@ const ProductDetailModal = ({ item, orgId, onClose, notice }) => {
 	const [form, setForm] = useState({
 		name: item.name || "",
 		barcode: item.barcode || "",
+		memo: item.memo || "",
 		safetyStock: item.safetyStock ?? 2
 	});
 

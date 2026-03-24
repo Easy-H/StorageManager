@@ -1,10 +1,11 @@
 import React from 'react';
 import { styles } from '../../../styles.js'
 import { View, ScrollView, Text } from 'react-native';
+import * as Hangul from 'hangul-js';
 
 const getAuditStatus = (lastAuditDate) => {
   if (!lastAuditDate) return { text: "실사필요", color: "#fa8c16", bg: "#fff7e6" };
-  
+
   // lastAuditDate는 이제 이미 Date 객체입니다.
   const diffTime = Math.abs(new Date() - lastAuditDate);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -15,13 +16,30 @@ const getAuditStatus = (lastAuditDate) => {
 };
 
 const ProductList = ({ products, searchTerm, onSelectProduct, sortBy }) => {
-  const s = searchTerm.toLowerCase();
+  const searchKeyword = searchTerm.toLowerCase().trim();
 
   // 1. 검색 필터링
   let displayList = products.filter(p => {
-    const nameMatch = p.name.toLowerCase().includes(s);
-    const barcodeMatch = (p.barcode || "").toLowerCase().includes(s);
-    return nameMatch || barcodeMatch;
+    const name = (p.name || "").toLowerCase();
+    const barcode = (p.barcode || "").toLowerCase();
+
+    // 1. 바코드 숫자에 키워드가 포함되는지 확인
+    if (barcode.includes(searchKeyword)) return true;
+
+    // 2. 일반 검색 (부분 일치: '크리' -> '클린')
+    if (Hangul.search(name, searchKeyword) !== -1) return true;
+
+    // 3. 초성 검색 (초성만 입력했을 때: 'ㅋㄹ' -> '클린')
+    // 검색어 자체가 초성으로만 이루어져 있는지 확인
+    const isChoseongQuery = searchKeyword.split('').every(char => Hangul.isConsonant(char) && !Hangul.isVowel(char));
+
+    if (isChoseongQuery) {
+      // 제품명에서 초성만 추출 (예: '클린' -> 'ㅋㄹ')
+      const choseongName = Hangul.disassemble(name, true).map(group => group[0]).join('');
+      return choseongName.includes(searchKeyword);
+    }
+
+    return false;
   });
 
   // 2. 정렬 로직
@@ -44,7 +62,7 @@ const ProductList = ({ products, searchTerm, onSelectProduct, sortBy }) => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}
-    style={styles.productList}>
+      style={styles.productList}>
       {displayList.map(p => {
         const isLow = p.currentStock <= (p.safetyStock || 0);
         const audit = getAuditStatus(p.lastAudit);
@@ -52,8 +70,8 @@ const ProductList = ({ products, searchTerm, onSelectProduct, sortBy }) => {
         return (
           <View key={p.id} onClick={() => onSelectProduct(p)} style={styles.productItem}>
             <View style={{ flex: 1 }}>
-              <View style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: 'row'}}>
-                <Text style={{ fontSize: '16px', fontWeight:'bold' }}>{p.name}</Text>
+              <View style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: 'row' }}>
+                <Text style={{ fontSize: '16px', fontWeight: 'bold' }}>{p.name}</Text>
                 <Text style={{ fontSize: '10px', color: audit.color, backgroundColor: audit.bg, padding: '2px 5px', borderRadius: '4px' }}>
                   {audit.text}
                 </Text>

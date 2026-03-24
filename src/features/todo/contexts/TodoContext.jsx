@@ -3,6 +3,7 @@ import { db } from '../../../common/api/firebase/firebase.js'; // 설정된 fire
 import { collection, query, where, onSnapshot, doc, deleteDoc, updateDoc, increment } from 'firebase/firestore';
 import { FirebaseProductRepository as ProductAPI } from '../../product/api/FirebaseProductRepository';
 import { FirebaseTodoRepository } from '../FirebaseTodoRepository.jsx';
+
 const TodoContext = createContext();
 
 export const TodoProvider = ({ orgId, children }) => {
@@ -58,7 +59,6 @@ export const TodoProvider = ({ orgId, children }) => {
 			// 1. 할 일(Todo)에 담긴 모든 아이템을 순회하며 재고 업데이트 API 호출
 			const updatePromises = todo.items.map(item => {
 				// API 규격에 맞게 매개변수 구성
-				console.log(item);
 				// item 객체는 최소한 { id, currentStock, name } 정보를 가지고 있어야 합니다.
 				return ProductAPI.updateStock(
 					orgId,      // 조직 ID

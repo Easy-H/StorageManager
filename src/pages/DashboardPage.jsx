@@ -83,11 +83,11 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 						<Text style={{ fontSize: '12px', color: '#2f54eb' }}>실사 필요</Text>
 						<Text style={{ fontSize: '24px', fontWeight: 'bold', color: '#1d39c4' }}>{overdueAuditItems} <Text style={{ fontSize: '14px' }}>건</Text></Text>
 					</View>
-					<TouchableOpacity onClick={handleDownloadExcel}
+					<TouchableOpacity onPress={handleDownloadExcel}
 						style={styles.blueButton}>
 						<Text style={styles.buttonText}>📦 재고현황 받기</Text>
 					</TouchableOpacity>
-					<TouchableOpacity onClick={handleDownloadLogs} style={styles.greenButton}>
+					<TouchableOpacity onPress={handleDownloadLogs} style={styles.greenButton}>
 						<Text style={styles.buttonText}>📋 활동로그 받기</Text>
 					</TouchableOpacity>
 				</View>
