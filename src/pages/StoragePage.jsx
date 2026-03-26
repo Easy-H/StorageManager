@@ -65,6 +65,7 @@ const StoragePage = ({ products, currentOrg, onBack, notice }) => {
             {selectedItem && (
                 <ProductDetailModal
                     item={selectedItem}
+                    initialName={searchTerm}
                     orgId={currentOrg.id}
                     onClose={() => setSelectedItem(null)}
                     notice={notice} />

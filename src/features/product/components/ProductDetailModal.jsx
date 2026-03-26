@@ -5,12 +5,12 @@ import ProductEditor from './ProductEditor.jsx';
 import StockManager from './StockManager.jsx';
 import { styles } from '../../../styles.js'
 
-const ProductDetailModal = ({ item, orgId, onClose, notice }) => {
+const ProductDetailModal = ({ item, initialName, orgId, onClose, notice }) => {
 	const [editMode, setEditMode] = useState(item.isNew || false);
 	const [inputQty, setInputQty] = useState(item.isNew ? 0 : 1);
 	const [lastAuditDisplay, setLastAuditDisplay] = useState(item.lastAudit);
 	const [form, setForm] = useState({
-		name: item.name || "",
+		name: item.name || initialName,
 		barcode: item.barcode || "",
 		memo: item.memo || "",
 		safetyStock: item.safetyStock ?? 2

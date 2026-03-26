@@ -69,7 +69,6 @@ export const styles = StyleSheet.create({
   formStack: {
     width: '100%',
     gap: 12,
-    paddingVertical: 12,
   },
   inputBasic: {
     padding: 14,

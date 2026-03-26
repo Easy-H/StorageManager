@@ -7,7 +7,7 @@ import { styles } from '../../../styles.js'
 
 const ProductEditor = ({ item, form, setForm, onSave, onDelete, inputQty }) => (
   <View style={styles.formStack}>
-    <Text style={styles.h3}>{item.isNew ? "신규 품목 등록" : "정보 수정"}</Text>
+    <Text style={styles.h2}>{item.isNew ? "신규 품목 등록" : "정보 수정"}</Text>
     <TextInput
       value={form.name}
       onChange={e => setForm({ ...form, name: e.target.value })}

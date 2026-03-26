@@ -1,6 +1,7 @@
 import React from 'react';
 import { styles } from '../../../styles.js'
 import { View, ScrollView, Text } from 'react-native';
+import { useProductSearch } from '../hooks/useProductSearch.jsx';
 import * as Hangul from 'hangul-js';
 
 const getAuditStatus = (lastAuditDate) => {
@@ -17,30 +18,10 @@ const getAuditStatus = (lastAuditDate) => {
 
 const ProductList = ({ products, searchTerm, onSelectProduct, sortBy }) => {
   const searchKeyword = searchTerm.toLowerCase().trim();
+  const { searchResult } = useProductSearch(products, searchTerm);
 
   // 1. 검색 필터링
-  let displayList = products.filter(p => {
-    const name = (p.name || "").toLowerCase();
-    const barcode = (p.barcode || "").toLowerCase();
-
-    // 1. 바코드 숫자에 키워드가 포함되는지 확인
-    if (barcode.includes(searchKeyword)) return true;
-
-    // 2. 일반 검색 (부분 일치: '크리' -> '클린')
-    if (Hangul.search(name, searchKeyword) !== -1) return true;
-
-    // 3. 초성 검색 (초성만 입력했을 때: 'ㅋㄹ' -> '클린')
-    // 검색어 자체가 초성으로만 이루어져 있는지 확인
-    const isChoseongQuery = searchKeyword.split('').every(char => Hangul.isConsonant(char) && !Hangul.isVowel(char));
-
-    if (isChoseongQuery) {
-      // 제품명에서 초성만 추출 (예: '클린' -> 'ㅋㄹ')
-      const choseongName = Hangul.disassemble(name, true).map(group => group[0]).join('');
-      return choseongName.includes(searchKeyword);
-    }
-
-    return false;
-  });
+  let displayList = searchResult;
 
   // 2. 정렬 로직
   displayList.sort((a, b) => {
