@@ -18,7 +18,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
                 {/* 1. 조직 정보 수정 */}
                 <Text style={styles.h3}>🏷️ 조직 이름 변경</Text>
                 <View style={ViewStyle}>
-                    <View style={{ display: 'flex', flexDirection: 'row', gap: '8px' }}>
+                    <View style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
                         <input
                             value={newName}
                             onChange={e => setNewName(e.target.value)}
@@ -38,7 +38,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack }) => {
                 <Text style={styles.h3}>👤 멤버 및 권한 관리</Text>
                 <View style={ViewStyle}>
                     <View style={{ display: 'flex',
-                        flexDirection: 'column', gap: '10px' }}>
+                        flexDirection: 'column', gap: 10 }}>
                         {members.map(member => {
                             return (
                                 <Member key={member.uid}
@@ -68,11 +68,13 @@ export const localStyle = StyleSheet.create({});
 // --- 스타일 객체 (기본 디자인 유지) ---
 const ViewStyle = {
     background: '#fff',
-    padding: '16px',
-    borderRadius: '12px',
-    marginBottom: '16px',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
     boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-    border: '1px solid #eeeeee'
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: '#eeeeee'
 };
 
 export default AdminPage;

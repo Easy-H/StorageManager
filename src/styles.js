@@ -183,7 +183,6 @@ export const styles = StyleSheet.create({
     color: Colors.primary,
   },
   searchSection: {
-    padding: 12,
     gap: 6,
     flexDirection: 'row'
   },
@@ -194,7 +193,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#fcfcfc',
     color: Colors.secondary,
     fontSize: 20,
-    padding: 6,
+    padding: 10,
   },
 
   // 리스트 아이템

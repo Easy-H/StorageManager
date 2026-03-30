@@ -1,16 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as XLSX from 'xlsx';
 import { useTodos } from '../features/todo/contexts/TodoContext';
 import { styles, Colors } from '../styles';
 import Header from '../common/components/Header';
 import TodoModal from '../features/todo/components/TodoModal';
+import TodoList from '../features/todo/components/TodoList';
+import SearchBar from '../common/components/SearchBar';
 
 export default function TodoPage({ products, currentOrg, onBack, notice }) {
-    const { todos, loading, deleteTodo, executeTodo, addNewTodo, updateTodo } = useTodos();
+    const { todos, loading, deleteTodo, executeTodo, addNewTodo, updateTodo, undoTodo } = useTodos();
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedTodo, setSelectedTodo] = useState(null);
-
+    const [searchTerm, setSearchTerm] = useState("");
     // Web용 파일 입력 참조
     const fileInputRef = useRef(null);
 
@@ -18,6 +20,15 @@ export default function TodoPage({ products, currentOrg, onBack, notice }) {
     const handleExecute = async (todo) => {
         try {
             await executeTodo(todo);
+            notice("재고에 성공적으로 반영되었습니다.");
+        } catch (e) {
+            notice("실행 중 오류가 발생했습니다.");
+        }
+    };
+    
+    const handleUndo = async (todo) => {
+        try {
+            await undoTodo(todo);
             notice("재고에 성공적으로 반영되었습니다.");
         } catch (e) {
             notice("실행 중 오류가 발생했습니다.");
@@ -113,39 +124,27 @@ export default function TodoPage({ products, currentOrg, onBack, notice }) {
                     onChange={handleFileChange}
                 />
 
-                <View style={localStyles.actionBar}>
-                    <Text style={localStyles.todoCount}>대기 중인 항목: {todos.length}개</Text>
+                <View style={styles.searchSection}>
+                    <SearchBar
+                        placeholder={"할 일 이름 검색..."}
+                        value={searchTerm}
+                        onChange={setSearchTerm} />
                     <TouchableOpacity
-                        style={localStyles.miniAddButton}
+                        style={styles.greenButton}
                         onPress={() => { setSelectedTodo(null); setModalVisible(true); }}
                     >
-                        <Text style={{ color: Colors.primary, fontWeight: 'bold' }}>+ 새 할 일 만들기</Text>
+                        <Text style={styles.buttonText}>+ 새 할 일</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.blueButton}
+                        onPress={() => fileInputRef.current?.click()}>
+                        <Text style={styles.buttonText}>EXCEL</Text>
                     </TouchableOpacity>
                 </View>
+                <TodoList todos={todos} searchTerm={searchTerm} openEditModal={openEditModal}
+                    handleDelete={handleDelete} handleExecute={handleExecute} handleUndo={handleUndo} />
 
-                <FlatList
-                    data={todos}
-                    keyExtractor={(item) => item.id}
-                    contentContainerStyle={{ paddingBottom: 100 }}
-                    renderItem={({ item }) => (
-                        <View style={styles.productItem}>
-                            <TouchableOpacity style={{ flex: 1 }} onPress={() => openEditModal(item)}>
-                                <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{item.title}</Text>
-                                <Text style={{ color: item.type === 'IN' ? Colors.primary : Colors.errorRed, marginTop: 4 }}>
-                                    {item.type === 'IN' ? '🔵 입고 예정' : '🔴 출고 예정'}
-                                </Text>
-                            </TouchableOpacity>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <TouchableOpacity onPress={() => handleExecute(item)} style={[styles.primaryButton, { marginRight: 8, paddingHorizontal: 15 }]}>
-                                    <Text style={{ color: '#fff' }}>실행</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => handleDelete(item.id)} style={localStyles.deleteIcon}>
-                                    <Text style={{ color: Colors.errorRed, fontSize: 12 }}>삭제</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    )}
-                />
             </View>
 
             {modalVisible && (
@@ -160,13 +159,6 @@ export default function TodoPage({ products, currentOrg, onBack, notice }) {
                 />
             )}
 
-            <TouchableOpacity
-                style={localStyles.fab}
-                onPress={() => fileInputRef.current?.click()}
-            >
-                <Text style={localStyles.fabText}>📂</Text>
-                <Text style={{ fontSize: 10, color: '#fff', fontWeight: 'bold' }}>EXCEL</Text>
-            </TouchableOpacity>
         </View>
     );
 }

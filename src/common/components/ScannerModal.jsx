@@ -25,12 +25,13 @@ const ScannerModal = ({ onScan, onClose }) => {
       <View style={styles.modalContent}>
         <Text style={styles.h2}>바코드 스캐너</Text>
         <div id="reader"></div>
-        <button
-          onClick={onClose}
-          className="close-modal-btn"
+        <TouchableOpacity
+          onPress={onClose}
         >
+          <Text style={styles.closeModalBtnText}>
           ✕ 스캔 취소
-        </button>
+          </Text>
+        </TouchableOpacity>
         </View>
     </View>
   );

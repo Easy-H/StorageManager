@@ -107,7 +107,7 @@ function AppContent() {
             hasAdminAccess ? (
               <AdminPage onBack={handleExitOrg} currentOrg={currentOrg} user={user} notice={showToast} onExitOrg={handleExitOrg} />
             ) : (
-              <Navigate to="/storage" replace />
+              <Navigate to="/dashboard" replace />
             )
           } />
           <Route path="/todo" element={
@@ -115,8 +115,8 @@ function AppContent() {
               <TodoPage currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} products={products}/>
             </TodoProvider>
             }/>
-          <Route path="/" element={<Navigate to="/storage" replace />} />
-          <Route path="*" element={<Navigate to="/storage" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </View>
 

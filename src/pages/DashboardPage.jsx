@@ -69,77 +69,78 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 		<>
 			<Header currentOrg={currentOrg} onBack={onBack} notice={notice} />
 			<ScrollView showsVerticalScrollIndicator={false}
-				contentContainerStyle={ styles.appContent }>
+				contentContainerStyle={styles.appContent}>
 
 				{/* 주요 지표 카드 */}
-
 				<Text style={styles.h3}>📌 요약</Text>
-				<View style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '30px' }}>
-					<View className="stat-card" style={{ background: '#fff7e6', padding: '15px', borderRadius: '12px', border: '1px solid #ffd591' }}>
-						<Text style={{ fontSize: '12px', color: '#fa8c16' }}>재고 부족</Text>
-						<Text style={{ fontSize: '24px', fontWeight: 'bold', color: '#d46b08' }}>{lowStockItems} <Text style={{ fontSize: '14px' }}>건</Text></Text>
-					</View>
-					<View className="stat-card" style={{ background: '#f0f5ff', padding: '15px', borderRadius: '12px', border: '1px solid #adc6ff' }}>
-						<Text style={{ fontSize: '12px', color: '#2f54eb' }}>실사 필요</Text>
-						<Text style={{ fontSize: '24px', fontWeight: 'bold', color: '#1d39c4' }}>{overdueAuditItems} <Text style={{ fontSize: '14px' }}>건</Text></Text>
-					</View>
-					<TouchableOpacity onPress={handleDownloadExcel}
-						style={styles.blueButton}>
-						<Text style={styles.buttonText}>📦 재고현황 받기</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={handleDownloadLogs} style={styles.greenButton}>
-						<Text style={styles.buttonText}>📋 활동로그 받기</Text>
-					</TouchableOpacity>
-				</View>
+				<View style={ViewStyle}>
+					<View style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
+						<View className="stat-card" style={{ background: '#fff7e6', padding: 15, borderRadius: 12, borderWidth: 1, borderStyle: 'solid', borderColor: '#ffd591' }}>
+							<Text style={{ fontSize: 12, color: '#fa8c16' }}>재고 부족</Text>
+							<Text style={{ fontSize: 24, fontWeight: 'bold', color: '#d46b08' }}>{lowStockItems} <Text style={{ fontSize: 14 }}>건</Text></Text>
+						</View>
+						<View className="stat-card" style={{ background: '#f0f5ff', padding: 15, borderRadius: 12, borderWidth: 1, borderStyle: 'solid', borderColor: '#adc6ff' }}>
+							<Text style={{ fontSize: 12, color: '#2f54eb' }}>실사 필요</Text>
+							<Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1d39c4' }}>{overdueAuditItems} <Text style={{ fontSize: 14 }}>건</Text></Text>
+						</View>
+						<TouchableOpacity onPress={handleDownloadExcel}
+							style={styles.blueButton}>
+							<Text style={styles.buttonText}>📦 재고현황 받기</Text>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={handleDownloadLogs} style={styles.greenButton}>
+							<Text style={styles.buttonText}>📋 활동로그 받기</Text>
+						</TouchableOpacity>
+					</View></View>
 
 				{/* 🚀 발주 필요 리스트 섹션 (수정된 부분) */}
 
 				<Text style={styles.h3}>🚨 발주 필요 품목</Text>
-				<View style={{ background: '#fff', padding: '20px', borderRadius: '15px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', marginBottom: '25px' }}>
+				<View style={ViewStyle}>
 					{lowStockItems > 0 ? (
-						<View style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+						<View style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
 							{lowStockList.map(item => (
-								<View key={item.id} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: '#fff1f0', borderRadius: '8px', border: '1px solid #ffa39e' }}>
-									<Text style={{ fontSize: '14px', fontWeight: '500' }}>{item.name}</Text>
-									<Text style={{ fontSize: '12px', color: '#cf1322' }}>
+								<View key={item.id} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, background: '#fff1f0', borderRadius: 8, borderWidth: 1, borderStyle: 'solid', borderColor: '#ffa39e' }}>
+									<Text style={{ fontSize: 14, fontWeight: '500' }}>{item.name}</Text>
+									<Text style={{ fontSize: 12, color: '#cf1322' }}>
 										현재: <Text style={{ fontWeight: 'bold' }}>{item.currentStock}</Text> / 기준: {item.safetyStock}
 									</Text>
 								</View>
 							))}
-							<Text style={{ fontSize: '12px', color: '#999', marginTop: '5px' }}>* 안전 재고 기준보다 낮거나 같은 품목입니다.</Text>
+							<Text style={{ fontSize: 12, color: '#999', marginTop: 5 }}>* 안전 재고 기준보다 낮거나 같은 품목입니다.</Text>
 						</View>
 					) : (
-						<Text style={{ fontSize: '14px', color: '#52c41a', margin: 0 }}>✅ 모든 품목의 재고가 충분합니다.</Text>
+						<Text style={{ fontSize: 14, color: '#52c41a', margin: 0 }}>✅ 모든 품목의 재고가 충분합니다.</Text>
 					)}
 				</View>
 
 				{/* 최근 활동 로그 */}
-					<Text style={styles.h3}>🕒 최근 활동</Text>
-				<View style={{ marginBottom: '50px' }}>
-					<View style={{ background: '#fff', borderRadius: '15px', border: '1px solid #eee', overflow: 'hidden' }}>
-						{recentLogs.length > 0 ? (
-							recentLogs.map((log, index) => (
-								<View key={log.id} style={{
-									paddingHorizontal: 15,
-									paddingVertical: 12,
-									borderBottom: index !== recentLogs.length - 1 ? '1px solid #f5f5f5' : 'none',
-									display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-								}}>
-									<Text style={{ fontSize: '14px' }}>
-										<View style={{ display: 'block' }}>
-											<Text style={{ fontWeight: '500' }}>{log.productName}</Text></View>
-										<View style={{ display: 'block' }}>
-											<Text style={{ fontSize: '11px', color: '#999' }}>{log.timestamp?.toLocaleString('ko-KR', { hour12: false })}</Text></View>
-									</Text>
-									<Text style={{ textAlign: 'right', fontSize: '13px', fontWeight: 'bold', color: log.type === 'IN' ? '#52c41a' : log.type === 'OUT' ? '#ff4d4f' : '#1890ff' }}>
-										{log.type === 'IN' ? `+${log.changeQty}` : log.type === 'OUT' ? `-${log.changeQty}` : '기록'}
-									</Text>
-								</View>
-							))
-						) : (
-							<Text style={{ padding: '30px', textAlign: 'center', color: '#999', fontSize: '13px' }}>기록이 없습니다.</Text>
-						)}
-					</View>
+				<Text style={styles.h3}>🕒 최근 활동</Text>
+
+				<View style={[ViewStyle, {padding: 0}]}>
+					{recentLogs.length > 0 ? (
+						recentLogs.map((log, index) => (
+							<View key={log.id} style={{
+								paddingHorizontal: 15,
+								paddingVertical: 12,
+								borderBottomWidth: index !== recentLogs.length - 1 ? 1 : 'none',
+								borderBottomStyle: index !== recentLogs.length - 1 ? 'solid' : 'none',
+								borderBottomColor: index !== recentLogs.length - 1 ? '#f5f5f5' : 'none',
+								display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
+							}}>
+								<Text style={{ fontSize: 14 }}>
+									<View style={{ display: 'block' }}>
+										<Text style={{ fontWeight: '500' }}>{log.productName}</Text></View>
+									<View style={{ display: 'block' }}>
+										<Text style={{ fontSize: 11, color: '#999' }}>{log.timestamp?.toLocaleString('ko-KR', { hour12: false })}</Text></View>
+								</Text>
+								<Text style={{ textAlign: 'right', fontSize: 13, fontWeight: 'bold', color: log.type === 'IN' ? '#52c41a' : log.type === 'OUT' ? '#ff4d4f' : '#1890ff' }}>
+									{log.type === 'IN' ? `+${log.changeQty}` : log.type === 'OUT' ? `${log.changeQty}` : '기록'}
+								</Text>
+							</View>
+						))
+					) : (
+						<Text style={{ padding: 30, textAlign: 'center', color: '#999', fontSize: 13 }}>기록이 없습니다.</Text>
+					)}
 				</View>
 			</ScrollView>
 		</>
@@ -147,3 +148,14 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 };
 
 export default DashboardPage;
+
+const ViewStyle = {
+	background: '#fff',
+	padding: 16,
+	borderRadius: 12,
+	marginBottom: 16,
+	boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+	borderWidth: 1,
+	borderStyle: 'solid',
+	borderColor: '#eeeeee'
+};

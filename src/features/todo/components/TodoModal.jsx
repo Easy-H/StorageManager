@@ -102,12 +102,12 @@ export default function TodoModal({ visible, onClose, onSave, onExecute, onDelet
             </View>
             <ScrollView
               ref={scrollViewRef} // 2. ref 연결
-              style={{ maxHeight: 300, minHeight: 300, }}
+              style={{ maxHeight: 150, minHeight: 150, }}
               // 3. 컨텐츠 사이즈가 변할 때(아이템 추가 시) 자동으로 아래로 이동
               onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
             >
               {items.map((item, index) => {
-                const isUnknown = item.isUnknown; // ID가 없으면 미등록(빨간색 표시)
+                const isUnknown = item.productId ? false : true; // ID가 없으면 미등록(빨간색 표시)
 
                 return (
                   <View key={index} style={[localStyles.itemRow, isUnknown && localStyles.unknownRow]}>
@@ -124,13 +124,14 @@ export default function TodoModal({ visible, onClose, onSave, onExecute, onDelet
                     {/* 미등록 시 등록 버튼 노출 */}
 
                     {
-                      isUnknown && item.name && (
+                      !!(item && item.name && isUnknown) && (
                         <TouchableOpacity
                           onPress={() => handleRegisterNew(index)}
                           style={localStyles.miniRegisterBtn}>
-                          <Text style={{ fontSize: 14, color: '#fff', padding: 5 }}>등록</Text>
+                          <Text style={{ fontSize: 20, color: '#fff', padding: 5 }}>등록</Text>
                         </TouchableOpacity>
-                      )}
+                      )
+                    }
 
                     {/* 수량 입력 */}
                     <TextInput
@@ -191,10 +192,10 @@ export default function TodoModal({ visible, onClose, onSave, onExecute, onDelet
             <ProductSearchModal
               visible={searchModalVisible}
               products={products}
-              selectedIds={items.map(i => i.productId).filter(id => id)}
+              productSelected={items}
               onSelect={(p) => {
                 const next = [...items];
-                next[activeIndex] = { productId: p.id, name: p.name, quantity: 1, isUnknown: p.isUnknown };
+                next[activeIndex] = { productId: p.id, name: p.name, quantity: 1 };
                 setItems(next);
               }}
               onClose={() => setSearchModalVisible(false)}
@@ -211,8 +212,8 @@ const localStyles = StyleSheet.create({
   typeButtonGroup: { flexDirection: 'row', gap: 5 },
   typeBtn: { paddingVertical: 6, paddingHorizontal: 12, borderWidth: 1, borderColor: '#ddd', borderRadius: 4 },
   itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: '#eee' },
-  itemRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 5 },
-  unknownRow: { backgroundColor: '#fff1f0', borderRadius: 4, paddingHorizontal: 5 },
+  itemRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 5, justifyContent: 'stretch' },
+  unknownRow: { backgroundColor: '#fff1f0', borderRadius: 4 },
   productPick: { padding: 8, backgroundColor: '#f9f9f9', borderRadius: 4, borderWidth: 1, borderColor: '#eee' },
   miniRegisterBtn: { backgroundColor: Colors.primary, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 4 }
 });

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../../../common/api/firebase/firebase.js'; // 설정된 firebase 불러오기
 import { collection, query, where, onSnapshot, doc, deleteDoc, updateDoc, increment } from 'firebase/firestore';
 import { FirebaseProductRepository as ProductAPI } from '../../product/api/FirebaseProductRepository';
-import { FirebaseTodoRepository } from '../FirebaseTodoRepository.jsx';
+import { FirebaseTodoRepository as TodoAPI } from '../FirebaseTodoRepository.jsx';
 
 const TodoContext = createContext();
 
@@ -33,23 +33,24 @@ export const TodoProvider = ({ orgId, children }) => {
 
 	// 2. 할 일 삭제 함수
 	const deleteTodo = async (todoId) => {
-		FirebaseTodoRepository.deleteTodo(orgId, todoId);
+		TodoAPI.deleteTodo(orgId, todoId);
 	};
 	// Todo를 추가하는 로직 예시 (컴포넌트 내부)
 	const addNewTodo = async (newTodoData) => {
-
 		try {
-			await FirebaseTodoRepository.addTodo(orgId, newTodoData);
+			await TodoAPI.addTodo(orgId, newTodoData);
 			console.log("할 일이 등록되었습니다.");
 		} catch (e) {
+			console.log(e.message);
 			alert("등록 실패: " + e.message);
+			throw (e);
 		}
 	};
 
 	const updateTodo = async (todoId, updatedData) => {
-		
-		await  FirebaseTodoRepository.updateTodo(orgId, todoId, updatedData);
-			
+
+		await TodoAPI.updateTodo(orgId, todoId, updatedData);
+
 	};
 
 	// 3. 할 일 실행 (재고 반영) 함수
@@ -72,8 +73,10 @@ export const TodoProvider = ({ orgId, children }) => {
 			// 2. 모든 재고 업데이트가 완료될 때까지 대기
 			await Promise.all(updatePromises);
 
-			// 3. 재고 반영이 성공하면 할 일(Todo) 삭제
-			await deleteTodo(todo.id);
+			await updateTodo(todo.id, {
+				status: 'executed',
+				executedAt: new Date() // 또는 서버 타임스탬프
+			});
 
 		} catch (error) {
 			console.error("할 일 실행 중 오류 발생:", error);
@@ -81,8 +84,40 @@ export const TodoProvider = ({ orgId, children }) => {
 		}
 	};
 
+	const undoTodo = async (todo) => {
+		try {
+			// 1. 재고 반대 연산 수행
+			const undoPromises = todo.items.map(item => {
+				// 현재 타입이 'IN'(입고)이면 'OUT'(출고)으로, 'OUT'이면 'IN'으로 반전시켜 호출
+				const reverseType = todo.type === 'IN' ? 'OUT' : 'IN';
+
+				return ProductAPI.updateStock(
+					orgId,
+					item.productId,
+					item.quantity,
+					false,
+					reverseType
+				);
+			});
+
+			await Promise.all(undoPromises);
+
+			// 2. 상태를 다시 'pending'으로 변경하고 실행일 삭제
+			await updateTodo(todo.id, {
+				status: 'pending',
+				executedAt: null // 실행 취소 시 시간 기록 삭제
+			});
+
+			console.log("실행 취소 및 재고 원복 완료");
+		} catch (error) {
+			console.error("실행 취소 중 오류 발생:", error);
+			throw error;
+		}
+	};
+
 	return (
-		<TodoContext.Provider value={{ todos, loading, deleteTodo, executeTodo, addNewTodo, updateTodo }}>
+		<TodoContext.Provider value={{ todos, loading,
+			deleteTodo, executeTodo, addNewTodo, updateTodo, undoTodo }}>
 			{children}
 		</TodoContext.Provider>
 	);
