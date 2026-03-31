@@ -3,9 +3,9 @@ import * as Hangul from 'hangul-js';
 export function useTodoSearch(todos, keyword) {
 
     const searchKeyword = keyword.toLowerCase().trim();
-    
+
     let searchResult = todos.filter(todo => {
-        const name = (todo.name || "").toLowerCase();
+        const name = (todo.title || "").toLowerCase();
 
         // 2. 일반 검색 (부분 일치: '크리' -> '클린')
         if (Hangul.search(name, searchKeyword) !== -1) return true;

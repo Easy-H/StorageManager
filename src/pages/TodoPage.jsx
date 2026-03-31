@@ -156,6 +156,7 @@ export default function TodoPage({ products, currentOrg, onBack, notice }) {
                     onExecute={handleExecute} // 모달 내 실행 연동
                     onDelete={handleDelete}   // 모달 내 삭제 연동
                     initialData={selectedTodo}
+                    initialName={searchTerm}
                 />
             )}
 

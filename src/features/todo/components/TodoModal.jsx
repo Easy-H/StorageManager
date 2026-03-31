@@ -3,8 +3,8 @@ import { Modal, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet,
 import { styles, Colors } from '../../../styles';
 import ProductSearchModal from './ProductSearchModal';
 
-export default function TodoModal({ visible, onClose, onSave, onExecute, onDelete, onRegisterProduct, initialData, products }) {
-  const [title, setTitle] = useState('');
+export default function TodoModal({ visible, onClose, onSave, onExecute, onDelete, onRegisterProduct, initialData, initialName, products }) {
+  const [title, setTitle] = useState(initialName);
   const [type, setType] = useState('IN');
   const [items, setItems] = useState([]);
   const [searchModalVisible, setSearchModalVisible] = useState(false);
@@ -19,7 +19,7 @@ export default function TodoModal({ visible, onClose, onSave, onExecute, onDelet
         setType(initialData.type || 'IN');
         setItems(initialData.items || []);
       } else {
-        setTitle('');
+        setTitle(initialName);
         setType('IN');
         setItems([]);
       }
