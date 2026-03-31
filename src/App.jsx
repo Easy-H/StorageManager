@@ -195,7 +195,8 @@ const navStyles = StyleSheet.create({
 
 function App() {
   return (
-    <HashRouter>
+    <HashRouter style={{
+      backgroundColor: '#f9f9f9'}}>
       <AppContent />
     </HashRouter>
   );

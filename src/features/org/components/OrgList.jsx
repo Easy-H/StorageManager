@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FirebaseOrgRepository as OrgAPI } from '../api/FirebaseOrgRepository';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { styles } from '../../../styles';
+import { Colors, styles } from '../../../styles';
 
 
 const OrgList = ({ user, navigate, setCurrentOrg, onLoading, notice }) => {
@@ -42,26 +42,26 @@ const OrgList = ({ user, navigate, setCurrentOrg, onLoading, notice }) => {
 
     return (
 
-        <div className="org-list">
+        <View style={styles.orgList}>
             {
                 orgs?.length > 0 ? (
                     orgs.map(o => (
-                        <div key={o.id} onClick={() => handleSelectOrg(o)} className="org-card" style={{ cursor: 'pointer', padding: '15px', border: '1px solid #eee', borderRadius: '10px', marginBottom: '10px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <strong>{o.name}</strong>
-                                <small style={{ color: '#888', fontSize: '10px', background: '#f0f0f0', padding: '2px 6px', borderRadius: '4px' }}>
+                        <View key={o.id} onClick={() => handleSelectOrg(o)} style={[styles.orgCard, { cursor: 'pointer', padding: 15, border: '1px solid #eee', borderRadius: 10, marginBottom: 10 }]}>
+                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                                <Text style={{fontSize: 16, fontWeight: 'bolder', color: Colors.primary}}>{o.name}</Text>
+                                <Text style={{ color: '#888', fontSize: 10, background: '#f0f0f0', paddingVertical: 2, paddingHorizontal: 6, borderRadius: 4 }}>
                                     {o.level >= 100 ? "admin" : "member"}
-                                </small>
-                            </div>
-                            <div style={{ fontSize: '11px', color: '#aaa', marginTop: '6px', fontFamily: 'monospace' }}>
+                                </Text>
+                            </View>
+                            <View style={{ fontSize: '11px', color: '#aaa', marginTop: '6px', fontFamily: 'monospace' }}>
                                 ID: {o.id}
-                            </div>
-                        </div>
+                            </View>
+                        </View>
                     ))
                 ) : (
-                    <p style={{ color: '#999', margin: '20px 0', textAlign: 'center' }}>소속된 조직이 없습니다.</p>
+                    <Text style={{ color: '#999', margin: '20px 0', textAlign: 'center' }}>소속된 조직이 없습니다.</Text>
                 )}
-        </div>
+        </View>
     )
 }
 

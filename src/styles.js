@@ -92,7 +92,6 @@ export const styles = StyleSheet.create({
   orgList: {
     width: '100%',
     gap: 12,
-    marginVertical: 20,
   },
   orgCard: {
     padding: 18,
