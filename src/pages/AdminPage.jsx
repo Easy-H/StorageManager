@@ -5,10 +5,10 @@ import { Member } from '../features/org/components/Member';
 import { ScrollView, View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { styles } from '../styles';
 
-const AdminPage = ({ currentOrg, notice, user, onBack }) => {
+const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }) => {
     const [newName, setNewName] = useState(currentOrg.name);
     const { members, deleteOrg, removeMember, updateOrgName, upgradeMemberLevel }
-        = useOrgManage(currentOrg, notice);
+        = useOrgManage(currentOrg, setCurrentOrg, notice);
 
     return (
         <>

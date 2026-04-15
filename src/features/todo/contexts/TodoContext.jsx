@@ -42,7 +42,7 @@ export const TodoProvider = ({ orgId, children }) => {
 			console.log("할 일이 등록되었습니다.");
 		} catch (e) {
 			console.log(e.message);
-			alert("등록 실패: " + e.message);
+			notice("등록 실패: " + e.message);
 			throw (e);
 		}
 	};
@@ -56,68 +56,51 @@ export const TodoProvider = ({ orgId, children }) => {
 	// 3. 할 일 실행 (재고 반영) 함수
 	const executeTodo = async (todo) => {
 		try {
-			console.log(todo);
-			// 1. 할 일(Todo)에 담긴 모든 아이템을 순회하며 재고 업데이트 API 호출
-			const updatePromises = todo.items.map(item => {
-				// API 규격에 맞게 매개변수 구성
-				// item 객체는 최소한 { id, currentStock, name } 정보를 가지고 있어야 합니다.
-				return ProductAPI.updateStock(
-					orgId,      // 조직 ID
-					item.productId,
-					item.quantity,   // 변동 수량
-					false,           // 직접 입력 아님 (상대적 가감)
-					todo.type        // 'IN' 또는 'OUT'
-				);
-			});
+			setLoading(true);
 
-			// 2. 모든 재고 업데이트가 완료될 때까지 대기
-			await Promise.all(updatePromises);
+			// 개별 호출 대신 일괄(Batch) 처리 메서드 호출
+			await ProductAPI.updateStocks(
+				orgId,
+				todo.items,
+				todo.type,
+				todo.id
+			);
 
-			await updateTodo(todo.id, {
-				status: 'executed',
-				executedAt: new Date() // 또는 서버 타임스탬프
-			});
-
+			console.log("일괄 재고 반영 완료");
 		} catch (error) {
 			console.error("할 일 실행 중 오류 발생:", error);
-			throw error; // 상위 컴포넌트(TodoPage)에서 에러 메시지를 띄울 수 있게 던짐
+			notice("재고 반영 중 오류가 발생했습니다: " + error.message);
+		} finally {
+			setLoading(false);
 		}
 	};
 
 	const undoTodo = async (todo) => {
 		try {
-			// 1. 재고 반대 연산 수행
-			const undoPromises = todo.items.map(item => {
-				// 현재 타입이 'IN'(입고)이면 'OUT'(출고)으로, 'OUT'이면 'IN'으로 반전시켜 호출
-				const reverseType = todo.type === 'IN' ? 'OUT' : 'IN';
+			// 이미 실행된 상태인지 한 번 더 체크 (방어적 코드)
+			if (todo.status !== 'executed') {
+				throw new Error("이미 대기 중이거나 실행되지 않은 항목입니다.");
+			}
 
-				return ProductAPI.updateStock(
-					orgId,
-					item.productId,
-					item.quantity,
-					false,
-					reverseType
-				);
-			});
+			await ProductAPI.undoStocks(
+				orgId,
+				todo.items,
+				todo.type, // 원래의 타입(IN/OUT)을 넘겨줌
+				todo.id
+			);
 
-			await Promise.all(undoPromises);
-
-			// 2. 상태를 다시 'pending'으로 변경하고 실행일 삭제
-			await updateTodo(todo.id, {
-				status: 'pending',
-				executedAt: null // 실행 취소 시 시간 기록 삭제
-			});
-
-			console.log("실행 취소 및 재고 원복 완료");
+			console.log("실행 취소 및 재고 원복(Batch) 완료");
 		} catch (error) {
 			console.error("실행 취소 중 오류 발생:", error);
-			throw error;
+			notice("취소 처리 중 오류가 발생했습니다: " + error.message);
 		}
 	};
 
 	return (
-		<TodoContext.Provider value={{ todos, loading,
-			deleteTodo, executeTodo, addNewTodo, updateTodo, undoTodo }}>
+		<TodoContext.Provider value={{
+			todos, loading,
+			deleteTodo, executeTodo, addNewTodo, updateTodo, undoTodo
+		}}>
 			{children}
 		</TodoContext.Provider>
 	);

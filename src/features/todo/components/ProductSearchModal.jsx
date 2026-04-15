@@ -32,7 +32,7 @@ export default function ProductSearchModal({ onClose, onSelect, products, produc
             data={filteredResult}
             keyExtractor={(item) => item.id}
             style={{ maxHeight: 300, minHeight: 300 }}
-            contentContainerStyle={{ gap: 20 }}
+            contentContainerStyle={{ gap: 5 }}
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => { 

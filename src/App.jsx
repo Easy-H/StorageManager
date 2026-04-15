@@ -105,7 +105,7 @@ function AppContent() {
           } />
           <Route path="/admin" element={
             hasAdminAccess ? (
-              <AdminPage onBack={handleExitOrg} currentOrg={currentOrg} user={user} notice={showToast} onExitOrg={handleExitOrg} />
+              <AdminPage onBack={handleExitOrg} currentOrg={currentOrg} user={user} notice={showToast} onExitOrg={handleExitOrg} setCurrentOrg={setCurrentOrg} />
             ) : (
               <Navigate to="/dashboard" replace />
             )

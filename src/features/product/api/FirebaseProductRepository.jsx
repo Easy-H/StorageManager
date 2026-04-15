@@ -26,7 +26,7 @@ export const FirebaseProductRepository = {
   // [C/U] 제품 저장 및 수정
   saveItem: async (orgId, itemId, formData, initialQty) => {
     if (!orgId) throw new Error("조직 ID가 필요합니다.");
-    
+
     const isEdit = !!(itemId);
     const colRef = collection(db, "organizations", orgId, "products");
     const docRef = isEdit
@@ -34,7 +34,7 @@ export const FirebaseProductRepository = {
       : doc(colRef);
     if (formData.initialStock) {
       initialQty = formData.initialStock;
-      delete(formData.initialStock);
+      delete (formData.initialStock);
     }
     // 1. 공통 데이터 (이름, 카테고리 등)
     const data = {
@@ -64,7 +64,7 @@ export const FirebaseProductRepository = {
 
     const docRef = doc(db, "organizations", orgId, "products", productId);
     const logColRef = collection(db, "organizations", orgId, "inventory_logs");
-    
+
     // runTransaction을 통해 읽기-쓰기를 하나의 작업으로 묶습니다.
     await runTransaction(db, async (transaction) => {
       // 1. 최신 데이터 읽기 (내부에서 직접 조회)
@@ -102,8 +102,101 @@ export const FirebaseProductRepository = {
         changeQty: isDirectInput ? (newStock - currentStock) : (type === 'IN' ? change : -change),
         finalStock: newStock,
         timestamp: serverTimestamp(),
-        userEmail: "" 
+        userEmail: ""
       });
+    });
+  },
+
+  updateStocks: async (orgId, items, type, todoId) => {
+    if (!orgId || !items.length) throw new Error("데이터가 부족합니다.");
+
+    await runTransaction(db, async (transaction) => {
+      const logColRef = collection(db, "organizations", orgId, "inventory_logs");
+      const todoRef = doc(db, "organizations", orgId, "todos", todoId);
+
+      // 1. 모든 제품의 현재 상태를 먼저 읽음 (트랜잭션 내 Read는 항상 먼저 수행)
+      const productRefs = items.map(item => doc(db, "organizations", orgId, "products", item.productId));
+      const productSnaps = await Promise.all(productRefs.map(ref => transaction.get(ref)));
+
+      // 2. 재고 계산 및 유효성 검사
+      const updates = [];
+      const logs = [];
+
+      for (let i = 0; i < items.length; i++) {
+        const snap = productSnaps[i];
+        if (!snap.exists()) throw new Error(`품목을 찾을 수 없습니다: ${items[i].name}`);
+
+        const currentStock = snap.data().currentStock || 0;
+        const change = Number(items[i].quantity);
+        const newStock = type === 'IN' ? currentStock + change : currentStock - change;
+
+        // 🛑 핵심: 출고 시 재고가 부족하면 트랜잭션 전체 롤백
+        if (newStock < 0) {
+          throw new Error(`[재고 부족] '${items[i].name}'의 현재 재고는 ${currentStock}개입니다. (${change}개 출고 불가)`);
+        }
+
+        updates.push({ ref: productRefs[i], newStock });
+        logs.push({
+          productId: items[i].productId,
+          productName: items[i].name,
+          type: type,
+          changeQty: type === 'IN' ? change : -change,
+          finalStock: newStock
+        });
+      }
+
+      // 3. 검증 통과 시 모든 쓰기 작업 실행
+      updates.forEach(({ ref, newStock }) => {
+        transaction.update(ref, {
+          currentStock: newStock,
+          updatedAt: serverTimestamp(),
+          lastAudit: serverTimestamp()
+        });
+      });
+
+      logs.forEach(logData => {
+        const newLogRef = doc(logColRef);
+        transaction.set(newLogRef, { ...logData, timestamp: serverTimestamp(), todoId });
+      });
+
+      transaction.update(todoRef, { status: 'executed', executedAt: serverTimestamp() });
+    });
+  },
+  undoStocks: async (orgId, items, originalType, todoId) => {
+    await runTransaction(db, async (transaction) => {
+      const todoRef = doc(db, "organizations", orgId, "todos", todoId);
+      const logColRef = collection(db, "organizations", orgId, "inventory_logs");
+
+      const productRefs = items.map(item => doc(db, "organizations", orgId, "products", item.productId));
+      const productSnaps = await Promise.all(productRefs.map(ref => transaction.get(ref)));
+
+      for (let i = 0; i < items.length; i++) {
+        const currentStock = productSnaps[i].data().currentStock || 0;
+        const change = Number(items[i].quantity);
+        // 입고(IN) 취소는 재고 감소(-), 출고(OUT) 취소는 재고 증가(+)
+        const undoChange = originalType === 'IN' ? -change : change;
+        const newStock = currentStock + undoChange;
+
+        if (newStock < 0) {
+          throw new Error(`[취소 불가] '${items[i].name}'을(를) 이미 사용하였습니다. (현재 재고: ${currentStock}개)`);
+        }
+
+        transaction.update(productRefs[i], { currentStock: newStock, updatedAt: serverTimestamp() });
+
+        const newLogRef = doc(logColRef);
+        transaction.set(newLogRef, {
+          productId: items[i].productId,
+          productName: items[i].name,
+          type: `UNDO_${originalType}`,
+          changeQty: undoChange,
+          finalStock: newStock,
+          timestamp: serverTimestamp(),
+          todoId,
+          isUndo: true
+        });
+      }
+
+      transaction.update(todoRef, { status: 'pending', executedAt: null });
     });
   },
 

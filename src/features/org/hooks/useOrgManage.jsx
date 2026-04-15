@@ -1,7 +1,7 @@
 import { FirebaseOrgRepository as OrgAPI } from '../api/FirebaseOrgRepository';
 import React, { useState, useEffect } from 'react';
 
-export const useOrgManage = (currentOrg, notice) => {
+export const useOrgManage = (currentOrg, setCurrentOrg, notice) => {
 
     const [members, setMembers] = useState([]);
 
@@ -43,6 +43,7 @@ export const useOrgManage = (currentOrg, notice) => {
 
     const updateOrgName = async (newName) => {
         await OrgAPI.updateOrgName(currentOrg.id, newName);
+        setCurrentOrg({...currentOrg ,name: newName});
         notice("변경됨");
     }
 
