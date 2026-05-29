@@ -4,8 +4,9 @@ import { useProductActions } from '../hooks/useProductActions.jsx';
 import ProductEditor from './ProductEditor.jsx';
 import StockManager from './StockManager.jsx';
 import { styles } from '../../../styles.js'
+import { Modal, CloseButton } from '../../../common/components/ui/react-native/custom';
 
-const ProductDetailModal = ({ item, initialName, orgId, onClose, notice }) => {
+const ProductDetailModal = ({ visible, item, initialName, orgId, onClose, notice }) => {
 	const [editMode, setEditMode] = useState(item.isNew || false);
 	const [inputQty, setInputQty] = useState(item.isNew ? 0 : 1);
 	const [lastAuditDisplay, setLastAuditDisplay] = useState(item.lastAudit);
@@ -28,37 +29,34 @@ const ProductDetailModal = ({ item, initialName, orgId, onClose, notice }) => {
 	};
 
 	return (
-		<View style={styles.modalOverlay}>
-			<View style={styles.modalContent}>
-				{editMode ? (
-					<ProductEditor
-						item={item}
-						form={form}
-						setForm={setForm}
-						onSave={saveItem}
-						onDelete={deleteItem}
-						inputQty={inputQty}
-					/>
-				) : (
-					<StockManager
-						item={item}
-						lastAuditDisplay={lastAuditDisplay}
-						onAudit={handleAuditClick}
-						onEditMode={() => setEditMode(true)}
-						inputQty={inputQty}
-						setInputQty={setInputQty}
-						updateStock={updateStock}
-					/>
-				)}
+		<Modal>
+			{editMode ? (
+				<ProductEditor
+					item={item}
+					form={form}
+					setForm={setForm}
+					onSave={saveItem}
+					onDelete={deleteItem}
+					inputQty={inputQty}
+				/>
+			) : (
+				<StockManager
+					item={item}
+					lastAuditDisplay={lastAuditDisplay}
+					onAudit={handleAuditClick}
+					onEditMode={() => setEditMode(true)}
+					inputQty={inputQty}
+					setInputQty={setInputQty}
+					updateStock={updateStock}
+				/>
+			)}
 
-				<TouchableOpacity
-					onPress={() => (editMode && !item.isNew ? setEditMode(false) : onClose())}
-					style={styles.closeModalBtn}>
-						<Text style={styles.closeModalBtnText}>
-							{editMode && !item.isNew ? "이전으로" : "닫기"}</Text>
-				</TouchableOpacity>
-			</View>
-		</View>
+			<CloseButton
+				onPress={() => (
+					editMode && !item.isNew ? setEditMode(false) : onClose())}>
+				{editMode && !item.isNew ? "이전으로" : "닫기"}
+			</CloseButton>
+		</Modal>
 	);
 };
 

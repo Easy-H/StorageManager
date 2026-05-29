@@ -3,7 +3,9 @@ import Header from '../common/components/Header';
 import { useOrgManage } from '../features/org/hooks/useOrgManage';
 import { Member } from '../features/org/components/Member';
 import { ScrollView, View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { styles } from '../styles';
+import { styles, Colors } from '../styles';
+import { Button, H3 } from '../common/components/ui/react-native/common';
+import { Box, GreenButton } from '../common/components/ui/react-native/custom';
 
 const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }) => {
     const [newName, setNewName] = useState(currentOrg.name);
@@ -16,8 +18,8 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }) => {
             <ScrollView contentContainerStyle={ styles.appContent }>
 
                 {/* 1. 조직 정보 수정 */}
-                <Text style={styles.h3}>🏷️ 조직 이름 변경</Text>
-                <View style={ViewStyle}>
+                <H3>🏷️ 조직 이름 변경</H3>
+                <Box>
                     <View style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
                         <input
                             value={newName}
@@ -25,18 +27,16 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }) => {
                             className="input-basic"
                             style={{ flex: 1 }}
                         />
-                        <TouchableOpacity
-                            onPress={() => updateOrgName(newName)}
-                            style={[styles.greenButton]}
-                        >
-                            <Text style={styles.buttonText}>수정</Text>
-                        </TouchableOpacity>
+                        <GreenButton
+                            onPress={() => updateOrgName(newName)}>
+                            수정
+                        </GreenButton>
                     </View>
-                </View>
+                </Box>
 
                 {/* 2. 멤버 관리 */}
-                <Text style={styles.h3}>👤 멤버 및 권한 관리</Text>
-                <View style={ViewStyle}>
+                <H3>👤 멤버 및 권한 관리</H3>
+                <Box>
                     <View style={{ display: 'flex',
                         flexDirection: 'column', gap: 10 }}>
                         {members.map(member => {
@@ -47,34 +47,21 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }) => {
                                 ;
                         })}
                     </View>
-                </View>
+                </Box>
 
                 {/* 3. 위험 구역 */}
-                <Text style={[styles.h3, {color: '#ff4d4f'}]}>🚨 위험 구역</Text>
-                <View style={{ ...ViewStyle, border: '1px solid #ffccc7', backgroundColor: '#fff2f0' }}>
+                <H3 style={{color: '#ff4d4f'}}>🚨 위험 구역</H3>
+                <Box style={{ border: '1px solid #ffccc7', backgroundColor: '#fff2f0' }}>
                     <p style={{ fontSize: '12px', color: '#ff7875', marginBottom: '10px' }}>
                         조직을 삭제하면 재고 데이터와 모든 로그가 영구 삭제됩니다.
                     </p>
                     <TouchableOpacity onClick={deleteOrg} className="link-TouchableOpacity">
                         <Text style={{ color: '#ff4d4f', fontWeight: 'bold', padding: 0 }}>조직 전체 삭제하기</Text>
                     </TouchableOpacity>
-                </View>
+                </Box>
             </ScrollView>
         </>
     );
-};
-
-export const localStyle = StyleSheet.create({});
-// --- 스타일 객체 (기본 디자인 유지) ---
-const ViewStyle = {
-    background: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#eeeeee'
 };
 
 export default AdminPage;

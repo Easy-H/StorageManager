@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { styles } from '../../../styles.js'
+import { Colors } from '../../../styles.js'
 import { View, ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useProductSearch } from '../hooks/useProductSearch.jsx';
 
@@ -11,7 +11,7 @@ const getAuditStatus = (lastAuditDate) => {
 
   if (diffDays <= 7) return { text: "실사완료", color: "#52c41a", bg: "#f6ffed", needsAudit: false, needsInspection: false };
   if (diffDays <= 30) return { text: "점검예정", color: "#1890ff", bg: "#e6f7ff", needsAudit: false, needsInspection: true };
-  return { text: "실사필요", color: "#fa8c16", bg: "#fff7e6", needsAudit: true, needsInspection: true};
+  return { text: "실사필요", color: "#fa8c16", bg: "#fff7e6", needsAudit: true, needsInspection: true };
 };
 
 const ProductList = ({ products, searchTerm, onSelectProduct }) => {
@@ -32,7 +32,7 @@ const ProductList = ({ products, searchTerm, onSelectProduct }) => {
     if (filterType === "LOW_STOCK") return p.currentStock <= (p.safetyStock || 0);
     if (filterType === "NEEDS_AUDIT") return getAuditStatus(p.lastAudit).needsAudit;
     if (filterType === "NEEDS_INSPECTION") return getAuditStatus(p.lastAudit).needsInspection;
-    return true; 
+    return true;
   });
 
   // 2. 정렬 로직
@@ -58,7 +58,7 @@ const ProductList = ({ products, searchTerm, onSelectProduct }) => {
             onPress={() => setFilterType("ALL")}
             style={[localStyles.filterTab, filterType === "ALL" && localStyles.activeTab]}>
             <Text style={[localStyles.tabText, filterType === "ALL" && localStyles.activeTabText]}>
-                전체 ({counts.ALL})
+              전체 ({counts.ALL})
             </Text>
           </TouchableOpacity>
 
@@ -66,15 +66,15 @@ const ProductList = ({ products, searchTerm, onSelectProduct }) => {
             onPress={() => setFilterType("LOW_STOCK")}
             style={[localStyles.filterTab, filterType === "LOW_STOCK" && localStyles.activeTab]}>
             <Text style={[localStyles.tabText, filterType === "LOW_STOCK" && localStyles.activeTabText]}>
-                ⚠️ 부족 ({counts.LOW_STOCK})
+              ⚠️ 부족 ({counts.LOW_STOCK})
             </Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             onPress={() => setFilterType("NEEDS_INSPECTION")}
             style={[localStyles.filterTab, filterType === "NEEDS_INSPECTION" && localStyles.activeTab]}>
             <Text style={[localStyles.tabText, filterType === "NEEDS_INSPECTION" && localStyles.activeTabText]}>
-                ✅ 점검 ({counts.NEEDS_INSPECTION})
+              ✅ 점검 ({counts.NEEDS_INSPECTION})
             </Text>
           </TouchableOpacity>
 
@@ -82,7 +82,7 @@ const ProductList = ({ products, searchTerm, onSelectProduct }) => {
             onPress={() => setFilterType("NEEDS_AUDIT")}
             style={[localStyles.filterTab, filterType === "NEEDS_AUDIT" && localStyles.activeTab]}>
             <Text style={[localStyles.tabText, filterType === "NEEDS_AUDIT" && localStyles.activeTabText]}>
-                📅 실사 ({counts.NEEDS_AUDIT})
+              📅 실사 ({counts.NEEDS_AUDIT})
             </Text>
           </TouchableOpacity>
 
@@ -97,13 +97,13 @@ const ProductList = ({ products, searchTerm, onSelectProduct }) => {
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.productList}>
+      <ScrollView showsVerticalScrollIndicator={false} style={localStyles.productList}>
         {displayList.map(p => {
           const isLow = p.currentStock <= (p.safetyStock || 0);
           const audit = getAuditStatus(p.lastAudit);
 
           return (
-            <View key={p.id} onClick={() => onSelectProduct(p)} style={styles.productItem}>
+            <View key={p.id} onClick={() => onSelectProduct(p)} style={localStyles.productItem}>
               <View style={{ flex: 1 }}>
                 <View style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: 'row' }}>
                   <Text style={{ fontSize: '16px', fontWeight: 'bold' }}>{p.name}</Text>
@@ -157,7 +157,24 @@ const localStyles = StyleSheet.create({
   activeTabText: {
     color: '#1890ff',
     fontWeight: 'bold',
-  }
+  },
+  productList: {
+    flex: 1
+  },
+  productItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 18,
+    paddingRight: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f6f6f6',
+    backgroundColor: Colors.white,
+    display: 'flex',
+    cursor: 'pointer'
+  },
 });
 
 export default ProductList;

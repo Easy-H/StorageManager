@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Header from '../common/components/Header';
 import * as XLSX from 'xlsx';
 // Firebase 관련 import가 사라지고 Repository만 남습니다.
-import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { View, ScrollView, Text } from 'react-native';
 import { styles } from '../styles';
 import { useLog } from '../features/product/hooks/useLog';
+import { BlueButton, Box, GreenButton } from '../common/components/ui/react-native/custom';
 
 const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 	const { recentLogs, getAllLogs } = useLog(currentOrg);
@@ -73,7 +74,7 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 
 				{/* 주요 지표 카드 */}
 				<Text style={styles.h3}>📌 요약</Text>
-				<View style={ViewStyle}>
+				<Box>
 					<View style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
 						<View className="stat-card" style={{ background: '#fff7e6', padding: 15, borderRadius: 12, borderWidth: 1, borderStyle: 'solid', borderColor: '#ffd591' }}>
 							<Text style={{ fontSize: 12, color: '#fa8c16' }}>재고 부족</Text>
@@ -83,19 +84,19 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 							<Text style={{ fontSize: 12, color: '#2f54eb' }}>실사 필요</Text>
 							<Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1d39c4' }}>{overdueAuditItems} <Text style={{ fontSize: 14 }}>건</Text></Text>
 						</View>
-						<TouchableOpacity onPress={handleDownloadExcel}
-							style={styles.blueButton}>
-							<Text style={styles.buttonText}>📦 재고현황 받기</Text>
-						</TouchableOpacity>
-						<TouchableOpacity onPress={handleDownloadLogs} style={styles.greenButton}>
-							<Text style={styles.buttonText}>📋 활동로그 받기</Text>
-						</TouchableOpacity>
-					</View></View>
+						<BlueButton onPress={handleDownloadExcel}>
+								📦 재고현황 받기
+						</BlueButton >
+						<GreenButton onPress={handleDownloadLogs}>
+							📋 활동로그 받기
+						</GreenButton>
+					</View>
+				</Box>
 
 				{/* 🚀 발주 필요 리스트 섹션 (수정된 부분) */}
 
 				<Text style={styles.h3}>🚨 발주 필요 품목</Text>
-				<View style={ViewStyle}>
+				<Box>
 					{lowStockItems > 0 ? (
 						<View style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
 							{lowStockList.map(item => (
@@ -111,12 +112,12 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 					) : (
 						<Text style={{ fontSize: 14, color: '#52c41a', margin: 0 }}>✅ 모든 품목의 재고가 충분합니다.</Text>
 					)}
-				</View>
+				</Box>
 
 				{/* 최근 활동 로그 */}
 				<Text style={styles.h3}>🕒 최근 활동</Text>
 
-				<View style={[ViewStyle, {padding: 0}]}>
+				<Box style={{padding: 0}}>
 					{recentLogs.length > 0 ? (
 						recentLogs.map((log, index) => (
 							<View key={log.id} style={{
@@ -141,21 +142,10 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }) => {
 					) : (
 						<Text style={{ padding: 30, textAlign: 'center', color: '#999', fontSize: 13 }}>기록이 없습니다.</Text>
 					)}
-				</View>
+				</Box>
 			</ScrollView>
 		</>
 	);
 };
 
 export default DashboardPage;
-
-const ViewStyle = {
-	background: '#fff',
-	padding: 16,
-	borderRadius: 12,
-	marginBottom: 16,
-	boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-	borderWidth: 1,
-	borderStyle: 'solid',
-	borderColor: '#eeeeee'
-};

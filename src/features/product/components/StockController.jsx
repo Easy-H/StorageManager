@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
-import { Colors, styles } from '../../../styles';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { Colors } from '../../../styles';
+import { Button } from '../../../common/components/ui/react-native/common';
+import { BlueButton, CloseButton, GreenButton } from '../../../common/components/ui/react-native/custom';
 
 const StockController = ({ inputQty, setInputQty, currentStock, updateStock, item }) => {
   const [isDirectInput, setIsDirectInput] = useState(false);
@@ -20,9 +22,9 @@ const StockController = ({ inputQty, setInputQty, currentStock, updateStock, ite
   return (
     <>
       <View className="qty-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginVertical: 10, flexDirection: 'row' }}>
-        <TouchableOpacity onPress={handleDecrease} style={circleQtyBtn}>
-          <Text style={circleQtyBtnText}>-</Text>
-        </TouchableOpacity>
+        <Button onPress={handleDecrease} style={circleQtyBtn}>
+          -
+        </Button>
         <TextInput
           type="number"
           value={inputQty}
@@ -37,46 +39,42 @@ const StockController = ({ inputQty, setInputQty, currentStock, updateStock, ite
             borderBottomStyle: 'solid', borderBottomColor: '#ddd',
             background: 'transparent' }}
         />
-        <TouchableOpacity onPress={handleIncrease} style={circleQtyBtn}>
-          <Text style={circleQtyBtnText}>+</Text>
-        </TouchableOpacity>
+        <Button onPress={handleIncrease} style={circleQtyBtn}>
+          +
+        </Button>
       </View>
 
       <View className="TouchableOpacity-row" style={{ display: 'flex', gap: 10, flexDirection: 'row', justifyContent: 'center' }}>
         {isDirectInput ? (
-          <TouchableOpacity
+          <GreenButton
             onPress={() => updateStock(item, inputQty, true, 'ADJUST')}
-            style={styles.greenButton}
           >
-            <Text style={styles.buttonText}>이 수량으로 확정 (실사 포함)</Text>
-
-          </TouchableOpacity>
+            이 수량으로 확정 (실사 포함)
+          </GreenButton>
         ) : (
           <>
-            <TouchableOpacity
+            <GreenButton
               onPress={() => updateStock(item, inputQty, false, 'IN')}
-              style={styles.greenButton}
             >
-              <Text style={styles.buttonText}>입고(+)</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleOutStock} // ✨ 검증 함수로 교체
-              className="blue-TouchableOpacity"
-              style={[styles.blueButton, { backgroundColor: inputQty > currentStock ? '#ccc' : Colors.primary }]}
+              입고(+)
+            </GreenButton>
+            <BlueButton
+              onPress={handleOutStock}
+              style={{ background: inputQty > currentStock ? '#ccc' : Colors.primary }}
             >
-              <Text style={styles.buttonText}>출고(-)</Text>
-            </TouchableOpacity>
+              출고(-)
+            </BlueButton>
           </>
         )}
       </View>
 
-      <TouchableOpacity
+      <CloseButton
         onPress={() => {
           setIsDirectInput(!isDirectInput);
           setInputQty(isDirectInput ? 1 : currentStock);
         }}>
-        <Text style={styles.closeModalBtnText}>{isDirectInput ? "◀ 증감 모드로 전환" : "실재고 숫자를 직접 수정"}</Text>
-      </TouchableOpacity>
+          {isDirectInput ? "◀ 증감 모드로 전환" : "실재고 숫자를 직접 수정"}
+      </CloseButton>
     </>
   );
 };
@@ -90,13 +88,8 @@ const circleQtyBtn = {
   borderStyle: 'solid',
   borderColor: Colors.borderColor,
   fontSize: 20,
-  alignItems: 'center',
   cursor: 'pointer',
   padding: 0,
-}
-
-const circleQtyBtnText = {
   fontSize: 20,
-  flex: 1,
   alignContent: 'center',
 }

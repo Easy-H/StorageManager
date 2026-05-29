@@ -1,67 +1,67 @@
 import React from 'react';
 import {
-  View, ScrollView, Text, TextInput, TouchableOpacity,
+  View, ScrollView, Text,
   StyleSheet, Platform, Dimensions
 } from 'react-native';
 import { styles } from '../../../styles.js'
+import GreenButton from '../../../common/components/ui/react-native/custom/GreenButton.jsx';
+import CloseButton from '../../../common/components/ui/react-native/custom/CloseButton.jsx';
+import H2 from '../../../common/components/ui/react-native/common/H2.jsx';
+import InputText from '../../../common/components/ui/react-native/custom/InputText.jsx';
 
 const ProductEditor = ({ item, form, setForm, onSave, onDelete, inputQty }) => (
   <View style={styles.formStack}>
-    <Text style={styles.h2}>{item.isNew ? "신규 품목 등록" : "정보 수정"}</Text>
-    <TextInput
+    <H2>{item.isNew ? "신규 품목 등록" : "정보 수정"}</H2>
+    <InputText
       value={form.name}
       onChange={e => setForm({ ...form, name: e.target.value })}
       placeholder="품목 이름"
-      style={styles.inputBasic}
     />
-    <TextInput
+    <InputText
       value={form.barcode}
       onChange={e => setForm({ ...form, barcode: e.target.value })}
       placeholder="바코드(선택)"
-      style={styles.inputBasic}
     />
     {item.isNew && (
       <>
       <Text style={{ fontSize: '12', textAlign: 'left', marginTop: '10px' }}>
       최초 입고 수량 (선택)
       </Text>
-        <TextInput
+        <InputText
           type="number"
           value={form.initialStock | 0}
           onChange={e => setForm({ ...form, initialStock: Number(e.target.value) })}
           placeholder="0"
-          style={[styles.inputBasic]}
         />
       </>
     )}
     <Text style={{ fontSize: '12', textAlign: 'left', marginTop: '10px' }}>안전 재고 기준 (개)</Text>
-    <TextInput
+    <InputText
       type="number"
       value={form.safetyStock}
       onChange={e => setForm({ ...form, safetyStock: Number(e.target.value) })}
-      style={styles.inputBasic}
     />
 
-    <TextInput
+    <InputText
       multiline
       numberOfLines={4}
       value={form.memo}
       onChange={e => setForm({ ...form, memo: e.target.value })}
       placeholder="기타 메모 (보관 방법, 주의사항 등 자유롭게 입력)"
-      style={[styles.inputBasic, localStyles.memoInput]}
+      style={localStyles.memoInput}
     />
 
 
     <View style={[styles.buttonRow, { marginTop: '10px', gap: '8px' }]}>
-      <TouchableOpacity onPress={() => onSave(item.id, form, inputQty)}
-        style={[styles.greenButton, { flex: 2 }]}>
-        <Text style={styles.buttonText}>저장하기</Text>
-      </TouchableOpacity>
+      <GreenButton onPress={() => onSave(item.id, form, inputQty)}
+        style={{ flex: 2 }}>
+          저장하기
+      </GreenButton>
       {!item.isNew && (
-        <TouchableOpacity onPress={() => onDelete(item)}
-          style={{ justifyContent: 'center', flex: 1 }}>
-          <Text style={[styles.linkButton, { color: '#ff4d4f' }]}>삭제</Text>
-        </TouchableOpacity>
+        <CloseButton onPress={() => onDelete(item)}
+          style={{ justifyContent: 'center', flex: 1, color: '#ff4d4f' }}>
+          삭제
+        </CloseButton>
       )}
     </View>
   </View>

@@ -1,4 +1,5 @@
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import { Button } from '../../../common/components/ui/react-native/common';
 
 export const Member = ({ member, user }) => {
     const role = member.level == 100 ? 'admin' : 'member';
@@ -16,20 +17,15 @@ export const Member = ({ member, user }) => {
             </View>
             {!isMe && (
                 <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
-                    <TouchableOpacity onClick={() => upgradeMemberLevel(member, role)} style={localStyle.roleBtnStyle}>
-                        <Text style={localStyle.roleBtnTextStyle}>
-                            {role === 'admin' ? '멤버로 강등' : '관리자로 승격'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
+                    <Button onClick={() => upgradeMemberLevel(member, role)} style={localStyle.roleBtnStyle}>
+                            {role === 'admin' ? '멤버로 강등' : '관리자로 승격'}
+                    </Button>
+                    <Button
                         onClick={() => removeMember(member.uid)}
                         style={{ ...localStyle.removeBtnStyle, color: 'red' }}
                     >
-                        <Text style={{
-                            ...localStyle.roleBtnTextStyle,
-                            color: 'red'
-                        }}>
-                            내보내기</Text>
-                    </TouchableOpacity>
+                        내보내기
+                    </Button>
                 </View>
             )}
         </View>
@@ -56,12 +52,10 @@ export const localStyle = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ddd',
         backgroundColor: '#52c41a',
-    }, 
-    roleBtnTextStyle: {
         fontSize: 12,
         color: 'white',
         fontWeight: 'bold',
-    },
+    }, 
     removeBtnStyle: {
         paddingHorizontal: 10,
         paddingVertical: 6,

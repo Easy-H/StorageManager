@@ -1,16 +1,18 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { styles } from '../../../styles';
 import StockController from './StockController';
+import { H2 } from '../../../common/components/ui/react-native/common';
+import { CloseButton } from '../../../common/components/ui/react-native/custom';
 
 const StockManager = ({ item, lastAuditDisplay, onAudit, onEditMode, inputQty, setInputQty, updateStock }) => {
 
     return (
         <>
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={styles.h2}>{item.name}</Text>
-                <TouchableOpacity onPress={onEditMode}>
-                    <Text style={styles.closeModalBtnText}>편집</Text></TouchableOpacity>
+                <H2>{item.name}</H2>
+                <CloseButton onPress={onEditMode}>
+                    편집
+                </CloseButton>
             </View>
 
             {item.memo && (
@@ -33,7 +35,7 @@ const StockManager = ({ item, lastAuditDisplay, onAudit, onEditMode, inputQty, s
                 </Text>
                 <TouchableOpacity onPress={onAudit}>
                     <Text style={auditBtnStyle}>✅ 수량 일치 확인 (실사)</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> 
             </View>
 
             <StockController inputQty={inputQty} setInputQty={setInputQty} currentStock={item.currentStock} item={item} updateStock={updateStock} />

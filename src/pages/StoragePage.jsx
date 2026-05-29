@@ -4,8 +4,9 @@ import ProductList from '../features/product/components/ProductList';
 import ScannerModal from '../common/components/ScannerModal';
 import ProductDetailModal from '../features/product/components/ProductDetailModal';
 import Header from '../common/components/Header';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { styles } from '../styles';
+import { BlueButton, GreenButton } from '../common/components/ui/react-native/custom';
 
 const StoragePage = ({ products, currentOrg, onBack, notice }) => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -23,15 +24,14 @@ const StoragePage = ({ products, currentOrg, onBack, notice }) => {
                         value={searchTerm}
                         onChange={setSearchTerm} />
 
-                    <TouchableOpacity onPress={() => setIsScannerOpen(true)} style={styles.blueButton}>
-                        <Text style={styles.buttonText}>📷</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
+                    <BlueButton onPress={() => setIsScannerOpen(true)}>
+                        📷
+                    </BlueButton>
+                    <GreenButton
                         onPress={() => setSelectedItem({ barcode: '', name: '', isNew: true, currentStock: 0 })}
-                        style={styles.greenButton}>
-                        <Text style={styles.buttonText}>
-                            추가</Text>
-                    </TouchableOpacity>
+                        >
+                        추가
+                    </GreenButton>
                 </View>
 
                 <ProductList products={products} searchTerm={searchTerm} onSelectProduct={setSelectedItem} />

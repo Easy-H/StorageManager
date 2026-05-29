@@ -4,6 +4,8 @@ import OrgList from '../features/org/components/OrgList';
 import { useOrg } from '../features/org/hooks/useOrg';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { styles } from '../styles';
+import { GreenButton, BlueButton } from '../common/components/ui/react-native/custom';
+import { Button } from '../common/components/ui/react-native/common';
 
 function OrgSelectPage({ user, userProfile, setCurrentOrg, onLogout, navigate, notice }) {
 	const [loading, setLoading] = useState(true); // 로딩 상태
@@ -25,12 +27,14 @@ function OrgSelectPage({ user, userProfile, setCurrentOrg, onLogout, navigate, n
 			/>
 
 			<View style={localStyle.buttons}>
-				<TouchableOpacity onPress={() => orgJoin()}
-					style={[styles.greenButton, {flex: 1}]}>
-					<Text style={styles.buttonText}>조직 생성</Text></TouchableOpacity>
-				<TouchableOpacity onPress={() => orgCreate}
-					style={[styles.blueButton, {flex: 1}]}>
-					<Text style={styles.buttonText}>조직 참여</Text></TouchableOpacity>
+				<GreenButton onPress={() => orgJoin()}
+					style={{flex: 1}}>
+					조직 생성
+				</GreenButton>
+				<BlueButton onPress={() => orgCreate}
+					style={{flex: 1}}>
+					조직 참여
+				</BlueButton>
 			</View>
 
 			<View style={localStyle.profileHeader}>
@@ -40,12 +44,9 @@ function OrgSelectPage({ user, userProfile, setCurrentOrg, onLogout, navigate, n
 					<Text style={localStyle.authEMail}>{user?.email}</Text>
 				</View>
 				{/* 이 부분의 </TouchableOpacity> 태그가 </View>로 되어 있었을 수 있습니다 */}
-				<TouchableOpacity
-					onPress={onLogout}
-					className="link-TouchableOpacity"
-				>
-					<Text style={localStyle.logout}>로그아웃</Text>
-				</TouchableOpacity>
+				<Button style={localStyle.logout}>
+					로그아웃
+				</Button>
 			</View>
 		</View>
 	);

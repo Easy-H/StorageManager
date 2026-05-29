@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FirebaseOrgRepository as OrgAPI } from '../api/FirebaseOrgRepository';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { Colors, styles } from '../../../styles';
+import { Colors } from '../../../styles';
 
 
 const OrgList = ({ user, navigate, setCurrentOrg, onLoading, notice }) => {
@@ -42,13 +42,13 @@ const OrgList = ({ user, navigate, setCurrentOrg, onLoading, notice }) => {
 
     return (
 
-        <View style={styles.orgList}>
+        <View style={localStyles.orgList}>
             {
                 orgs?.length > 0 ? (
                     orgs.map(o => (
-                        <View key={o.id} onClick={() => handleSelectOrg(o)} style={[styles.orgCard, { cursor: 'pointer', padding: 15, border: '1px solid #eee', borderRadius: 10, marginBottom: 10 }]}>
+                        <View key={o.id} onClick={() => handleSelectOrg(o)} style={[localStyles.orgCard, { cursor: 'pointer', padding: 15, border: '1px solid #eee', borderRadius: 10, marginBottom: 10 }]}>
                             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                                <Text style={{fontSize: 16, fontWeight: 'bolder', color: Colors.primary}}>{o.name}</Text>
+                                <Text style={{ fontSize: 16, fontWeight: 'bolder', color: Colors.primary }}>{o.name}</Text>
                                 <Text style={{ color: '#888', fontSize: 10, background: '#f0f0f0', paddingVertical: 2, paddingHorizontal: 6, borderRadius: 4 }}>
                                     {o.level >= 100 ? "admin" : "member"}
                                 </Text>
@@ -65,8 +65,21 @@ const OrgList = ({ user, navigate, setCurrentOrg, onLoading, notice }) => {
     )
 }
 
-export const localStyle = StyleSheet.create({
-
+export const localStyles = StyleSheet.create({
+    orgList: {
+        width: '100%',
+        gap: 12,
+    },
+    orgCard: {
+        padding: 18,
+        borderWidth: 1,
+        borderColor: Colors.primary,
+        borderRadius: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: Colors.bgLight,
+    },
 });
 
 export default OrgList;

@@ -1,12 +1,15 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useRef, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import * as XLSX from 'xlsx';
-import { useTodos } from '../features/todo/contexts/TodoContext';
-import { styles, Colors } from '../styles';
+
 import Header from '../common/components/Header';
-import TodoModal from '../features/todo/components/TodoModal';
-import TodoList from '../features/todo/components/TodoList';
 import SearchBar from '../common/components/SearchBar';
+import { BlueButton, GreenButton } from '../common/components/ui/react-native/custom';
+
+import TodoList from '../features/todo/components/TodoList';
+import TodoModal from '../features/todo/components/TodoModal';
+import { useTodos } from '../features/todo/contexts/TodoContext';
+import { Colors, styles } from '../styles';
 
 export default function TodoPage({ products, currentOrg, onBack, notice }) {
     const { todos, loading, deleteTodo, executeTodo, addNewTodo, updateTodo, undoTodo } = useTodos();
@@ -129,18 +132,16 @@ export default function TodoPage({ products, currentOrg, onBack, notice }) {
                         placeholder={"할 일 이름 검색..."}
                         value={searchTerm}
                         onChange={setSearchTerm} />
-                    <TouchableOpacity
-                        style={styles.greenButton}
+                    <GreenButton
                         onPress={() => { setSelectedTodo(null); setModalVisible(true); }}
                     >
-                        <Text style={styles.buttonText}>+ 새 할 일</Text>
-                    </TouchableOpacity>
+                        + 새 할 일
+                    </GreenButton>
 
-                    <TouchableOpacity
-                        style={styles.blueButton}
+                    <BlueButton
                         onPress={() => fileInputRef.current?.click()}>
-                        <Text style={styles.buttonText}>EXCEL</Text>
-                    </TouchableOpacity>
+                            EXCEL
+                    </BlueButton>
                 </View>
                 <TodoList todos={todos} searchTerm={searchTerm} openEditModal={openEditModal}
                     handleDelete={handleDelete} handleExecute={handleExecute} handleUndo={handleUndo} />

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import { styles, Colors } from '../../../styles';
 import ProductSearchModal from './ProductSearchModal';
+import { BlueButton, CloseButton, GreenButton, InputText, Modal } from '../../../common/components/ui/react-native/custom'
+import { Button, H2, H3 } from '../../../common/components/ui/react-native/common';
 
 export default function TodoModal({ visible, onClose, onSave, onExecute, onDelete, onRegisterProduct, initialData, initialName, products }) {
   const [title, setTitle] = useState(initialName);
@@ -60,149 +62,142 @@ export default function TodoModal({ visible, onClose, onSave, onExecute, onDelet
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.h2}>{initialData ? "할 일 관리" : "새 할 일 등록"}</Text>
+    <Modal visible={visible}>
+      <H2>{initialData ? "할 일 관리" : "새 할 일 등록"}</H2>
 
-          {/* 제목 입력 */}
-          <View style={{ marginBottom: 15 }}>
-            <TextInput
-              placeholder="할 일 제목 (예: 3월 20일 입고분)"
-              style={styles.inputBasic}
-              value={title}
-              onChangeText={setTitle}
-            />
-          </View>
+      {/* 제목 입력 */}
+      <View style={{ marginBottom: 15 }}>
+        <InputText
+          placeholder="할 일 제목 (예: 3월 20일 입고분)"
+          value={title}
+          onChangeText={setTitle}
+        />
+      </View>
 
-          {/* 유형 선택 */}
-          <View style={localStyles.sectionRow}>
-            <Text style={styles.h3}>거래 유형</Text>
-            <View style={localStyles.typeButtonGroup}>
-              <TouchableOpacity
-                onPress={() => setType('IN')}
-                style={[localStyles.typeBtn, type === 'IN' && { backgroundColor: Colors.primary, borderColor: Colors.primary }]}>
-                <Text style={{ color: type === 'IN' ? '#fff' : '#666' }}>입고 (+)</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setType('OUT')}
-                style={[localStyles.typeBtn, type === 'OUT' && { backgroundColor: Colors.errorRed, borderColor: Colors.errorRed }]}>
-                <Text style={{ color: type === 'OUT' ? '#fff' : '#666' }}>출고 (-)</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* 품목 리스트 영역 */}
-          <View style={{ flex: 1 }}>
-            <View style={localStyles.itemHeader}>
-              <Text style={styles.h3}>품목 리스트 ({items.length})</Text>
-              <TouchableOpacity onPress={() => setItems([...items, { productId: '', name: '', quantity: 1 }])}>
-                <Text style={{ color: Colors.primary, fontWeight: 'bold' }}>+ 추가</Text>
-              </TouchableOpacity>
-            </View>
-            <ScrollView
-              ref={scrollViewRef} // 2. ref 연결
-              style={{ maxHeight: 150, minHeight: 150, }}
-              // 3. 컨텐츠 사이즈가 변할 때(아이템 추가 시) 자동으로 아래로 이동
-              onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
-            >
-              {items.map((item, index) => {
-                const isUnknown = item.productId ? false : true; // ID가 없으면 미등록(빨간색 표시)
-
-                return (
-                  <View key={index} style={[localStyles.itemRow, isUnknown && localStyles.unknownRow]}>
-                    {/* 제품 선택 또는 이름 표시 */}
-                    <TouchableOpacity
-                      style={[localStyles.productPick, { flex: 1 }]}
-                      onPress={() => { setActiveIndex(index); setSearchModalVisible(true); }}
-                    >
-                      <Text style={{ color: isUnknown ? Colors.errorRed : '#333', fontWeight: isUnknown ? 'bold' : 'normal' }}>
-                        {item.name || "제품 선택..."} {isUnknown && "(미등록)"}
-                      </Text>
-                    </TouchableOpacity>
-
-                    {/* 미등록 시 등록 버튼 노출 */}
-
-                    {
-                      !!(item && item.name && isUnknown) && (
-                        <TouchableOpacity
-                          onPress={() => handleRegisterNew(index)}
-                          style={localStyles.miniRegisterBtn}>
-                          <Text style={{ fontSize: 20, color: '#fff', padding: 5 }}>등록</Text>
-                        </TouchableOpacity>
-                      )
-                    }
-
-                    {/* 수량 입력 */}
-                    <TextInput
-                      style={[styles.inputBasic, { width: 80, textAlign: 'center' }]}
-                      keyboardType="numeric"
-                      value={String(item.quantity)}
-                      onChangeText={(v) => {
-                        const next = [...items];
-                        next[index].quantity = Number(v) || 0;
-                        setItems(next);
-                      }}
-                    />
-
-                    {/* 행 삭제 */}
-                    <TouchableOpacity onPress={() => setItems(items.filter((_, i) => i !== index))} style={{ padding: 5 }}>
-                      <Text style={{ color: Colors.errorRed }}>❌</Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
-              {items.length === 0 && (
-                <Text style={{ textAlign: 'center', color: '#ccc', marginVertical: 20 }}>등록된 품목이 없습니다.</Text>
-              )}
-            </ScrollView>
-          </View>
-
-          {/* 하단 액션 버튼 */}
-          <View style={{ gap: 20 }}>
-            {initialData && (
-              <TouchableOpacity
-                style={[styles.blueButton, { width: '100%' }]}
-                onPress={() => { onExecute(initialData); onClose(); }}>
-                <Text style={styles.buttonText}>재고에 최종 반영(실행)</Text>
-              </TouchableOpacity>
-            )}
-
-            <View style={styles.buttonRow}>
-              <TouchableOpacity style={[styles.greenButton, { flex: 2 }]} onPress={handleSave}>
-                <Text style={styles.buttonText}>{initialData ? "변경사항 저장" : "할 일 등록하기"}</Text>
-              </TouchableOpacity>
-
-              {initialData && (
-                <TouchableOpacity
-                  onPress={() => { onDelete(initialData.id); onClose(); }}
-                  style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: Colors.errorRed, fontWeight: 'bold' }}>삭제</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-
-            <TouchableOpacity style={styles.closeModalBtn} onPress={onClose}>
-              <Text style={styles.closeModalBtnText}>닫기</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* 제품 검색 모달 연동 */}
-          {searchModalVisible && (
-            <ProductSearchModal
-              visible={searchModalVisible}
-              products={products}
-              productSelected={items}
-              onSelect={(p) => {
-                const next = [...items];
-                next[activeIndex] = { productId: p.id, name: p.name, quantity: 1 };
-                setItems(next);
-              }}
-              onClose={() => setSearchModalVisible(false)}
-            />
-          )}
+      {/* 유형 선택 */}
+      <View style={localStyles.sectionRow}>
+        <H3>거래 유형</H3>
+        <View style={localStyles.typeButtonGroup}>
+          <Button
+            onPress={() => setType('IN')}
+            style={[localStyles.typeBtn, type === 'IN' && { backgroundColor: Colors.primary, borderColor: Colors.primary, color: type === 'IN' ? '#fff' : '#666' }]}>
+            입고 (+)
+          </Button>
+          <Button
+            onPress={() => setType('OUT')}
+            style={[localStyles.typeBtn, type === 'OUT' && { backgroundColor: Colors.errorRed, borderColor: Colors.errorRed, color: type === 'OUT' ? '#fff' : '#666' }]}>
+            출고 (-)
+          </Button>
         </View>
       </View>
+
+      {/* 품목 리스트 영역 */}
+      <View style={{ flex: 1 }}>
+        <View style={localStyles.itemHeader}>
+          <H3>품목 리스트 ({items.length})</H3>
+          <Button onPress={() => setItems([...items, { productId: '', name: '', quantity: 1 }])}
+            style={{ color: Colors.primary, fontWeight: 'bold' }}>
+            + 추가
+          </Button>
+        </View>
+        <ScrollView
+          ref={scrollViewRef} // 2. ref 연결
+          style={{ maxHeight: 150, minHeight: 150, }}
+          // 3. 컨텐츠 사이즈가 변할 때(아이템 추가 시) 자동으로 아래로 이동
+          onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+        >
+          {items.map((item, index) => {
+            const isUnknown = item.productId ? false : true; // ID가 없으면 미등록(빨간색 표시)
+
+            return (
+              <View key={index} style={[localStyles.itemRow, isUnknown && localStyles.unknownRow]}>
+                {/* 제품 선택 또는 이름 표시 */}
+                <Button
+                  style={[localStyles.productPick, { flex: 1, color: isUnknown ? Colors.errorRed : '#333', fontWeight: isUnknown ? 'bold' : 'normal' }]}
+                  onPress={() => { setActiveIndex(index); setSearchModalVisible(true); }}
+                >
+                  {item.name || "제품 선택..."} {isUnknown && "(미등록)"}
+                </Button>
+
+                {/* 미등록 시 등록 버튼 노출 */}
+
+                {
+                  !!(item && item.name && isUnknown) && (
+                    <Button
+                      onPress={() => handleRegisterNew(index)}
+                      style={[localStyles.miniRegisterBtn, { fontSize: 20, color: '#fff', padding: 5 }]}>
+                      등록
+                    </Button>
+                  )
+                }
+
+                {/* 수량 입력 */}
+                <InputText
+                  style={{ width: 80, textAlign: 'center' }}
+                  keyboardType="numeric"
+                  value={String(item.quantity)}
+                  onChangeText={(v) => {
+                    const next = [...items];
+                    next[index].quantity = Number(v) || 0;
+                    setItems(next);
+                  }}
+                />
+
+                {/* 행 삭제 */}
+                <Button onPress={() => setItems(items.filter((_, i) => i !== index))} style={{ padding: 5, color: Colors.errorRed }}>
+                  ❌
+                </Button>
+              </View>
+            );
+          })}
+          {items.length === 0 && (
+            <Text style={{ textAlign: 'center', color: '#ccc', marginVertical: 20 }}>등록된 품목이 없습니다.</Text>
+          )}
+        </ScrollView>
+      </View>
+
+      {/* 하단 액션 버튼 */}
+      <View style={{ gap: 20 }}>
+        {initialData && (
+          <BlueButton style={{ width: '100%' }}
+            onPress={() => { onExecute(initialData); onClose(); }}>
+            재고에 최종 반영(실행)
+          </BlueButton>
+        )}
+
+        <View style={styles.buttonRow}>
+          <GreenButton style={{ flex: 2 }} onPress={handleSave}>
+            {initialData ? "변경사항 저장" : "할 일 등록하기"}
+          </GreenButton>
+
+          {initialData && (
+            <Button
+              onPress={() => { onDelete(initialData.id); onClose(); }}
+              style={{ flex: 1, alignItems: 'center', justifyContent: 'center', color: Colors.errorRed, fontWeight: 'bold' }}>
+              삭제
+            </Button>
+          )}
+        </View>
+
+        <CloseButton onPress={onClose}>
+          닫기
+        </CloseButton>
+      </View>
+
+      {/* 제품 검색 모달 연동 */}
+      {searchModalVisible && (
+        <ProductSearchModal
+          visible={searchModalVisible}
+          products={products}
+          productSelected={items}
+          onSelect={(p) => {
+            const next = [...items];
+            next[activeIndex] = { productId: p.id, name: p.name, quantity: 1 };
+            setItems(next);
+          }}
+          onClose={() => setSearchModalVisible(false)}
+        />
+      )}
     </Modal>
   );
 }
