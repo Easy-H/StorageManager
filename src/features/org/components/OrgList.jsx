@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FirebaseOrgRepository as OrgAPI } from '../api/FirebaseOrgRepository';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { Colors } from '../../../styles';
+import { View, StyleSheet, Text } from 'react-native';
+import OrgListItem from './OrgListItem';
 
 
 const OrgList = ({ user, navigate, setCurrentOrg, onLoading, notice }) => {
@@ -46,17 +46,7 @@ const OrgList = ({ user, navigate, setCurrentOrg, onLoading, notice }) => {
             {
                 orgs?.length > 0 ? (
                     orgs.map(o => (
-                        <View key={o.id} onClick={() => handleSelectOrg(o)} style={[localStyles.orgCard, { cursor: 'pointer', padding: 15, border: '1px solid #eee', borderRadius: 10, marginBottom: 10 }]}>
-                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                                <Text style={{ fontSize: 16, fontWeight: 'bolder', color: Colors.primary }}>{o.name}</Text>
-                                <Text style={{ color: '#888', fontSize: 10, background: '#f0f0f0', paddingVertical: 2, paddingHorizontal: 6, borderRadius: 4 }}>
-                                    {o.level >= 100 ? "admin" : "member"}
-                                </Text>
-                            </View>
-                            <View style={{ fontSize: '11px', color: '#aaa', marginTop: '6px', fontFamily: 'monospace' }}>
-                                ID: {o.id}
-                            </View>
-                        </View>
+                        <OrgListItem key={o.id} org={o} onSelect={handleSelectOrg} />
                     ))
                 ) : (
                     <Text style={{ color: '#999', margin: '20px 0', textAlign: 'center' }}>소속된 조직이 없습니다.</Text>
@@ -69,16 +59,6 @@ export const localStyles = StyleSheet.create({
     orgList: {
         width: '100%',
         gap: 12,
-    },
-    orgCard: {
-        padding: 18,
-        borderWidth: 1,
-        borderColor: Colors.primary,
-        borderRadius: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: Colors.bgLight,
     },
 });
 

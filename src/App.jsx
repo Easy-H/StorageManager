@@ -8,7 +8,7 @@ import './App.css'
 
 // 기존 API 및 훅 (그대로 유지)
 import { FirebaseAuthRepository as AuthAPI } from './features/auth/api/FirebaseAuthRepository';
-import { useAuth } from './common/hooks/useAuth';
+import { useAuth } from './features/auth/hooks/useAuth';
 import { useProducts } from './features/product/hooks/useProducts';
 import { useToast } from './common/hooks/useToast';
 

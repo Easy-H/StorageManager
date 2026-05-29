@@ -5,7 +5,6 @@ import { styles } from '../../../../../styles';
 export default function InputText({ style, ...props }) {
 
     return (
-
         <TextInput
             style={[styles.inputBasic, style]}
             {...props}

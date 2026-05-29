@@ -1,17 +1,20 @@
-import { TouchableOpacity, Text } from "react-native-web";
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
 export default function Button({ style, children, ...props}) {
+    const flatStyle = StyleSheet.flatten(style);
+    
     return (
         <TouchableOpacity 
             style={[buttonStyle, style]}
             { ...props }>
             <Text
                 style={{
-                    color: style?.color,
-                    fontSize: style?.fontSize,
-                    fontWeight: style?.fontWeight,
-                    textDecoration: style?.textDecoration,
-                    textAlign: style?.textAlign
+                    color: flatStyle?.color,
+                    fontSize: flatStyle?.fontSize,
+                    fontWeight: flatStyle?.fontWeight,
+                    textDecorationLine: flatStyle?.textDecorationLine || flatStyle?.textDecoration,
+                    textAlign: flatStyle?.textAlign,
+                    textWrap: flatStyle?.textWrap
                 }}
             >
                 { children }

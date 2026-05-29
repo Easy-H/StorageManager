@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
-import { useProductActions } from '../hooks/useProductActions.jsx';
+import { useEffect, useState } from 'react';
+
+import { LinkButton, Modal } from '../../../common/components/ui/react-native/custom';
+import { useProductActions } from '../hooks/useProductActions';
+
 import ProductEditor from './ProductEditor.jsx';
-import StockManager from './StockManager.jsx';
-import { styles } from '../../../styles.js'
-import { Modal, CloseButton } from '../../../common/components/ui/react-native/custom';
+import StockEditor from './StockEditor.jsx';
 
 const ProductDetailModal = ({ visible, item, initialName, orgId, onClose, notice }) => {
 	const [editMode, setEditMode] = useState(item.isNew || false);
@@ -40,7 +40,7 @@ const ProductDetailModal = ({ visible, item, initialName, orgId, onClose, notice
 					inputQty={inputQty}
 				/>
 			) : (
-				<StockManager
+				<StockEditor
 					item={item}
 					lastAuditDisplay={lastAuditDisplay}
 					onAudit={handleAuditClick}
@@ -51,11 +51,11 @@ const ProductDetailModal = ({ visible, item, initialName, orgId, onClose, notice
 				/>
 			)}
 
-			<CloseButton
+			<LinkButton
 				onPress={() => (
 					editMode && !item.isNew ? setEditMode(false) : onClose())}>
 				{editMode && !item.isNew ? "이전으로" : "닫기"}
-			</CloseButton>
+			</LinkButton>
 		</Modal>
 	);
 };
