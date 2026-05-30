@@ -1,6 +1,6 @@
-import React from 'react';
-import { StyleSheet, View, Text, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Button } from '../../../common/components/ui/react-native/common';
+import { Colors } from '../../../styles';
 import { OrgMember, OrgRole } from '../types';
 
 interface MemberProps {
@@ -15,27 +15,38 @@ export const Member = ({ member, user, upgradeMemberLevel, removeMember }: Membe
     const isMe = member.uid === user.uid;
     
     return (
-        <View style={localStyle.memberItemStyle}>
-            <View>
-                <Text style={{ fontWeight: 'bold', color: '#242424' }}>
-                    {member.userName || member.name || member.email} {isMe && "(나)"}
-                </Text>
-                <View>
-                    <Text style={{ fontSize: 12, color: '#888' } as TextStyle}>
-                        {role === 'admin' ? '👑 관리자' : '👤 멤버'}</Text>
+        <View style={[localStyle.memberItemStyle, isMe && localStyle.isMeContainer]}>
+            <View style={localStyle.infoSection}>
+                <View style={localStyle.nameRow}>
+                    <Text style={[localStyle.nameText, isMe && localStyle.isMeText]}>
+                        {member.userName || member.name || member.email?.split('@')[0]}
+                    </Text>
+                    {isMe && (
+                        <View style={localStyle.meBadge}>
+                            <Text style={localStyle.meBadgeText}>나</Text>
+                        </View>
+                    )}
+                    <View style={[localStyle.roleBadge, role === 'admin' ? localStyle.adminBadge : localStyle.memberBadge]}>
+                        <Text style={[localStyle.roleBadgeText, role === 'admin' ? localStyle.adminBadgeText : localStyle.memberBadgeText]}>
+                            {role === 'admin' ? '👑 관리자' : '👤 멤버'}
+                        </Text>
+                    </View>
                 </View>
+                <Text style={localStyle.emailText}>
+                    {member.email}
+                </Text>
             </View>
             {!isMe && (
-                <View style={{ flexDirection: 'row', gap: 5 } as ViewStyle}>
+                <View style={localStyle.actionSection}>
                     <Button 
                         onPress={() => upgradeMemberLevel(member, role === 'admin' ? OrgRole.MEMBER : OrgRole.ADMIN)} 
-                        style={localStyle.roleBtnStyle}
+                        style={[localStyle.actionBtn, localStyle.roleBtn]}
                     >
                         {role === 'admin' ? '멤버로 강등' : '관리자로 승격'}
                     </Button>
                     <Button
                         onPress={() => removeMember(member.uid)}
-                        style={[localStyle.removeBtnStyle, { color: 'red' } as TextStyle]}
+                        style={[localStyle.actionBtn, localStyle.removeBtn]}
                     >
                         내보내기
                     </Button>
@@ -49,34 +60,86 @@ export const localStyle = StyleSheet.create({
     memberItemStyle: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingBottom: 9,
-        borderBottomColor: '#f6f6f6',
-        borderBottomWidth: 1,
-    } as ViewStyle, 
-    roleBtnStyle: {
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 6,
-        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        backgroundColor: '#fff',
+        borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#ddd',
-        backgroundColor: '#52c41a',
-        fontSize: 12,
-        color: 'white',
+        borderColor: '#f0f0f0',
+    } as ViewStyle,
+    isMeContainer: {
+        backgroundColor: '#f0f7ff',
+        borderColor: '#bae7ff',
+    },
+    infoSection: {
+        flex: 1,
+        gap: 2,
+    },
+    nameRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    nameText: {
+        fontSize: 16,
         fontWeight: 'bold',
-        // @ts-ignore
-        cursor: 'pointer',
-    }, 
-    removeBtnStyle: {
-        paddingHorizontal: 10,
-        paddingVertical: 6,
+        color: '#262626',
+    },
+    isMeText: {
+        color: Colors.primary,
+    },
+    emailText: {
         fontSize: 12,
-        justifyContent: 'center',
+        color: '#8c8c8c',
+    },
+    meBadge: {
+        backgroundColor: Colors.primary,
+        paddingHorizontal: 6,
+        paddingVertical: 1,
+        borderRadius: 4,
+    },
+    meBadgeText: {
+        color: '#fff',
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+    roleBadge: {
+        paddingHorizontal: 8,
+        paddingVertical: 2,
         borderRadius: 6,
+        alignSelf: 'flex-start',
         borderWidth: 1,
-        borderColor: '#ddd',
-        backgroundColor: 'white',
-        // @ts-ignore
-        cursor: 'pointer',
-    } as ViewStyle & TextStyle
+    },
+    roleBadgeText: {
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    adminBadge: { backgroundColor: '#f6ffed', borderColor: '#b7eb8f' },
+    adminBadgeText: { color: '#52c41a' },
+    memberBadge: { backgroundColor: '#f5f5f5', borderColor: '#d9d9d9' },
+    memberBadgeText: { color: '#595959' },
+    
+    actionSection: {
+        flexDirection: 'row',
+        gap: 6,
+    },
+    actionBtn: {
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+        justifyContent: 'center',
+        borderWidth: 1,
+        fontSize: 12,
+    } as ViewStyle & TextStyle,
+    roleBtn: {
+        backgroundColor: '#fff',
+        borderColor: '#d9d9d9',
+        color: '#595959',
+    },
+    removeBtn: {
+        backgroundColor: '#fff',
+        borderColor: '#ffccc7',
+        color: '#ff4d4f',
+    },
 });

@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import { User } from 'firebase/auth';
+import { useState } from 'react';
+import { ScrollView, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import Header from '../common/components/Header';
-import { useOrgManage } from '../features/org/hooks/useOrgManage';
-import { Member } from '../features/org/components/Member';
-import { ScrollView, View, TouchableOpacity, Text, ViewStyle, TextStyle } from 'react-native';
-import { styles } from '../styles';
 import { H3 } from '../common/components/ui/react-native/common';
 import { Box, GreenButton } from '../common/components/ui/react-native/custom';
+import MemberList from '../features/org/components/MemberList';
+import { useOrgManage } from '../features/org/hooks/useOrgManage';
 import { OrgMembership } from '../features/org/types';
-import { User } from 'firebase/auth';
+import { styles } from '../styles';
 
 interface AdminPageProps {
     currentOrg: OrgMembership;
@@ -50,19 +50,12 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
                 {/* 2. 멤버 관리 */}
                 <H3>👤 멤버 및 권한 관리</H3>
                 <Box>
-                    <View style={{ flexDirection: 'column', gap: 10 } as ViewStyle}>
-                        {members.map(member => {
-                            return (
-                                <Member key={member.uid}
-                                    member={member}
-                                    user={user as any}
-                                    upgradeMemberLevel={upgradeMemberLevel}
-                                    // Member 컴포넌트는 uid: string을 인자로 받는 removeMember를 기대합니다.
-                                    removeMember={(uid) => removeMember(members.find(m => m.uid === uid)!)}
-                                />)
-                                ;
-                        })}
-                    </View>
+                    <MemberList 
+                        members={members}
+                        user={user}
+                        upgradeMemberLevel={upgradeMemberLevel}
+                        onRemoveMember={removeMember}
+                    />
                 </Box>
 
                 {/* 3. 위험 구역 */}
