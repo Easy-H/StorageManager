@@ -8,7 +8,7 @@ import {
     deleteDoc,
     DocumentReference 
 } from 'firebase/firestore';
-import { CreateTodoData } from '../types';
+import { CreateTodoData, TodoStatus } from '../types';
 
 export const FirebaseTodoRepository = {
     // [C] 할 일 등록 (수동 또는 엑셀)
@@ -16,7 +16,7 @@ export const FirebaseTodoRepository = {
         const colRef = collection(db, "organizations", orgId, "todos");
         return await addDoc(colRef, {
             ...todoData,
-            status: 'pending',
+            status: TodoStatus.PENDING,
             createdAt: serverTimestamp(),
         });
     },

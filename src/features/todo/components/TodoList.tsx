@@ -1,13 +1,10 @@
 import { useMemo, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Text } from 'react-native';
 
-import { FilterButton } from '../../../common/components/ui/react-native/custom';
-
+import FilterHeader, { FilterTab } from '../../../common/components/ui/react-native/custom/FilterHeader';
 import { useTodoSearch } from '../hooks/useTodoSearch';
-import { Todo } from '../types';
+import { Todo, TodoStatus } from '../types';
 import TodoItem from './TodoListItem';
-
-type FilterType = "ALL" | "PENDING" | "EXECUTED";
 
 interface TodoListProps {
     todos: Todo[];
@@ -26,45 +23,36 @@ const TodoList = ({
     handleDelete, 
     handleUndo 
 }: TodoListProps) => {
-    const [filterType, setFilterType] = useState<FilterType>("PENDING");
+    const [filterType, setFilterType] = useState<string>("PENDING");
     const { searchResult } = useTodoSearch(todos, searchTerm);
 
     // --- 각 탭별 개수 실시간 계산 ---
     const counts = useMemo(() => ({
         ALL: searchResult.length,
-        PENDING: searchResult.filter(t => t.status === 'pending').length,
-        EXECUTED: searchResult.filter(t => t.status === 'executed').length,
+        PENDING: searchResult.filter(t => t.status === TodoStatus.PENDING).length,
+        EXECUTED: searchResult.filter(t => t.status === TodoStatus.EXECUTED).length,
     }), [searchResult]);
 
     // 상태에 따른 필터링 로직
     const filteredList = useMemo(() => searchResult.filter(todo => {
-        if (filterType === "PENDING") return todo.status === 'pending';
-        if (filterType === "EXECUTED") return todo.status === 'executed';
+        if (filterType === "PENDING") return todo.status === TodoStatus.PENDING;
+        if (filterType === "EXECUTED") return todo.status === TodoStatus.EXECUTED;
         return true; 
     }), [searchResult, filterType]);
 
+    const tabs: FilterTab[] = [
+        { label: "전체", value: "ALL", count: counts.ALL },
+        { label: "⏳ 대기", value: "PENDING", count: counts.PENDING },
+        { label: "✅ 완료", value: "EXECUTED", count: counts.EXECUTED },
+    ];
+
     return (
-        <>
-            {/* 필터 탭 버튼 영역 - 개수 포함 */}
-            <View style={localStyles.filterTabContainer}>
-                <FilterButton
-                    onPress={() => setFilterType("ALL")}
-                    isActive={filterType === "ALL"}>
-                    전체 ({counts.ALL})
-                </FilterButton>
-
-                <FilterButton
-                    onPress={() => setFilterType("PENDING")}
-                    isActive={filterType === "PENDING"}>
-                        ⏳ 대기 ({counts.PENDING})
-                </FilterButton>
-
-                <FilterButton
-                    onPress={() => setFilterType("EXECUTED")}
-                    isActive={ filterType === "EXECUTED" }>
-                    ✅ 완료 ({counts.EXECUTED})
-                </FilterButton>
-            </View>
+        <>            
+            <FilterHeader
+                tabs={tabs}
+                activeTab={filterType}
+                onTabChange={setFilterType}
+            />
 
             <FlatList
                 data={filteredList}
@@ -86,12 +74,4 @@ const TodoList = ({
         </>
     );
 };
-
-const localStyles = StyleSheet.create({
-    filterTabContainer: {
-        flexDirection: 'row',
-        gap: 8
-    },
-});
-
 export default TodoList;

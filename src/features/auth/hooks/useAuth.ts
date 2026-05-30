@@ -26,5 +26,8 @@ export function useAuth() {
     return unsub;
   }, []);
 
-  return { user, userProfile, loading };
+  const signUp = (email: string, pass: string) => AuthAPI.signUp(email, pass);
+  const signIn = (email: string, pass: string) => AuthAPI.signIn(email, pass);
+
+  return { user, userProfile, loading, signUp, signIn };
 }

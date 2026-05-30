@@ -64,6 +64,7 @@ function AppContent() {
     );
   }
 
+
   // 비로그인 상태
   if (!user) {
     return (
@@ -93,7 +94,7 @@ function AppContent() {
 
   // 2. 조직 선택 후 (메인 레이아웃)
   return (
-    <View style={styles.appWrapper}>
+    <>
       {/* 메인 콘텐츠 영역 (TabContent 역할) */}
       <View style={{ flex: 1, paddingBottom: 65 }}>
         <Routes>
@@ -147,7 +148,7 @@ function AppContent() {
       </View>
 
       <Toast message={toast.message} show={toast.show} />
-    </View>
+    </>
   );
 }
 

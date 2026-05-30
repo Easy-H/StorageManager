@@ -1,23 +1,27 @@
-export type Org = {
-  id: string;
-  name: string;
+export enum OrgRole {
+    PENDING = 0,
+    MEMBER = 10,
+    MANAGER = 50,
+    ADMIN = 100
+}
+
+type BaseOrgData = {
+    level: OrgRole;
+    joinedAt?: any;
+    requestedAt?: any;
 };
 
-export type OrgMembership = {
-  id: string;
-  name: string;
-  level: number;
-  joinedAt?: any;
-  requestedAt?: any;
+export type OrgMembership = BaseOrgData & {
+    id: string;
+    name: string;
 };
 
-export type OrgMember = {
-  id: string;
-  uid: string;
-  email: string | null;
-  name: string;
-  level: number;
-  joinedAt?: any;
-  requestedAt?: any;
-  isActive?: boolean;
+export type OrgMember = BaseOrgData & {
+    id?: string;
+    uid: string;
+    email: string | null;
+    name?: string;
+    userName?: string;
+    updatedAt?: any;
+    isActive?: boolean;
 };

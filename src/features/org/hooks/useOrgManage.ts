@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FirebaseOrgRepository as OrgAPI } from '../api/FirebaseOrgRepository';
-import { OrgMember, OrgMembership } from '../types';
+import { OrgMember, OrgMembership, OrgRole } from '../types';
 import type { User } from 'firebase/auth';
 
 export const useOrgManage = (
@@ -54,15 +54,15 @@ export const useOrgManage = (
     }
   };
 
-  const upgradeMemberLevel = async (targetMember: OrgMember, currentRole: 'admin' | 'member') => {
+  const upgradeMemberLevel = async (targetMember: OrgMember, newRole: OrgRole) => {
     if (!user || targetMember.uid === user.uid) {
       return notice("자신의 권한은 직접 변경할 수 없습니다.");
     }
 
-    const isUpgrading = currentRole !== 'admin';
-    const targetRoleName = isUpgrading ? '관리자' : '멤버';
-    const targetLevel = isUpgrading ? 100 : 10;
+    const targetRoleName = newRole === OrgRole.ADMIN ? '관리자' : '멤버';
+    const targetLevel = newRole;
 
+    // 현재 역할과 변경하려는 역할이 같으면 변경할 필요 없음
     if (!window.confirm(`${targetMember.name || targetMember.email}님을 ${targetRoleName}로 변경하시겠습니까?`)) {
       return;
     }

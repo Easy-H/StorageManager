@@ -16,15 +16,6 @@ export const Colors = {
 };
 
 export const styles = StyleSheet.create({
-  h2: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  // 기본 레이아웃 및 배경
-  h3: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -33,9 +24,9 @@ export const styles = StyleSheet.create({
   },
   appWrapper: {
     ...Platform.select({
-    web: { height: '100vh' },
-    default: { height: '100%' }
-  }),
+      web: { height: '100vh' },
+      default: { height: '100%' }
+    }),
   },
   appContent: {
     flex: 1,
@@ -223,48 +214,12 @@ export const styles = StyleSheet.create({
   lowStock: {
     color: Colors.errorRed,
   },
-
-  // 모달 시스템
-  modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    zIndex: 100,
-  },
-  modalContent: {
-    backgroundColor: Colors.white,
-    width: '100%',
-    maxWidth: 400,
-    padding: 25,
-    gap: 20,
-    borderRadius: 20,
-  },
   qtyRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 20,
     marginVertical: 10,
-  },
-  removeBtn: {
-    
-  },
-  closeModalBtn: {
-    backgroundColor: 'none',
-    borderColor: 'none',
-  },
-  closeModalBtnText: {
-    color: '#888',
-    textDecorationLine: 'underline',
-    cursor: 'pointer',
-    fontSize: 14,
-    textAlign: 'center'
   },
   circleQtyBtn: {
     width: 45,
@@ -285,7 +240,7 @@ export const styles = StyleSheet.create({
     borderBottomColor: Colors.primary,
     color: Colors.secondary,
   },
-  
+
   // 스캐너 및 모드 토글
   reader: {
     backgroundColor: '#000000',
