@@ -1,18 +1,17 @@
-import React, { useRef, useState } from 'react';
-import { StyleSheet, Text, View, ViewStyle, TextStyle } from 'react-native';
+import { useRef, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import * as XLSX from 'xlsx';
 
-import Header from '../common/components/Header';
 import SearchBar from '../common/components/SearchBar';
 import { BlueButton, GreenButton } from '../common/components/ui/react-native/custom';
 
+import { OrgMembership } from '../features/org/types';
+import { Product } from '../features/product/types';
 import TodoList from '../features/todo/components/TodoList';
 import TodoModal from '../features/todo/components/TodoModal';
 import { useTodos } from '../features/todo/contexts/TodoContext';
-import { Colors, styles } from '../styles';
-import { Product } from '../features/product/types';
-import { OrgMembership } from '../features/org/types';
 import { Todo } from '../features/todo/types';
+import { Colors, styles } from '../styles';
 
 interface TodoPageProps {
     products: Product[];
@@ -133,8 +132,7 @@ export default function TodoPage({ products, currentOrg, onBack, notice }: TodoP
     if (loading) return <View style={styles.centerContainer}><Text>로딩 중...</Text></View>;
 
     return (
-        <View style={styles.appWrapper}>
-            <Header currentOrg={currentOrg} onBack={onBack} notice={notice} />
+        <>
 
             <View style={styles.appContent}>
                 {/*Hidden File Input for Web */}
@@ -182,7 +180,7 @@ export default function TodoPage({ products, currentOrg, onBack, notice }: TodoP
                 />
             )}
 
-        </View>
+        </>
     );
 }
 

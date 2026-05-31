@@ -1,5 +1,4 @@
 import React from 'react';
-import Header from '../common/components/Header';
 import * as XLSX from 'xlsx';
 import { ScrollView } from 'react-native';
 import { styles } from '../styles';
@@ -78,7 +77,6 @@ const DashboardPage = ({ products, currentOrg, onBack, notice }: DashboardPagePr
 
 	return (
 		<>
-			<Header currentOrg={currentOrg} onBack={onBack} notice={notice} />
 			<ScrollView showsVerticalScrollIndicator={false}
 				contentContainerStyle={styles.appContent}>
 				<DashboardSummary

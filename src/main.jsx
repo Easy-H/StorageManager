@@ -1,11 +1,18 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { StyleSheet, View, Platform } from 'react-native'
 import App from './App.jsx'
-import { View } from 'react-native-web'
-import { styles } from './styles.js'
+
+export const localStyles = StyleSheet.create({
+    appWrapper: {
+        ...Platform.select({
+            web: { height: '100vh' },
+            default: { height: '100%' }
+        }),
+    }
+});
 
 createRoot(document.getElementById('root')).render(
-    <View style={styles.appWrapper}>
+    <View style={localStyles.appWrapper}>
         <App />
     </View>,
 )

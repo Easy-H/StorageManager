@@ -3,7 +3,6 @@ import SearchBar from '../common/components/SearchBar';
 import ProductList from '../features/product/components/ProductList';
 import ScannerModal from '../common/components/ScannerModal';
 import ProductDetailModal from '../features/product/components/ProductDetailModal';
-import Header from '../common/components/Header';
 import { View, StyleSheet } from 'react-native';
 import { styles } from '../styles';
 import { BlueButton, GreenButton } from '../common/components/ui/react-native/custom';
@@ -24,7 +23,6 @@ const StoragePage = ({ products, currentOrg, onBack, notice }: StoragePageProps)
 
     return (
         <>
-            <Header currentOrg={currentOrg} onBack={onBack} notice={notice} />
             <View style={styles.appContent} >
 
                 <View style={styles.searchSection}>

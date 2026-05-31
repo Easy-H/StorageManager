@@ -12,7 +12,7 @@ export default function Button({ style, children, numberOfLines, ...props }: But
     
     return (
         <TouchableOpacity 
-            style={[buttonStyle, style as StyleProp<ViewStyle>]}
+            style={[buttonStyle, flatStyle as StyleProp<ViewStyle>]}
             { ...props }>
             <Text
                 numberOfLines={numberOfLines}

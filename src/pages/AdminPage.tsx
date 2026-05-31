@@ -1,7 +1,6 @@
 import { User } from 'firebase/auth';
 import { useState } from 'react';
 import { ScrollView, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
-import Header from '../common/components/Header';
 import { H3 } from '../common/components/ui/react-native/common';
 import { Box, GreenButton } from '../common/components/ui/react-native/custom';
 import MemberList from '../features/org/components/MemberList';
@@ -26,7 +25,6 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
 
     return (
         <>
-            <Header currentOrg={currentOrg} onBack={onBack} notice={notice} />
             <ScrollView contentContainerStyle={ styles.appContent }>
 
                 {/* 1. 조직 정보 수정 */}

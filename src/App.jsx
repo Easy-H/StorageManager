@@ -6,11 +6,15 @@ import { View, Text, TouchableOpacity, SafeAreaView, Platform, Alert, StyleSheet
 import { styles, Colors } from './styles';
 import './App.css'
 
+import Header from './common/components/Header';
+import { useToast } from './common/hooks/useToast';
+import Toast from './common/components/Toast';
+
 // 기존 API 및 훅 (그대로 유지)
 import { FirebaseAuthRepository as AuthAPI } from './features/auth/api/FirebaseAuthRepository';
 import { useAuth } from './features/auth/hooks/useAuth';
 import { useProducts } from './features/product/hooks/useProducts';
-import { useToast } from './common/hooks/useToast';
+import { TodoProvider } from './features/todo/contexts/TodoContext';
 
 // 페이지 및 컴포넌트
 import AuthPage from './pages/AuthPage';
@@ -19,8 +23,6 @@ import StoragePage from './pages/StoragePage';
 import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
 import TodoPage from './pages/TodoPage';
-import Toast from './common/components/Toast';
-import { TodoProvider } from './features/todo/contexts/TodoContext';
 
 function AppContent() {
   const { user, userProfile, loading } = useAuth();
@@ -97,6 +99,7 @@ function AppContent() {
     <>
       {/* 메인 콘텐츠 영역 (TabContent 역할) */}
       <View style={{ flex: 1, paddingBottom: 65 }}>
+        <Header currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} />
         <Routes>
           <Route path="/dashboard" element={
             <DashboardPage products={products} currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} />

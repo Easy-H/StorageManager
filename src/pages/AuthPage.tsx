@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TextStyle, ViewStyle } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
+
+import { H2 } from '../common/components/ui/react-native/common';
+import { GreenButton, LinkButton } from '../common/components/ui/react-native/custom';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import { styles } from '../styles';
-import { H2 } from '../common/components/ui/react-native/common';
-import { LinkButton, GreenButton } from '../common/components/ui/react-native/custom';
 
 interface AuthPageProps {
 	notice: (msg: string) => void;
@@ -35,12 +36,12 @@ const AuthPage = ({ notice }: AuthPageProps) => {
 	};
 
 	return (
-		<View style={styles.orgContainer}>
+		<View style={localStyles.orgContainer}>
 			<View style={styles.appHeader}>
 				<H2>🛒 Storage Manager</H2>
 			</View>
 			{/* @ts-ignore - Web form tag */}
-			<form className="form-stack"> 
+			<form className="form-stack">
 				<Text style={{ textAlign: "left" } as TextStyle}>이메일</Text>
 				{/* @ts-ignore - Web input tag */}
 				<input type="email" placeholder="이메일" required onChange={(e: any) => setEmail(e.target.value)} className="input-basic" />
@@ -65,5 +66,16 @@ const AuthPage = ({ notice }: AuthPageProps) => {
 		</View>
 	);
 };
+
+const localStyles = StyleSheet.create({
+	orgContainer: {
+		width: '100%',
+		maxWidth: 400,
+		marginVertical: 50,
+		alignSelf: 'center',
+		padding: 20,
+		alignItems: 'center',
+	}
+});
 
 export default AuthPage;

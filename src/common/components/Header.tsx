@@ -1,6 +1,6 @@
-import React from 'react';
-import { styles } from '../../styles';
-import { View, Text, TouchableOpacity, TextStyle } from 'react-native';
+import { StyleSheet, Text, TextStyle, TouchableOpacity, View } from 'react-native';
+import { Colors, styles } from '../../styles';
+import { Button } from './ui/react-native/common';
 
 interface Organization {
     id: string;
@@ -22,7 +22,9 @@ const Header = ({ currentOrg, onBack, notice }: HeaderProps) => {
 
     return (
         <View style={styles.appHeader}>
-            <TouchableOpacity onPress={onBack} style={styles.backButton}><Text>◀ 조직변경</Text></TouchableOpacity>
+            <Button onPress={onBack} style={localStyles.backButton}>
+                ◀ 조직변경
+            </Button>
             {/* @ts-ignore - Web cursor support */}
             <TouchableOpacity onPress={() => handleCopyOrgId(currentOrg.id)} style={{ cursor: 'pointer' }}>
                 <View>
@@ -36,5 +38,16 @@ const Header = ({ currentOrg, onBack, notice }: HeaderProps) => {
         </View>
     );
 };
+
+const localStyles = StyleSheet.create({
+    backButton: {
+        fontSize: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 6,
+        color: Colors.secondary,
+    }
+});
 
 export default Header;

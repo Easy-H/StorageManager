@@ -22,12 +22,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.bgWhite,
   },
-  appWrapper: {
-    ...Platform.select({
-      web: { height: '100vh' },
-      default: { height: '100%' }
-    }),
-  },
   appContent: {
     flex: 1,
     width: '100%',
@@ -71,15 +65,6 @@ export const styles = StyleSheet.create({
     color: Colors.secondary,
   },
 
-  // 조직 선택 화면
-  orgContainer: {
-    width: '100%',
-    maxWidth: 400,
-    marginVertical: 50,
-    alignSelf: 'center',
-    padding: 20,
-    alignItems: 'center',
-  },
   orgList: {
     width: '100%',
     gap: 12,
