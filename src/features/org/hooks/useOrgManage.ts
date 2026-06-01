@@ -54,6 +54,16 @@ export const useOrgManage = (
     }
   };
 
+  const updateOrgSettings = async (settings: Partial<any>) => {
+    try {
+      await OrgAPI.updateOrgSettings(currentOrg.id, settings);
+      setCurrentOrg({ ...currentOrg, ...settings });
+      notice("설정이 저장되었습니다.");
+    } catch (e) {
+      notice("설정 저장 실패");
+    }
+  };
+
   const upgradeMemberLevel = async (targetMember: OrgMember, newRole: OrgRole) => {
     if (!user || targetMember.uid === user.uid) {
       return notice("자신의 권한은 직접 변경할 수 없습니다.");
@@ -75,5 +85,5 @@ export const useOrgManage = (
     }
   };
 
-  return { members, deleteOrg, removeMember, updateOrgName, upgradeMemberLevel };
+  return { members, deleteOrg, removeMember, updateOrgName, upgradeMemberLevel, updateOrgSettings };
 };

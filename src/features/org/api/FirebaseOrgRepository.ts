@@ -1,10 +1,16 @@
-import { db } from '../../../common/api/firebase/firebase';
-import {
-	collection, doc, onSnapshot, getDocs, serverTimestamp, getDoc, writeBatch,
-	Unsubscribe, DocumentData, FieldValue
-} from 'firebase/firestore';
 import type { User } from 'firebase/auth';
-import { OrgMembership, OrgMember, OrgRole } from '../types';
+import {
+	collection, doc,
+	getDoc,
+	getDocs,
+	onSnapshot,
+	serverTimestamp,
+	Unsubscribe,
+	updateDoc,
+	writeBatch
+} from 'firebase/firestore';
+import { db } from '../../../common/api/firebase/firebase';
+import { OrgMember, OrgMembership, OrgRole } from '../types';
 
 export const FirebaseOrgRepository = {
 
@@ -50,6 +56,7 @@ export const FirebaseOrgRepository = {
 				name: name,
 				adminEmail: admin.email,
 				adminUid: admin.uid,
+				isAutoJoin: false,
 				isActive: true,
 				createdAt: serverTimestamp()
 			});
@@ -87,7 +94,9 @@ export const FirebaseOrgRepository = {
 		const orgSnap = await getDoc(doc(db, "organizations", orgId));
 		if (!orgSnap.exists()) throw new Error("존재하지 않는 조직입니다.");
 
-		const orgName = orgSnap.data().name;
+		const orgData = orgSnap.data();
+		const orgName = orgData.name;
+		const isAutoJoin = orgData.isAutoJoin === true;
 		const userName = userProfile?.name || user.email?.split('@')[0] || 'Unknown';
 
 		const batch = writeBatch(db);
@@ -104,7 +113,7 @@ export const FirebaseOrgRepository = {
 
 			const commonData = {
 				name: orgName,
-				level: OrgRole.PENDING,
+				level: isAutoJoin ? OrgRole.MEMBER : OrgRole.PENDING,
 				requestedAt: serverTimestamp()
 			};
 
@@ -174,6 +183,11 @@ export const FirebaseOrgRepository = {
 			batch.delete(doc(db, "users", mDoc.id, "organizations", orgId));
 		});
 		await batch.commit();
+	},
+
+	async updateOrgSettings(orgId: string, settings: Partial<any>): Promise<void> {
+		const orgRef = doc(db, "organizations", orgId);
+		await updateDoc(orgRef, settings);
 	},
 
 	async updateOrgName(orgId: string, newName: string): Promise<void> {

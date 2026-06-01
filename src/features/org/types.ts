@@ -14,6 +14,8 @@ type BaseOrgData = {
 export type OrgMembership = BaseOrgData & {
     id: string;
     name: string;
+    isAutoJoin?: boolean;
+    isActive?: boolean;
 };
 
 export type OrgMember = BaseOrgData & {

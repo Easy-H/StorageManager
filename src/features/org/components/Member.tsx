@@ -12,6 +12,7 @@ type MemberProps = {
 
 export const Member = ({ member, user, upgradeMemberLevel, removeMember }: MemberProps) => {
     const role = member.level === OrgRole.ADMIN ? 'admin' : 'member';
+    const isPending = member.level === OrgRole.PENDING;
     const isMe = member.uid === user.uid;
     
     return (
@@ -26,11 +27,19 @@ export const Member = ({ member, user, upgradeMemberLevel, removeMember }: Membe
                             <Text style={localStyle.meBadgeText}>나</Text>
                         </View>
                     )}
-                    <View style={[localStyle.roleBadge, role === 'admin' ? localStyle.adminBadge : localStyle.memberBadge]}>
-                        <Text style={[localStyle.roleBadgeText, role === 'admin' ? localStyle.adminBadgeText : localStyle.memberBadgeText]}>
-                            {role === 'admin' ? '👑 관리자' : '👤 멤버'}
-                        </Text>
-                    </View>
+                    {isPending ? (
+                        <View style={[localStyle.roleBadge, localStyle.pendingBadge]}>
+                            <Text style={[localStyle.roleBadgeText, localStyle.pendingBadgeText]}>
+                                ⏳ 승인 대기
+                            </Text>
+                        </View>
+                    ) : (
+                        <View style={[localStyle.roleBadge, role === 'admin' ? localStyle.adminBadge : localStyle.memberBadge]}>
+                            <Text style={[localStyle.roleBadgeText, role === 'admin' ? localStyle.adminBadgeText : localStyle.memberBadgeText]}>
+                                {role === 'admin' ? '👑 관리자' : '👤 멤버'}
+                            </Text>
+                        </View>
+                    )}
                 </View>
                 <Text style={localStyle.emailText}>
                     {member.email}
@@ -38,12 +47,21 @@ export const Member = ({ member, user, upgradeMemberLevel, removeMember }: Membe
             </View>
             {!isMe && (
                 <View style={localStyle.actionSection}>
-                    <Button 
-                        onPress={() => upgradeMemberLevel(member, role === 'admin' ? OrgRole.MEMBER : OrgRole.ADMIN)} 
-                        style={[localStyle.actionBtn, localStyle.roleBtn]}
-                    >
-                        {role === 'admin' ? '멤버로 강등' : '관리자로 승격'}
-                    </Button>
+                    {isPending ? (
+                        <Button 
+                            onPress={() => upgradeMemberLevel(member, OrgRole.MEMBER)} 
+                            style={[localStyle.actionBtn, localStyle.approveBtn]}
+                        >
+                            승인
+                        </Button>
+                    ) : (
+                        <Button 
+                            onPress={() => upgradeMemberLevel(member, role === 'admin' ? OrgRole.MEMBER : OrgRole.ADMIN)} 
+                            style={[localStyle.actionBtn, localStyle.roleBtn]}
+                        >
+                            {role === 'admin' ? '멤버로 강등' : '관리자로 승격'}
+                        </Button>
+                    )}
                     <Button
                         onPress={() => removeMember(member.uid)}
                         style={[localStyle.actionBtn, localStyle.removeBtn]}
@@ -119,6 +137,8 @@ export const localStyle = StyleSheet.create({
     adminBadgeText: { color: '#52c41a' },
     memberBadge: { backgroundColor: '#f5f5f5', borderColor: '#d9d9d9' },
     memberBadgeText: { color: '#595959' },
+    pendingBadge: { backgroundColor: '#fff7e6', borderColor: '#ffd591' },
+    pendingBadgeText: { color: '#fa8c16' },
     
     actionSection: {
         flexDirection: 'row',
@@ -136,6 +156,11 @@ export const localStyle = StyleSheet.create({
         backgroundColor: '#fff',
         borderColor: '#d9d9d9',
         color: '#595959',
+    },
+    approveBtn: {
+        backgroundColor: '#52c41a',
+        borderColor: '#52c41a',
+        color: '#fff',
     },
     removeBtn: {
         backgroundColor: '#fff',

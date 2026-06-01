@@ -20,7 +20,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
     const [newName, setNewName] = useState(currentOrg.name);
     
     // useOrgManage.ts 정의에 맞춰 5개의 인자를 모두 전달합니다.
-    const { members, deleteOrg, removeMember, updateOrgName, upgradeMemberLevel }
+    const { members, deleteOrg, removeMember, updateOrgName, upgradeMemberLevel, updateOrgSettings }
         = useOrgManage(currentOrg, setCurrentOrg, notice, user, onBack);
 
     return (
@@ -43,6 +43,20 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
                             수정
                         </GreenButton>
                     </View>
+                </Box>
+
+                <H3>⚙️ 가입 설정</H3>
+                <Box>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' } as ViewStyle}>
+                        <Text style={{ fontSize: 14, color: '#444' }}>승인 없이 즉시 가입 허용</Text>
+                        <input 
+                            type="checkbox" 
+                            checked={currentOrg.isAutoJoin || false} 
+                            onChange={(e: any) => updateOrgSettings({ isAutoJoin: e.target.checked })}
+                            style={{ width: 20, height: 20 }}
+                        />
+                    </View>
+                    <Text style={{ fontSize: 11, color: '#888', marginTop: 8 }}>활성화하면 초대된 사용자가 승인 없이 바로 멤버가 됩니다.</Text>
                 </Box>
 
                 {/* 2. 멤버 관리 */}
