@@ -8,7 +8,7 @@ import {
     deleteDoc,
     DocumentReference 
 } from 'firebase/firestore';
-import { CreateTodoData, TodoStatus } from '../types';
+import { CreateTodoData, TodoStatus, Todo } from '../types';
 
 export const FirebaseTodoRepository = {
     // [C] 할 일 등록 (수동 또는 엑셀)
@@ -21,7 +21,7 @@ export const FirebaseTodoRepository = {
         });
     },
 
-    updateTodo: async (orgId: string, todoId: string, updatedData: Partial<CreateTodoData>): Promise<void> => {
+    updateTodo: async (orgId: string, todoId: string, updatedData: Partial<Todo>): Promise<void> => {
         const todoRef = doc(db, "organizations", orgId, "todos", todoId);
         await updateDoc(todoRef, {
             ...updatedData,

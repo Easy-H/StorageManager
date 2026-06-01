@@ -1,12 +1,14 @@
-import React from 'react';
-import { FlatList, Text, StyleSheet } from 'react-native';
-import { useProductManagement } from '../hooks/useProductManagement';
-import { getAuditStatus } from '../utils/auditUtils';
-import ProductListItem from './ProductListItem';
-import FilterHeader from '../../../common/components/ui/react-native/custom/FilterHeader';
-import { Product } from '../types';
+import { FlatList, StyleSheet, Text } from 'react-native';
 
-interface ProductListProps {
+import FilterHeader from '../../../common/components/ui/react-native/custom/FilterHeader';
+
+import { useProductManagement } from '../hooks/useProductManagement';
+import { Product } from '../types';
+import { getAuditStatus } from '../utils/auditUtils';
+
+import ProductListItem from './ProductListItem';
+
+type ProductListProps = {
 	products: Product[];
 	searchTerm: string;
 	onSelectProduct: (product: Product) => void;

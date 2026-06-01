@@ -3,7 +3,7 @@ import { Button } from '../../../common/components/ui/react-native/common';
 import { Colors } from '../../../styles';
 import { OrgMember, OrgRole } from '../types';
 
-interface MemberProps {
+type MemberProps = {
     member: OrgMember;
     user: { uid: string };
     upgradeMemberLevel: (member: OrgMember, role: OrgRole) => void;

@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { LinkButton, Modal } from '../../../common/components/ui/react-native/custom';
 import { useProductActions } from '../hooks/useProductActions';
 
+import { Product } from '../types';
 import ProductEditor from './ProductEditor';
 import StockEditor from './StockEditor';
-import { Product } from '../types';
 
-interface ProductDetailModalProps {
+type ProductDetailModalProps = {
 	visible: boolean;
 	item: Product;
 	initialName: string;

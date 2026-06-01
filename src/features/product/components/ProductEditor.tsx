@@ -1,14 +1,15 @@
-import React from 'react';
 import {
-	View, Text,
-	StyleSheet, TextStyle
+	StyleSheet,
+	Text,
+	TextStyle,
+	View
 } from 'react-native';
-import { styles, Colors } from '../../../styles'
-import { GreenButton, InputText, LinkButton } from '../../../common/components/ui/react-native/custom';
 import { H2 } from '../../../common/components/ui/react-native/common';
+import { GreenButton, InputText, LinkButton } from '../../../common/components/ui/react-native/custom';
+import { Colors, styles } from '../../../styles';
 import { Product } from '../types';
 
-interface ProductEditorProps {
+type ProductEditorProps = {
 	item: Product;
 	form: {
 		name: string;

@@ -1,9 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Colors } from '../../../styles';
 import { OrgMembership, OrgRole } from '../types';
 
-interface OrgListItemProps {
+type OrgListItemProps = {
 	org: OrgMembership;
 	onSelect: (org: OrgMembership) => void;
 }

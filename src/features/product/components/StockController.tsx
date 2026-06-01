@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { TextInput, View, ViewStyle, TextStyle } from 'react-native';
+import { TextInput, TextStyle, View, ViewStyle } from 'react-native';
 import { Button } from '../../../common/components/ui/react-native/common';
 import { BlueButton, GreenButton, LinkButton } from '../../../common/components/ui/react-native/custom';
 import { Colors } from '../../../styles';
 
-interface StockControllerProps {
+type StockControllerProps = {
 	inputQty: number;
 	setInputQty: React.Dispatch<React.SetStateAction<number>>;
 	currentStock: number;

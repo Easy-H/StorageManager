@@ -5,8 +5,8 @@ import { BlueButton, GreenButton, InputText, LinkButton, Modal } from '../../../
 import { Colors, styles } from '../../../styles';
 import { Product, StockUpdateItem, StockUpdateType } from '../../product/types';
 import { Todo } from '../types';
-import TodoModalItemList from './TodoModalItemList';
 import ProductSearchModal from './ProductSearchModal';
+import TodoModalItemList from './TodoModalItemList';
 import TodoTypeSelector from './TodoTypeSelector';
 
 interface TodoModalProps {
@@ -138,9 +138,10 @@ export default function TodoModal({
 				<ProductSearchModal
 					products={products}
 					productSelected={items}
-					onSelect={(p: Product) => {
+					onSelect={(p) => {
 						const next = [...items];
-						next[activeIndex] = { productId: p.id, name: p.name, quantity: 1 };
+						const productId = ('id' in p && p.id) ? p.id : '';
+						next[activeIndex] = { productId, name: p.name, quantity: 1 };
 						setItems(next);
 					}}
 					onClose={() => setSearchModalVisible(false)}

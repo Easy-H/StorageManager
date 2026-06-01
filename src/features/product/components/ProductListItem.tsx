@@ -1,9 +1,8 @@
-import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { ListItem } from '../../../common/components/ui/react-native/custom';
 import { Product } from '../types';
 
-interface ProductListItemProps {
+type ProductListItemProps = {
 	product: Product;
 	auditStatus: {
 		color: string;

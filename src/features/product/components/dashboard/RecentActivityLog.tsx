@@ -1,9 +1,8 @@
-import React from 'react';
-import { StyleSheet, Text, View, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { H3 } from '../../../../common/components/ui/react-native/common';
 import { Box } from '../../../../common/components/ui/react-native/custom';
 
-interface ActivityLog {
+type ActivityLog = {
 	id: string;
 	productName: string;
 	timestamp: Date | any; // Firestore Timestamp 대응을 위해 any 허용하거나 Date 사용
@@ -11,7 +10,7 @@ interface ActivityLog {
 	changeQty: number | string;
 }
 
-interface RecentActivityLogProps {
+type RecentActivityLogProps = {
 	logs: ActivityLog[];
 }
 

@@ -1,11 +1,10 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Colors } from '../../../styles';
+import { StyleSheet, View } from 'react-native';
 import { Button } from '../../../common/components/ui/react-native/common';
 import { InputText } from '../../../common/components/ui/react-native/custom';
+import { Colors } from '../../../styles';
 import { StockUpdateItem } from '../../product/types';
 
-interface TodoItemRowProps {
+type TodoItemRowProps = {
 	item: StockUpdateItem;
 	onPressPick: () => void;
 	onPressRegister: () => void;

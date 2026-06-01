@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import SearchBar from '../common/components/SearchBar';
-import ProductList from '../features/product/components/ProductList';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+
 import ScannerModal from '../common/components/ScannerModal';
-import ProductDetailModal from '../features/product/components/ProductDetailModal';
-import { View, StyleSheet } from 'react-native';
-import { styles } from '../styles';
+import SearchBar from '../common/components/SearchBar';
 import { BlueButton, GreenButton } from '../common/components/ui/react-native/custom';
-import { Product } from '../features/product/types';
+
 import { OrgMembership } from '../features/org/types';
+import ProductDetailModal from '../features/product/components/ProductDetailModal';
+import ProductList from '../features/product/components/ProductList';
+import { Product } from '../features/product/types';
+import { styles } from '../styles';
 
 interface StoragePageProps {
     products: Product[];

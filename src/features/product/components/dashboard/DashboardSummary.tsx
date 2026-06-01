@@ -1,5 +1,4 @@
-import React from 'react';
-import { StyleSheet, Text, View, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { H3 } from '../../../../common/components/ui/react-native/common';
 import { BlueButton, Box, GreenButton } from '../../../../common/components/ui/react-native/custom';
 

@@ -5,8 +5,8 @@ export enum TodoStatus {
 
 export type TodoItem = {
     productId: string;
-    productName: string;
-    quantity: number;
+    name: string;
+    quantity: number | string;
 };
 
 export type TodoType = 'IN' | 'OUT';
@@ -19,6 +19,7 @@ type BaseTodoData = {
 };
 
 export type CreateTodoData = {
+    title: string;
     items: TodoItem[];
     type: TodoType;
     memo?: string;

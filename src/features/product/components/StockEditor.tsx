@@ -1,10 +1,10 @@
 import React from 'react';
-import { Text, TouchableOpacity, View, TextStyle, ViewStyle } from 'react-native';
+import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { H2 } from '../../../common/components/ui/react-native/common';
 import { LinkButton } from '../../../common/components/ui/react-native/custom';
 import StockController from './StockController';
 
-interface StockEditorProps {
+type StockEditorProps = {
 	item: any;
 	lastAuditDisplay: any;
 	onAudit: () => void;

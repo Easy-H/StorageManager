@@ -4,7 +4,7 @@ import { Member } from './Member';
 import { OrgMember, OrgRole } from '../types';
 import { User } from 'firebase/auth';
 
-interface MemberListProps {
+type MemberListProps = {
     members: OrgMember[];
     user: User | null;
     upgradeMemberLevel: (member: OrgMember, role: OrgRole) => void;

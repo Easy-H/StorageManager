@@ -6,7 +6,7 @@ import { useTodoSearch } from '../hooks/useTodoSearch';
 import { Todo, TodoStatus } from '../types';
 import TodoItem from './TodoListItem';
 
-interface TodoListProps {
+type TodoListProps = {
     todos: Todo[];
     searchTerm: string;
     openEditModal: (item: Todo) => void;

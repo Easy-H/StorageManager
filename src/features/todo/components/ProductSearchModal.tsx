@@ -1,14 +1,16 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { FlatList, Text, TouchableOpacity, View, ViewStyle, TextStyle } from 'react-native';
-import { H2 } from '../../../common/components/ui/react-native/common';
-import { LinkButton, InputText, Modal, BlueButton } from '../../../common/components/ui/react-native/custom';
-import { styles } from '../../../styles';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FlatList, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+
 import ScannerModal from '../../../common/components/ScannerModal';
+import { H2 } from '../../../common/components/ui/react-native/common';
+import { BlueButton, InputText, LinkButton, Modal } from '../../../common/components/ui/react-native/custom';
+import { styles } from '../../../styles';
+
 import { useProductSearch } from '../../product/hooks/useProductSearch';
 import { Product } from '../../product/types';
 import { TodoItem } from '../types';
 
-interface ProductSearchModalProps {
+type ProductSearchModalProps = {
 	onClose: () => void;
 	onSelect: (item: Product | { id: null; name: string }) => void;
 	products: Product[];

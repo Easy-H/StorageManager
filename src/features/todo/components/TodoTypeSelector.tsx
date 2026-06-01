@@ -1,10 +1,9 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button, H3 } from '../../../common/components/ui/react-native/common';
 import { Colors } from '../../../styles';
 import { StockUpdateType } from '../../product/types';
 
-interface TodoTypeSelectorProps {
+type TodoTypeSelectorProps = {
 	type: StockUpdateType;
 	setType: (type: StockUpdateType) => void;
 }

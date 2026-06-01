@@ -5,7 +5,7 @@ import { Colors } from '../../../styles';
 import { StockUpdateItem } from '../../product/types';
 import TodoItemRow from './TodoItemRow';
 
-interface TodoModalItemListProps {
+type TodoModalItemListProps = {
 	items: StockUpdateItem[];
 	onAddItem: () => void;
 	onUpdateQuantity: (index: number, quantity: number) => void;
