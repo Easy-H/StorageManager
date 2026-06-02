@@ -1,30 +1,29 @@
 import React from 'react';
 import { StyleProp, ViewStyle, TextStyle, TouchableOpacityProps } from 'react-native';
 import { Button } from "../common";
-import vars from "../../vars";
+import { Colors } from "../../../../../styles";
+import vars from '../../vars';
 
-interface BlueButtonProps extends TouchableOpacityProps {
+interface SecondaryButtonProps extends TouchableOpacityProps {
     style?: StyleProp<ViewStyle | TextStyle>;
     children: React.ReactNode;
 }
 
-export default function BlueButton({ style, children, ...props }: BlueButtonProps) {
+export default function SecondaryButton({ style, children, ...props }: SecondaryButtonProps) {
     return (
         <Button
-            style={[blueButtonStyle, style]}
+            style={[secondaryButtonStyle, { backgroundColor: vars.secondary, color: vars.buttonText }, style]}
             {...props}>
             { children }
         </Button>
     )
 }
 
-const blueButtonStyle: ViewStyle & TextStyle = {
+const secondaryButtonStyle: ViewStyle & TextStyle = {
     flex: 1,
     padding: 14,
-    backgroundColor: vars.primary,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    color: vars.buttonText,
     fontWeight: 'bold',
 };

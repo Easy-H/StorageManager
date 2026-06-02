@@ -1,31 +1,28 @@
 import React from 'react';
 import { StyleProp, ViewStyle, TextStyle, TouchableOpacityProps } from 'react-native';
 import { Button } from "../common";
-import { Colors } from "../../../../../styles";
-import vars from '../../vars';
+import vars from "../../vars";
 
-interface GreenButtonProps extends TouchableOpacityProps {
+interface PrimaryButtonProps extends TouchableOpacityProps {
     style?: StyleProp<ViewStyle | TextStyle>;
     children: React.ReactNode;
 }
 
-export default function GreenButton({ style, children, ...props }: GreenButtonProps) {
+export default function PrimaryButton({ style, children, ...props }: PrimaryButtonProps) {
     return (
         <Button
-            style={[greenButtonStyle, style]}
+            style={[primaryButtonStyle, , { backgroundColor: vars.primary, color: vars.buttonText }, style]}
             {...props}>
             { children }
         </Button>
     )
 }
 
-const greenButtonStyle: ViewStyle & TextStyle = {
+const primaryButtonStyle: ViewStyle & TextStyle = {
     flex: 1,
     padding: 14,
-    backgroundColor: vars.secondary,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    color: vars.buttonText,
     fontWeight: 'bold',
 };

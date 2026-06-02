@@ -1,18 +1,16 @@
 import React from 'react';
 import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { H2 } from '../../../common/components/ui/react-native/common';
-import { LinkButton } from '../../../common/components/ui/react-native/custom';
+import { H2, LinkButton, vars } from '../../../common/components/ui-brick';
 import StockController from './StockController';
-import { vars } from '../../../common/components/ui';
 
 type StockEditorProps = {
-	item: any;
-	lastAuditDisplay: any;
-	onAudit: () => void;
-	onEditMode: () => void;
-	inputQty: number;
-	setInputQty: React.Dispatch<React.SetStateAction<number>>;
-	updateStock: (item: any, qty: number, isAudit: boolean, type: string) => void;
+    item: any;
+    lastAuditDisplay: any;
+    onAudit: () => void;
+    onEditMode: () => void;
+    inputQty: number;
+    setInputQty: React.Dispatch<React.SetStateAction<number>>;
+    updateStock: (item: any, qty: number, isAudit: boolean, type: string) => void;
 }
 
 const StockEditor = ({ item, lastAuditDisplay, onAudit, onEditMode, inputQty, setInputQty, updateStock }: StockEditorProps) => {
@@ -45,8 +43,11 @@ const StockEditor = ({ item, lastAuditDisplay, onAudit, onEditMode, inputQty, se
                     최근 실사: {lastAuditDisplay ? (lastAuditDisplay instanceof Date ? lastAuditDisplay.toLocaleDateString() : new Date(lastAuditDisplay).toLocaleDateString()) : '기록 없음'}
                 </Text>
                 <TouchableOpacity onPress={onAudit}>
-                    <Text style={auditBtnStyle}>✅ 수량 일치 확인 (실사)</Text>
-                </TouchableOpacity> 
+                    <Text style={[auditBtnStyle, {
+                        backgroundColor: vars.box,
+                        borderColor: vars.surface,
+                    }]}>✅ 수량 일치 확인 (실사)</Text>
+                </TouchableOpacity>
             </View>
 
             <StockController inputQty={inputQty} setInputQty={setInputQty} currentStock={item.currentStock} item={item} updateStock={updateStock} />
@@ -69,15 +70,13 @@ const memoTextStyle: TextStyle = {
     color: '#5c5f66',
     lineHeight: 1.5 * 13,
     // @ts-ignore
-    whiteSpace: 'pre-wrap', 
+    whiteSpace: 'pre-wrap',
     textAlign: 'left'
 };
 
 const auditBtnStyle: TextStyle & ViewStyle = {
     color: '#4a90e2',
-    backgroundColor: vars.box,
     borderWidth: 1,
-    borderColor: vars.surface,
     borderRadius: 20,
     marginTop: 10,
     paddingVertical: 6,

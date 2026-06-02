@@ -1,7 +1,6 @@
-import React, { useRef } from 'react';
-import { ScrollView, Text, View, StyleSheet } from 'react-native';
-import { Button, H3 } from '../../../common/components/ui/react-native/common';
-import { Colors } from '../../../styles';
+import { useRef } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Button, H3, vars } from '../../../common/components/ui-brick';
 import { StockUpdateItem } from '../../product/types';
 import TodoItemRow from './TodoItemRow';
 
@@ -28,7 +27,7 @@ const TodoModalItemList = ({
 		<View style={{ flex: 1 }}>
 			<View style={localStyles.itemHeader}>
 				<H3>품목 리스트 ({items.length})</H3>
-				<Button onPress={onAddItem} style={{ color: Colors.primary, fontWeight: 'bold' }}>
+				<Button onPress={onAddItem} style={{ color: vars.primary, fontWeight: 'bold' }}>
 					+ 추가
 				</Button>
 			</View>

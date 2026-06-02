@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
 import { View, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { User } from 'firebase/auth';
-import { Button } from '../../../common/components/ui/react-native/common';
-import { vars } from '../../../common/components/ui';
+import { Button, vars } from '../../../common/components/ui-brick';
 
 interface OrgUserFooterProps {
   user: User | null;

@@ -2,15 +2,14 @@ import { User } from 'firebase/auth';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 
-import { H2, H3 } from '../common/components/ui/react-native/common';
-import OrgList from '../features/org/components/OrgList';
-import { useOrg } from '../features/org/hooks/useOrg';
-import { OrgMembership } from '../features/org/types';
+import { H2, H3, vars } from '../../common/components/ui-brick';
+import OrgList from '../../features/org/components/OrgList';
+import { useOrg } from '../../features/org/hooks/useOrg';
+import { OrgMembership } from '../../features/org/types';
 
-import { vars } from '../common/components/ui';
-import OrgActionButtons from '../features/org/components/OrgActionButtons';
-import OrgUserFooter from '../features/org/components/OrgUserFooter';
-import PublicOrgSearchSection from '../features/org/components/PublicOrgSearchSection';
+import OrgActionButtons from '../../features/org/components/OrgActionButtons';
+import OrgUserFooter from '../../features/org/components/OrgUserFooter';
+import PublicOrgSearchSection from '../../features/org/components/PublicOrgSearchSection';
 
 interface OrgSelectPageProps {
 	user: User | null;
@@ -28,10 +27,14 @@ function OrgSelectPage({ user, userProfile, setCurrentOrg, onLogout, navigate, n
 
 	return (
 		<ScrollView contentContainerStyle={localStyle.orgContainer}>
-			<View style={{marginBottom: 15}}>
+			<View style={{ marginBottom: 15 }}>
 				<H2>🏢 조직 검색 및 선택</H2>
 				{!user && (
-					<TouchableOpacity onPress={onLogin} style={localStyle.headerLoginBtn}>
+					<TouchableOpacity onPress={onLogin}
+						style={[localStyle.headerLoginBtn,
+						{
+							backgroundColor: vars.primary,
+						}]}>
 						<Text style={localStyle.headerLoginText}>로그인</Text>
 					</TouchableOpacity>
 				)}
@@ -85,7 +88,6 @@ export const localStyle = StyleSheet.create({
 		borderColor: '#eee'
 	} as ViewStyle,
 	headerLoginBtn: {
-		backgroundColor: vars.primary,
 		paddingHorizontal: 15,
 		paddingVertical: 8,
 		borderRadius: 8,

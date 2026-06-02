@@ -1,11 +1,8 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import { H2, H3 } from '../common/components/ui/react-native/common';
-import { Box } from '../common/components/ui/react-native/custom';
-import { Product } from '../features/product/types';
-import { OrgMembership } from '../features/org/types';
-import { styles, Colors } from '../styles';
-import { vars } from '../common/components/ui';
+import { ScrollView, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { Box, H2, H3, vars } from '../../common/components/ui-brick';
+import { OrgMembership } from '../../features/org/types';
+import { Product } from '../../features/product/types';
+import { styles } from '../../styles';
 
 interface ShopPageProps {
 	products: Product[];

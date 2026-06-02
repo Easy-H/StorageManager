@@ -9,7 +9,13 @@ interface ListItemProps extends TouchableOpacityProps {
 
 export default function ListItem({ style, children, ...props }: ListItemProps) {
     return (
-        <TouchableOpacity style={[listItemStyle, style]} {...props}>
+        <TouchableOpacity
+            style={[listItemStyle,
+                {
+                    borderBottomColor: vars.surface,
+                    backgroundColor: vars.box,
+                },
+                style]} {...props}>
             {children}
         </TouchableOpacity>
     )
@@ -24,8 +30,6 @@ const listItemStyle: ViewStyle = {
     paddingLeft: 18,
     paddingRight: 18,
     borderBottomWidth: 1,
-    borderBottomColor: vars.surface,
-    backgroundColor: vars.box,
     // @ts-ignore - Web 전용 속성
     cursor: 'pointer'
 }

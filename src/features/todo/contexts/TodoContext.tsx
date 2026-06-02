@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { db } from '../../../common/api/firebase/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
-import { FirebaseProductRepository as ProductAPI } from '../../product/api/FirebaseProductRepository';
+import { FirebaseInventoryRepository as InventoryAPI } from '../../product/api/FirebaseInventoryRepository';
 import { FirebaseTodoRepository as TodoAPI } from '../api/FirebaseTodoRepository';
 import { Todo, CreateTodoData } from '../types';
 
@@ -89,7 +89,7 @@ export const TodoProvider = ({ orgId, notice, children }: TodoProviderProps) => 
 			setLoading(true);
 
 			// 개별 호출 대신 일괄(Batch) 처리 메서드 호출
-			await ProductAPI.updateStocks(
+			await InventoryAPI.updateStocks(
 				orgId,
 				todo.items,
 				todo.type,
@@ -114,7 +114,7 @@ export const TodoProvider = ({ orgId, notice, children }: TodoProviderProps) => 
 				throw new Error("이미 대기 중이거나 실행되지 않은 항목입니다.");
 			}
 
-			await ProductAPI.undoStocks(
+			await InventoryAPI.undoStocks(
 				orgId,
 				todo.items,
 				todo.type, // 원래의 타입(IN/OUT)을 넘겨줌

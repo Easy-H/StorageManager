@@ -4,9 +4,8 @@ import {
 	TextStyle,
 	View
 } from 'react-native';
-import { H2 } from '../../../common/components/ui/react-native/common';
-import { GreenButton, InputText, LinkButton } from '../../../common/components/ui/react-native/custom';
-import { Colors, styles } from '../../../styles';
+import { H2, InputText, LinkButton, SecondaryButton, vars } from '../../../common/components/ui-brick';
+import { styles } from '../../../styles';
 import { Product } from '../types';
 
 type ProductEditorProps = {
@@ -65,13 +64,16 @@ const ProductEditor = ({ item, form, setForm, onSave, onDelete, inputQty }: Prod
 		/>
 
 		<View style={[styles.buttonRow, localStyles.buttonArea]}>
-			<GreenButton onPress={() => onSave(item.id, form, inputQty)}
+			<SecondaryButton onPress={() => onSave(item.id, form, inputQty)}
 				style={localStyles.saveButton}>
 				저장하기
-			</GreenButton>
+			</SecondaryButton>
 			{!item.isNew && (
 				<LinkButton onPress={() => onDelete(item)}
-					style={localStyles.deleteButton}>
+					style={[localStyles.deleteButton,
+					{
+						color: vars.errorRed,
+					}]}>
 					삭제
 				</LinkButton>
 			)}
@@ -102,7 +104,6 @@ const localStyles = StyleSheet.create({
 	deleteButton: {
 		justifyContent: 'center',
 		flex: 1,
-		color: Colors.errorRed,
 	} as TextStyle,
 });
 

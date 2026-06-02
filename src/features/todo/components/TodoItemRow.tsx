@@ -1,6 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { Button } from '../../../common/components/ui/react-native/common';
-import { InputText } from '../../../common/components/ui/react-native/custom';
+import { Button, InputText } from '../../../common/components/ui-brick';
 import { Colors } from '../../../styles';
 import { StockUpdateItem } from '../../product/types';
 

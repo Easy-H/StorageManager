@@ -1,7 +1,5 @@
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
-import { H3 } from '../../../../common/components/ui/react-native/common';
-import { Box } from '../../../../common/components/ui/react-native/custom';
-import { vars } from '../../../../common/components/ui';
+import { H3, Box, vars } from '../../../../common/components/ui-brick';
 
 type ActivityLog = {
 	id: string;

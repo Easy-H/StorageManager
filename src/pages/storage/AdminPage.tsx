@@ -1,15 +1,13 @@
 import { User } from 'firebase/auth';
 import { useState } from 'react';
 import { ScrollView, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { H3 } from '../common/components/ui/react-native/common';
-import { Box, GreenButton } from '../common/components/ui/react-native/custom';
-import MemberList from '../features/org/components/MemberList';
-import { useOrgManage } from '../features/org/hooks/useOrgManage';
-import { OrgMembership } from '../features/org/types';
-import { styles } from '../styles';
-import { vars } from '../common/components/ui';
+import { H3, Box, SecondaryButton, vars } from '../../common/components/ui-brick';
+import MemberList from '../../features/org/components/MemberList';
+import { useOrgManage } from '../../features/org/hooks/useOrgManage';
+import { OrgMembership } from '../../features/org/types';
+import { styles } from '../../styles';
 
-interface AdminPageProps {
+type AdminPageProps = {
     currentOrg: OrgMembership;
     notice: (msg: string) => void;
     user: User | null;
@@ -40,10 +38,10 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
                             className="input-basic"
                             style={{ flex: 1 }}
                         />
-                        <GreenButton
+                        <SecondaryButton
                             onPress={() => updateOrgName(newName)}>
                             수정
-                        </GreenButton>
+                        </SecondaryButton>
                     </View>
 
                     <View style={{ borderBottomWidth: 1, borderBottomColor: vars.surface, marginBottom: 20 }} />

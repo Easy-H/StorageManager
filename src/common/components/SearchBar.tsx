@@ -1,7 +1,7 @@
 import React from 'react';
 import { styles } from '../../styles';
 import { View, TextInput, ViewStyle, StyleSheet } from 'react-native';
-import { vars } from './ui';
+import { vars } from './ui-brick';
 
 interface SearchBarProps {
     value: string;

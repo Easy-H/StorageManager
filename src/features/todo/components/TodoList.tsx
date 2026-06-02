@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FlatList, Text } from 'react-native';
 
-import FilterHeader, { FilterTab } from '../../../common/components/ui/react-native/custom/FilterHeader';
+import FilterHeader, { FilterTab } from '../../../common/components/ui-brick/react-native/custom/FilterHeader';
 import { useTodoSearch } from '../hooks/useTodoSearch';
 import { Todo, TodoStatus } from '../types';
 import TodoItem from './TodoListItem';

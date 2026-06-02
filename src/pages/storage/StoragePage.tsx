@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import ScannerModal from '../common/components/ScannerModal';
-import SearchBar from '../common/components/SearchBar';
-import { BlueButton, GreenButton } from '../common/components/ui/react-native/custom';
+import ScannerModal from '../../common/components/ScannerModal';
+import SearchBar from '../../common/components/SearchBar';
+import { PrimaryButton, SecondaryButton } from '../../common/components/ui-brick';
 
-import { OrgMembership } from '../features/org/types';
-import ProductDetailModal from '../features/product/components/ProductDetailModal';
-import ProductList from '../features/product/components/ProductList';
-import { Product } from '../features/product/types';
-import { styles } from '../styles';
+import { OrgMembership } from '../../features/org/types';
+import ProductDetailModal from '../../features/product/components/ProductDetailModal';
+import ProductList from '../../features/product/components/ProductList';
+import { Product } from '../../features/product/types';
+import { styles } from '../../styles';
 
 interface StoragePageProps {
     products: Product[];
@@ -33,14 +33,14 @@ const StoragePage = ({ products, currentOrg, onBack, notice }: StoragePageProps)
                         value={searchTerm}
                         onChange={setSearchTerm} />
 
-                    <BlueButton onPress={() => setIsScannerOpen(true)}>
+                    <PrimaryButton onPress={() => setIsScannerOpen(true)}>
                         📷
-                    </BlueButton>
-                    <GreenButton
+                    </PrimaryButton>
+                    <SecondaryButton
                         onPress={() => setSelectedItem({ barcode: '', name: '', isNew: true, currentStock: 0 } as any)}
                         >
                         추가
-                    </GreenButton>
+                    </SecondaryButton>
                 </View>
 
                 <ProductList products={products} searchTerm={searchTerm} onSelectProduct={(p: Product) => setSelectedItem(p)} />

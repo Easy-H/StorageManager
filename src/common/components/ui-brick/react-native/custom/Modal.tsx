@@ -17,7 +17,6 @@ const localStyles = StyleSheet.create({
     zIndex: 100,
   } as ViewStyle,
   modalContent: {
-    backgroundColor: vars.box,
     width: '100%',
     maxWidth: 400,
     padding: 25,
@@ -30,7 +29,7 @@ export default function Modal({ visible, children }: ModalProps) {
   return (
     <M visible={visible} transparent animationType="fade">
       <View style={localStyles.modalOverlay}>
-        <View style={localStyles.modalContent}>
+        <View style={[localStyles.modalContent, {backgroundColor: vars.box,}]}>
           {children}
         </View>
       </View>

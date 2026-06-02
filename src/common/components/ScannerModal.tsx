@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { useEffect } from 'react';
+import { Text } from 'react-native';
 import { styles } from '../../styles';
-import { Modal, LinkButton } from '../components/ui/react-native/custom';
+import { H2, LinkButton, Modal } from '../components/ui-brick';
 
 interface ScannerModalProps {
     onScan: (text: string) => void;
@@ -28,7 +28,7 @@ const ScannerModal = ({ onScan, onClose }: ScannerModalProps) => {
 
     return (
         <Modal>
-            <Text style={styles.h2}>바코드 스캐너</Text>
+            <H2>바코드 스캐너</H2>
             {/* @ts-ignore - Web DOM element for scanner library */}
             <div id="reader"></div>
             <LinkButton

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, H2 } from '../../../common/components/ui/react-native/common';
-import { BlueButton, GreenButton, InputText, LinkButton, Modal } from '../../../common/components/ui/react-native/custom';
-import { Colors, styles } from '../../../styles';
+import { Button, H2, InputText, LinkButton, Modal, PrimaryButton, SecondaryButton, vars } from '../../../common/components/ui-brick';
+import { styles } from '../../../styles';
 import { Product, StockUpdateItem, StockUpdateType } from '../../product/types';
 import { Todo } from '../types';
 import ProductSearchModal from './ProductSearchModal';
@@ -113,20 +112,20 @@ export default function TodoModal({
 
 			<View style={{ gap: 20 }}>
 				{initialData && (
-					<BlueButton style={{ width: '100%' }}
+					<PrimaryButton style={{ width: '100%' }}
 						onPress={() => { onExecute(initialData); onClose(); }}>
 						재고에 최종 반영(실행)
-					</BlueButton>
+					</PrimaryButton>
 				)}
 
 				<View style={styles.buttonRow}>
-					<GreenButton style={{ flex: 2 }} onPress={handleSave}>
+					<SecondaryButton style={{ flex: 2 }} onPress={handleSave}>
 						{initialData ? "변경사항 저장" : "할 일 등록하기"}
-					</GreenButton>
+					</SecondaryButton>
 					{initialData && (
 						<Button
 							onPress={() => { onDelete(initialData.id); onClose(); }}
-							style={{ flex: 1, alignItems: 'center', justifyContent: 'center', color: Colors.errorRed, fontWeight: 'bold' }}>
+							style={{ flex: 1, alignItems: 'center', justifyContent: 'center', color: vars.errorRed, fontWeight: 'bold' }}>
 							삭제
 						</Button>
 					)}

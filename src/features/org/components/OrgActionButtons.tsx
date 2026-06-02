@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { GreenButton, BlueButton } from '../../../common/components/ui/react-native/custom';
+import { SecondaryButton, PrimaryButton } from '../../../common/components/ui-brick';
 import { User } from 'firebase/auth';
 
 interface OrgActionButtonsProps {
@@ -15,7 +15,7 @@ const OrgActionButtons: FC<OrgActionButtonsProps> = ({ user, orgCreate, orgJoin,
 
   return (
     <View style={styles.buttons}>
-      <GreenButton onPress={() => {
+      <SecondaryButton onPress={() => {
         const orgName = prompt("생성할 조직의 이름을 입력하세요:");
         if (orgName && user) {
           orgCreate(orgName);
@@ -25,8 +25,8 @@ const OrgActionButtons: FC<OrgActionButtonsProps> = ({ user, orgCreate, orgJoin,
       }}
         style={{ flex: 1 } as ViewStyle}>
         조직 생성
-      </GreenButton>
-      <BlueButton onPress={() => {
+      </SecondaryButton>
+      <PrimaryButton onPress={() => {
         const orgId = prompt("참여할 조직의 ID를 입력하세요:");
         if (orgId && user) {
           orgJoin(orgId);
@@ -36,7 +36,7 @@ const OrgActionButtons: FC<OrgActionButtonsProps> = ({ user, orgCreate, orgJoin,
       }}
         style={{ flex: 1 } as ViewStyle}>
         조직 참여
-      </BlueButton>
+      </PrimaryButton>
     </View>
   );
 };

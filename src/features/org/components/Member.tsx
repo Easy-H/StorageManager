@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
-import { Button } from '../../../common/components/ui/react-native/common';
+import { Button } from '../../../common/components/ui-brick';
 import { Colors } from '../../../styles';
 import { OrgMember, OrgRole } from '../types';
 

@@ -1,5 +1,5 @@
-import { FC, useMemo, useState, useEffect } from 'react';
-import { Text, View, SafeAreaView } from 'react-native';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { Text, View } from 'react-native';
 import { HashRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 
 // 아까 만든 styles.js 임포트
@@ -18,14 +18,17 @@ import { useProducts } from './features/product/hooks/useProducts';
 import { TodoProvider } from './features/todo/contexts/TodoContext';
 
 // 페이지 및 컴포넌트
-import AdminPage from './pages/AdminPage';
-import AuthPage from './pages/AuthPage';
-import DashboardPage from './pages/DashboardPage';
-import OrgSelectPage from './pages/OrgSelectPage';
-import StoragePage from './pages/StoragePage';
-import ShopPage from './pages/ShopPage';
-import TodoPage from './pages/TodoPage';
-import { vars } from './common/components/ui';
+import { vars } from './common/components/ui-brick';
+
+import AuthPage from './pages/auth/AuthPage';
+import OrgSelectPage from './pages/auth/OrgSelectPage';
+
+import ShopPage from './pages/shop/ShopPage';
+
+import AdminPage from './pages/storage/AdminPage';
+import DashboardPage from './pages/storage/DashboardPage';
+import StoragePage from './pages/storage/StoragePage';
+import TodoPage from './pages/storage/TodoPage';
 
 interface UserProfile {
   level: number;

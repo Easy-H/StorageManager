@@ -1,15 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import SearchBar from '../common/components/SearchBar';
-import { BlueButton, GreenButton } from '../common/components/ui/react-native/custom';
+import SearchBar from '../../common/components/SearchBar';
 
-import { vars } from '../common/components/ui';
-import { OrgMembership } from '../features/org/types';
-import { Product } from '../features/product/types';
-import TodoList from '../features/todo/components/TodoList';
-import TodoModal from '../features/todo/components/TodoModal';
-import { useTodoPage } from '../features/todo/hooks/useTodoPage';
-import { styles } from '../styles';
+import { PrimaryButton, SecondaryButton, vars } from '../../common/components/ui-brick';
+import { OrgMembership } from '../../features/org/types';
+import { Product } from '../../features/product/types';
+import TodoList from '../../features/todo/components/TodoList';
+import TodoModal from '../../features/todo/components/TodoModal';
+import { useTodoPage } from '../../features/todo/hooks/useTodoPage';
+import { styles } from '../../styles';
 
 interface TodoPageProps {
     products: Product[];
@@ -59,14 +58,14 @@ export default function TodoPage({ products, currentOrg, onBack, notice }: TodoP
                         placeholder={"할 일 이름 검색..."}
                         value={searchTerm}
                         onChange={setSearchTerm} />
-                    <GreenButton onPress={openAddModal}>
+                    <SecondaryButton onPress={openAddModal}>
                         + 새 할 일
-                    </GreenButton>
+                    </SecondaryButton>
 
-                    <BlueButton
+                    <PrimaryButton
                         onPress={() => (fileInputRef.current as any)?.click()}>
                             EXCEL
-                    </BlueButton>
+                    </PrimaryButton>
                 </View>
                 <TodoList todos={todos} searchTerm={searchTerm} openEditModal={openEditModal}
                     handleDelete={handleDelete} handleExecute={handleExecute} handleUndo={handleUndo} />

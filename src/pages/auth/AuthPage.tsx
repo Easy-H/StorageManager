@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 
-import { H2 } from '../common/components/ui/react-native/common';
-import { GreenButton, LinkButton } from '../common/components/ui/react-native/custom';
-import { useAuth } from '../features/auth/hooks/useAuth';
-import { styles } from '../styles';
+import { H2, LinkButton, SecondaryButton } from '../../common/components/ui-brick';
+import { useAuth } from '../../features/auth/hooks/useAuth';
+import { styles } from '../../styles';
 
-interface AuthPageProps {
+type AuthPageProps = {
 	notice: (msg: string) => void;
 	onBack?: () => void;
 }
@@ -57,9 +56,9 @@ const AuthPage = ({ notice, onBack }: AuthPageProps) => {
 						<Text style={{ fontSize: 12, marginLeft: 5 } as TextStyle}> 이용약관 동의</Text>
 					</View>
 				)}
-				<GreenButton onPress={handleSubmit}>
+				<SecondaryButton onPress={handleSubmit}>
 					{isSignUp ? "가입하기" : "로그인"}
-				</GreenButton>
+				</SecondaryButton>
 			</form>
 			<LinkButton onPress={() => setIsSignUp(!isSignUp)}>
 				{isSignUp ? "로그인으로 이동" : "회원가입 하기"}

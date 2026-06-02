@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import { StyleSheet, View, Platform } from 'react-native'
 import App from './App.jsx'
-import vars from './common/components/ui/vars.js';
+import { vars } from './common/components/ui-brick';
 
 export const localStyles = StyleSheet.create({
     appWrapper: {

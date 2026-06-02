@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { LinkButton, Modal } from '../../../common/components/ui/react-native/custom';
+import { LinkButton, Modal } from '../../../common/components/ui-brick';
 import { useProductActions } from '../hooks/useProductActions';
 
 import { Product } from '../types';

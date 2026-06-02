@@ -1,13 +1,12 @@
-import React, { FC } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Colors } from '../../styles';
-import { vars } from './ui';
+import { FC } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { vars } from './ui-brick';
 
 /**
  * 탭 버튼 컴포넌트 (RN 스타일)
  */
-interface TabButtonProps {
+type TabButtonProps = {
   active: boolean;
   onPress: () => void;
   icon: string;
@@ -24,7 +23,7 @@ const TabButton: FC<TabButtonProps> = ({ active, onPress, icon, label }) => (
     <Text style={{ 
       fontSize: 11, 
       fontWeight: active ? 'bold' : 'normal',
-      color: active ? Colors.primary : '#bbb'
+      color: active ? vars.primary : '#bbb'
     }}>
       {label}
     </Text>

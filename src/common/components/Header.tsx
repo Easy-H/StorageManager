@@ -1,13 +1,12 @@
 import { StyleSheet, Text, TextStyle, TouchableOpacity, View } from 'react-native';
-import { Button } from './ui/react-native/common';
-import { vars } from './ui';
+import { Button, vars } from './ui-brick';
 
-interface Organization {
+type Organization = {
     id: string;
     name: string;
 }
 
-interface HeaderProps {
+type HeaderProps = {
     currentOrg: Organization;
     onBack: () => void;
     notice: (msg: string) => void;

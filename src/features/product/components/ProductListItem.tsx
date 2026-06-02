@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { ListItem } from '../../../common/components/ui/react-native/custom';
+import { ListItem, vars } from '../../../common/components/ui-brick';
 import { Product } from '../types';
-import { vars } from '../../../common/components/ui';
 
 type ProductListItemProps = {
 	product: Product;

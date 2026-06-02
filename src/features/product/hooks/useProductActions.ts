@@ -1,4 +1,5 @@
 import { FirebaseProductRepository as Repository } from '../api/FirebaseProductRepository';
+import { FirebaseInventoryRepository as InventoryAPI } from '../api/FirebaseInventoryRepository';
 import { Product } from '../types';
 
 type NoticeFunction = (message: string) => void;
@@ -20,7 +21,7 @@ export const useProductActions = (
 
   const updateStock = async (item: Product, inputQty: number | string, isDirectInput: boolean, type: string) => {
     try {
-      await Repository.updateStock(orgId, item.id, inputQty, isDirectInput, type);
+      await InventoryAPI.updateStock(orgId, item.id, inputQty, isDirectInput, type);
       notice("업데이트 완료");
       onClose();
     } catch (e) { console.log(e);notice("업데이트 실패"); }

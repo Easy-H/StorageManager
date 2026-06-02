@@ -1,6 +1,6 @@
 import { FlatList, StyleSheet, Text } from 'react-native';
 
-import FilterHeader from '../../../common/components/ui/react-native/custom/FilterHeader';
+import FilterHeader from '../../../common/components/ui-brick/react-native/custom/FilterHeader';
 
 import { useProductManagement } from '../hooks/useProductManagement';
 import { Product } from '../types';

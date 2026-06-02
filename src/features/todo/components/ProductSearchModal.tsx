@@ -2,8 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 import ScannerModal from '../../../common/components/ScannerModal';
-import { H2 } from '../../../common/components/ui/react-native/common';
-import { BlueButton, InputText, LinkButton, Modal } from '../../../common/components/ui/react-native/custom';
+import { H2, PrimaryButton, InputText, LinkButton, Modal } from '../../../common/components/ui-brick';
 import { styles } from '../../../styles';
 
 import { useProductSearch } from '../../product/hooks/useProductSearch';
@@ -95,7 +94,7 @@ export default function ProductSearchModal({
 					onChangeText={setKeyword}
 					style={{ flex: 1 }}
 				/>
-				<BlueButton onPress={() => setIsScannerOpen(true)}>📷</BlueButton>
+				<PrimaryButton onPress={() => setIsScannerOpen(true)}>📷</PrimaryButton>
 			</View>
 			<View style={{ backgroundColor: '#fff', borderRadius: 10, maxHeight: '100%' } as ViewStyle}>
 				<FlatList

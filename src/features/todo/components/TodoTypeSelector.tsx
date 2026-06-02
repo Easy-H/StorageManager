@@ -1,6 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { Button, H3 } from '../../../common/components/ui/react-native/common';
-import { Colors } from '../../../styles';
+import { Button, H3, vars } from '../../../common/components/ui-brick';
 import { StockUpdateType } from '../../product/types';
 
 type TodoTypeSelectorProps = {
@@ -17,7 +16,7 @@ const TodoTypeSelector = ({ type, setType }: TodoTypeSelectorProps) => {
 					onPress={() => setType('IN')}
 					style={[
 						localStyles.typeBtn,
-						type === 'IN' && { backgroundColor: Colors.primary, borderColor: Colors.primary, color: '#fff' }
+						type === 'IN' && { backgroundColor: vars.primary, borderColor: vars.primary, color: '#fff' }
 					]}>
 					입고 (+)
 				</Button>
@@ -25,7 +24,7 @@ const TodoTypeSelector = ({ type, setType }: TodoTypeSelectorProps) => {
 					onPress={() => setType('OUT')}
 					style={[
 						localStyles.typeBtn,
-						type === 'OUT' && { backgroundColor: Colors.errorRed, borderColor: Colors.errorRed, color: '#fff' }
+						type === 'OUT' && { backgroundColor: vars.errorRed, borderColor: vars.errorRed, color: '#fff' }
 					]}>
 					출고 (-)
 				</Button>

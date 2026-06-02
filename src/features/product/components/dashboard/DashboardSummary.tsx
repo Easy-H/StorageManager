@@ -1,6 +1,5 @@
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
-import { H3 } from '../../../../common/components/ui/react-native/common';
-import { BlueButton, Box, GreenButton } from '../../../../common/components/ui/react-native/custom';
+import { H3, Box, SecondaryButton, PrimaryButton } from '../../../../common/components/ui-brick';
 
 interface DashboardSummaryProps {
 	lowStockCount: number;
@@ -27,12 +26,12 @@ const DashboardSummary = ({ lowStockCount, overdueAuditCount, onDownloadExcel, o
 							{overdueAuditCount} <Text style={{ fontSize: 14 } as TextStyle}>건</Text>
 						</Text>
 					</View>
-					<BlueButton onPress={onDownloadExcel} style={localStyles.gridItem}>
+					<PrimaryButton onPress={onDownloadExcel} style={localStyles.gridItem}>
 						📦 재고현황 받기
-					</BlueButton>
-					<GreenButton onPress={onDownloadLogs} style={localStyles.gridItem}>
+					</PrimaryButton>
+					<SecondaryButton onPress={onDownloadLogs} style={localStyles.gridItem}>
 						📋 활동로그 받기
-					</GreenButton>
+					</SecondaryButton>
 				</View>
 			</Box>
 		</>

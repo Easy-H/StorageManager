@@ -1,9 +1,6 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { styles, Colors } from '../../../styles';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ListItem, vars } from '../../../common/components/ui-brick';
 import { Todo } from '../types';
-import { ListItem } from '../../../common/components/ui/react-native/custom';
-import { vars } from '../../../common/components/ui';
 
 interface TodoItemProps {
     item: Todo;
@@ -27,7 +24,7 @@ const TodoItem = ({ item, openEditModal, handleExecute, handleDelete, handleUndo
                         <Text style={localStyles.executedBadge}>완료</Text>
                     )}
                 </View>
-                <Text style={{ color: item.type === 'IN' ? Colors.primary : Colors.errorRed, marginTop: 4 }}>
+                <Text style={{ color: item.type === 'IN' ? vars.primary : vars.errorRed, marginTop: 4 }}>
                     {item.type === 'IN' ? '🔵 입고' : '🔴 출고'}
                     {item.status === 'executed' ? ' 처리됨' : ' 예정'}
                 </Text>
@@ -38,11 +35,14 @@ const TodoItem = ({ item, openEditModal, handleExecute, handleDelete, handleUndo
                     <>
                         <TouchableOpacity
                             onPress={() => handleExecute(item)}
-                            style={localStyles.executeButton}>
+                            style={[localStyles.executeButton, {
+                                backgroundColor: vars.primary,
+                                borderColor: vars.primary,
+                            }]}>
                             <Text style={{ color: '#fff', fontSize: 13 }}>실행</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => handleDelete(item.id)} style={localStyles.deleteIcon}>
-                            <Text style={{ color: Colors.errorRed, fontSize: 12 }}>삭제</Text>
+                            <Text style={{ color: vars.errorRed, fontSize: 12 }}>삭제</Text>
                         </TouchableOpacity>
                     </>
                 ) : (
@@ -53,7 +53,7 @@ const TodoItem = ({ item, openEditModal, handleExecute, handleDelete, handleUndo
                             <Text style={{ color: '#666', fontSize: 12 }}>취소</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => handleDelete(item.id)} style={localStyles.deleteIcon}>
-                            <Text style={{ color: Colors.errorRed, fontSize: 12 }}>삭제</Text>
+                            <Text style={{ color: vars.errorRed, fontSize: 12 }}>삭제</Text>
                         </TouchableOpacity>
                     </>
                 )}
@@ -76,10 +76,8 @@ const localStyles = StyleSheet.create({
     executeButton: {
         paddingVertical: 6,
         paddingHorizontal: 10,
-        backgroundColor: Colors.primary,
         borderRadius: 6,
         borderWidth: 1,
-        borderColor: Colors.primary,
     },
     undoButton: {
         paddingVertical: 6,

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { TextInput, TextStyle, View, ViewStyle } from 'react-native';
-import { vars } from '../../../common/components/ui';
-import { Button } from '../../../common/components/ui/react-native/common';
-import { BlueButton, GreenButton, LinkButton } from '../../../common/components/ui/react-native/custom';
+import { vars, Button, PrimaryButton, SecondaryButton, LinkButton } from '../../../common/components/ui-brick';
 
 type StockControllerProps = {
 	inputQty: number;
@@ -53,24 +51,24 @@ const StockController = ({ inputQty, setInputQty, currentStock, updateStock, ite
 
 			<View style={{ gap: 10, flexDirection: 'row', justifyContent: 'center' } as ViewStyle}>
 				{isDirectInput ? (
-					<GreenButton
+					<SecondaryButton
 						onPress={() => updateStock(item, inputQty, true, 'ADJUST')}
 					>
 						이 수량으로 확정 (실사 포함)
-					</GreenButton>
+					</SecondaryButton>
 				) : (
 					<>
-						<GreenButton
+						<SecondaryButton
 							onPress={() => updateStock(item, inputQty, false, 'IN')}
 						>
 							입고(+)
-						</GreenButton>
-						<BlueButton
+						</SecondaryButton>
+						<PrimaryButton
 							onPress={handleOutStock}
 							style={{ backgroundColor: inputQty > currentStock ? '#ccc' : vars.primary } as ViewStyle}
 						>
 							출고(-)
-						</BlueButton>
+						</PrimaryButton>
 					</>
 				)}
 			</View>

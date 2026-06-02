@@ -1,15 +1,14 @@
-import React from 'react';
-import * as XLSX from 'xlsx';
 import { ScrollView } from 'react-native';
-import { styles } from '../styles';
-import { useLog } from '../features/product/hooks/useLog';
-import DashboardSummary from '../features/product/components/dashboard/DashboardSummary';
-import LowStockList from '../features/product/components/dashboard/LowStockList';
-import RecentActivityLog from '../features/product/components/dashboard/RecentActivityLog';
-import { Product } from '../features/product/types';
-import { OrgMembership } from '../features/org/types';
+import * as XLSX from 'xlsx';
+import { OrgMembership } from '../../features/org/types';
+import DashboardSummary from '../../features/product/components/dashboard/DashboardSummary';
+import LowStockList from '../../features/product/components/dashboard/LowStockList';
+import RecentActivityLog from '../../features/product/components/dashboard/RecentActivityLog';
+import { useLog } from '../../features/product/hooks/useLog';
+import { Product } from '../../features/product/types';
+import { styles } from '../../styles';
 
-interface DashboardPageProps {
+type DashboardPageProps = {
 	products: Product[];
 	currentOrg: OrgMembership;
 	onBack: () => void;
