@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, TextStyle, StyleProp } from "react-native";
+import vars from "../../vars";
 
 interface H2Props {
     style?: StyleProp<TextStyle>;
@@ -15,6 +16,7 @@ export default function H2({ style, children }: H2Props) {
 }
 
 const h2Style: TextStyle = {
+    color: vars.text,
     fontSize: 24,
     fontWeight: 'bold',
 };

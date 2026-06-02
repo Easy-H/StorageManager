@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal as M, View, StyleSheet, ViewStyle } from 'react-native';
-import { Colors } from '../../../../../styles';
+import vars from '../../vars';
 
 type ModalProps = {
   visible?: boolean;
@@ -17,7 +17,7 @@ const localStyles = StyleSheet.create({
     zIndex: 100,
   } as ViewStyle,
   modalContent: {
-    backgroundColor: Colors.white,
+    backgroundColor: vars.box,
     width: '100%',
     maxWidth: 400,
     padding: 25,

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextStyle, TouchableOpacity, View } from 'react-native';
-import { Colors, styles } from '../../styles';
 import { Button } from './ui/react-native/common';
+import { vars } from './ui';
 
 interface Organization {
     id: string;
@@ -21,14 +21,14 @@ const Header = ({ currentOrg, onBack, notice }: HeaderProps) => {
     };
 
     return (
-        <View style={styles.appHeader}>
+        <View style={localStyles.appHeader}>
             <Button onPress={onBack} style={localStyles.backButton}>
                 ◀ 조직변경
             </Button>
             {/* @ts-ignore - Web cursor support */}
             <TouchableOpacity onPress={() => handleCopyOrgId(currentOrg.id)} style={{ cursor: 'pointer' }}>
                 <View>
-                    <Text style={{ fontWeight: 'bold', fontSize: 15, textAlign: 'right' } as TextStyle}>
+                    <Text style={{ color: vars.text, fontWeight: 'bold', fontSize: 15, textAlign: 'right' } as TextStyle}>
                         {currentOrg.name} 📋
                     </Text>
                 </View>
@@ -40,13 +40,22 @@ const Header = ({ currentOrg, onBack, notice }: HeaderProps) => {
 };
 
 const localStyles = StyleSheet.create({
+    appHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 15,
+        borderBottomWidth: 1,
+        backgroundColor: vars.background,
+        borderBottomColor: vars.surface,
+    },
     backButton: {
         fontSize: 12,
         paddingHorizontal: 12,
         paddingVertical: 6,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: vars.box,
         borderRadius: 6,
-        color: Colors.secondary,
+        color: vars.text,
     }
 });
 

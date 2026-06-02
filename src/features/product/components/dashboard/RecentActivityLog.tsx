@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { H3 } from '../../../../common/components/ui/react-native/common';
 import { Box } from '../../../../common/components/ui/react-native/custom';
+import { vars } from '../../../../common/components/ui';
 
 type ActivityLog = {
 	id: string;
@@ -26,7 +27,7 @@ const RecentActivityLog = ({ logs }: RecentActivityLogProps) => {
 							index !== logs.length - 1 && localStyles.borderBottom
 						]}>
 							<View>
-								<Text style={{ fontSize: 14, fontWeight: '500' } as TextStyle}>{log.productName}</Text>
+								<Text style={{ color: vars.text, fontSize: 14, fontWeight: '500' } as TextStyle}>{log.productName}</Text>
 								<Text style={{ fontSize: 11, color: '#999' } as TextStyle}>
 									{log.timestamp?.toLocaleString('ko-KR', { hour12: false })}
 								</Text>
@@ -57,7 +58,7 @@ const localStyles = StyleSheet.create({
 	} as ViewStyle,
 	borderBottom: { 
 		borderBottomWidth: 1, 
-		borderBottomColor: '#f5f5f5' 
+		borderBottomColor: vars.surface
 	} as ViewStyle,
 	changeQty: { textAlign: 'right', fontSize: 13, fontWeight: 'bold' }
 } as any);

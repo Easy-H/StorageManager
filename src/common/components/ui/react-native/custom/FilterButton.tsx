@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from "../common"; // Assuming this Button component correctly handles styles for its children
 import { Colors } from "../../../../../styles";
 import { StyleProp, ViewStyle, TextStyle, TouchableOpacityProps } from 'react-native';
+import vars from '../../vars';
 
 // Define props for FilterButton
 // Assuming the 'Button' from "../common" extends TouchableOpacityProps or similar
@@ -31,19 +32,19 @@ export default function FilterButton({ style, isActive, children, numberOfLines 
 const filterTab: ViewStyle & TextStyle= {
     flex: 1,
     paddingVertical: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: vars.background,
     borderRadius: 8, // Changed from '8px' to 8 for React Native compatibility
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: vars.surface,
     fontSize: 11,
     color: '#666'
 };
 
 const activeTab: ViewStyle & TextStyle = {
-    backgroundColor: '#fff',
-    borderColor: Colors.primary,
-    color: Colors.primary,
+    backgroundColor: vars.box,
+    borderColor: vars.primary,
+    color: vars.primary,
     fontWeight: 'bold',
 };

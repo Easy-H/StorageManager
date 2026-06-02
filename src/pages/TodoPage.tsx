@@ -3,13 +3,13 @@ import { StyleSheet, Text, View } from 'react-native';
 import SearchBar from '../common/components/SearchBar';
 import { BlueButton, GreenButton } from '../common/components/ui/react-native/custom';
 
+import { vars } from '../common/components/ui';
 import { OrgMembership } from '../features/org/types';
 import { Product } from '../features/product/types';
 import TodoList from '../features/todo/components/TodoList';
 import TodoModal from '../features/todo/components/TodoModal';
 import { useTodoPage } from '../features/todo/hooks/useTodoPage';
-import { Todo } from '../features/todo/types';
-import { Colors, styles } from '../styles';
+import { styles } from '../styles';
 
 interface TodoPageProps {
     products: Product[];
@@ -108,7 +108,7 @@ const localStyles = StyleSheet.create({
         paddingHorizontal: 12,
         borderRadius: 5,
         borderWidth: 1,
-        borderColor: Colors.primary,
+        borderColor: vars.primary,
     },
     deleteIcon: { padding: 8 },
     fab: {
@@ -118,7 +118,7 @@ const localStyles = StyleSheet.create({
         width: 65,
         height: 65,
         borderRadius: 33,
-        backgroundColor: Colors.secondary || '#333',
+        backgroundColor: vars.text,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 5,

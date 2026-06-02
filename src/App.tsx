@@ -4,7 +4,6 @@ import { HashRouter, Navigate, Route, Routes, useNavigate } from 'react-router-d
 
 // 아까 만든 styles.js 임포트
 import './App.css';
-import { styles } from './styles';
 
 import BottomNav from './common/components/BottomNav';
 import Header from './common/components/Header';
@@ -26,6 +25,7 @@ import OrgSelectPage from './pages/OrgSelectPage';
 import StoragePage from './pages/StoragePage';
 import ShopPage from './pages/ShopPage';
 import TodoPage from './pages/TodoPage';
+import { vars } from './common/components/ui';
 
 interface UserProfile {
   level: number;
@@ -76,7 +76,12 @@ const AppContent: FC = () => {
   // 로딩 화면
   if (loading) {
     return (
-      <View style={styles.centerContainer}>
+      <View style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: vars.background,
+      }}>
         <Text>로딩 중...</Text>
       </View>
     );
@@ -90,15 +95,15 @@ const AppContent: FC = () => {
         {(showAuth && !user) ? (
           <AuthPage notice={showToast} onBack={() => setShowAuth(false)} />
         ) : (
-        <OrgSelectPage
-          user={user}
-          userProfile={userProfile}
-          onLogout={handleLogout}
-          onLogin={() => setShowAuth(true)}
-          notice={showToast}
-          navigate={navigate}
-          setCurrentOrg={setCurrentOrg}
-        />
+          <OrgSelectPage
+            user={user}
+            userProfile={userProfile}
+            onLogout={handleLogout}
+            onLogin={() => setShowAuth(true)}
+            notice={showToast}
+            navigate={navigate}
+            setCurrentOrg={setCurrentOrg}
+          />
         )}
         <Toast message={toast.message} show={toast.show} />
       </>
@@ -129,10 +134,10 @@ const AppContent: FC = () => {
             )
           } />
           <Route path="/todo" element={
-            <TodoProvider orgId={ currentOrg!.id } notice={showToast}>
-              <TodoPage currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} products={products}/>
+            <TodoProvider orgId={currentOrg!.id} notice={showToast}>
+              <TodoPage currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} products={products} />
             </TodoProvider>
-            }/>
+          } />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

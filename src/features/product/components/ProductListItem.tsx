@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { ListItem } from '../../../common/components/ui/react-native/custom';
 import { Product } from '../types';
+import { vars } from '../../../common/components/ui';
 
 type ProductListItemProps = {
 	product: Product;
@@ -32,7 +33,7 @@ const ProductListItem = ({ product, auditStatus, onPress }: ProductListItemProps
 			<View style={localStyles.stockContainer}>
 				<Text style={[
 					localStyles.stockText, 
-					{ color: isLow ? '#ff4d4f' : '#333' }
+					{ color: isLow ? vars.errorRed : vars.text }
 				]}>
 					{product.currentStock}개
 				</Text>
@@ -52,6 +53,7 @@ const localStyles = StyleSheet.create({
 		flexDirection: 'row',
 	},
 	productName: {
+		color: vars.text,
 		fontSize: 16,
 		fontWeight: 'bold',
 	},
@@ -75,7 +77,7 @@ const localStyles = StyleSheet.create({
 	},
 	lowStockLabel: {
 		fontSize: 10,
-		color: '#ff4d4f',
+		color: vars.errorRed,
 		fontWeight: 'bold',
 	},
 });

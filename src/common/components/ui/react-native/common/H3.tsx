@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, TextStyle, StyleProp } from "react-native";
+import vars from "../../vars";
 
 interface H3Props {
     style?: StyleProp<TextStyle>;
@@ -15,6 +16,7 @@ export default function H3({ style, children }: H3Props) {
 }
 
 const h3Style: TextStyle = {
+    color: vars.text,
     fontSize: 16,
     fontWeight: 'bold',
 };

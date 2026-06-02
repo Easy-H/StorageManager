@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Colors } from '../../styles';
+import { vars } from './ui';
 
 /**
  * 탭 버튼 컴포넌트 (RN 스타일)
@@ -39,9 +40,9 @@ const navStyles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 65,
-    backgroundColor: '#fff',
+    backgroundColor: vars.box,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: vars.surface,
     zIndex: 50,
   },
   tabButton: {

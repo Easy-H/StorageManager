@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import { StyleSheet, View, Platform } from 'react-native'
 import App from './App.jsx'
+import vars from './common/components/ui/vars.js';
 
 export const localStyles = StyleSheet.create({
     appWrapper: {
@@ -8,6 +9,7 @@ export const localStyles = StyleSheet.create({
             web: { height: '100vh' },
             default: { height: '100%' }
         }),
+        backgroundColor: vars.background,
     }
 });
 

@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { View, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { User } from 'firebase/auth';
 import { Button } from '../../../common/components/ui/react-native/common';
+import { vars } from '../../../common/components/ui';
 
 interface OrgUserFooterProps {
   user: User | null;
@@ -33,12 +34,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingVertical: 15,
     borderTopWidth: 1,
-    borderTopColor: '#eeeeee',
+    borderTopColor: vars.surface,
     width: "100%",
   } as ViewStyle,
   logout: {
     // @ts-ignore
-    color: '#ff4d4f',
+    color: vars.errorRed,
     fontSize: 13,
     backgroundColor: 'transparent',
   } as ViewStyle & TextStyle,
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
     color: '#888'
   },
   authEMail: {
+    color: vars.text,
     fontSize: 14,
     fontWeight: '600'
   },

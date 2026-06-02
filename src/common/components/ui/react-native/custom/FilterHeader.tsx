@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import FilterButton from './FilterButton';
+import vars from '../../vars';
 
 export interface FilterTab {
     label: string;
@@ -85,7 +86,9 @@ const localStyles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 1,
         borderStyle: 'solid',
-        borderColor: '#ddd',
+        borderColor: vars.surface,
+        backgroundColor: vars.box,
+        color: vars.text,
         fontSize: 12,
     },
 });

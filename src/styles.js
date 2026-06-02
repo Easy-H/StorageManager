@@ -5,12 +5,12 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // 1. CSS 변수를 상수로 정의
 export const Colors = {
   primary: '#1890ff',
-  secondary: '#242424',
-  bgWhite: '#f9f9f9',
-  bgLight: '#f0f7ff',
-  borderColor: '#dddddd',
-  errorRed: '#ff4d4f',
   successGreen: '#52c41a',
+  bgWhite: '#f9f9f9',
+  borderColor: '#dddddd',
+  bgLight: '#f0f7ff',
+  secondary: '#242424',
+  errorRed: '#ff4d4f',
   white: '#ffffff',
   gray: '#888888',
 };
@@ -27,7 +27,6 @@ export const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 500, // 웹 환경 대응
     alignSelf: 'center',
-    backgroundColor: Colors.bgWhite,
     position: 'relative',
     color: 'black',
     padding: 10,

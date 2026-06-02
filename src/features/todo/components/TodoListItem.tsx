@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { styles, Colors } from '../../../styles';
 import { Todo } from '../types';
 import { ListItem } from '../../../common/components/ui/react-native/custom';
+import { vars } from '../../../common/components/ui';
 
 interface TodoItemProps {
     item: Todo;
@@ -14,14 +15,14 @@ interface TodoItemProps {
 
 const TodoItem = ({ item, openEditModal, handleExecute, handleDelete, handleUndo }: TodoItemProps) => {
     return (
-        <ListItem style={[styles.productItem, item.status === 'executed' && { opacity: 0.8 }]}>
+        <ListItem style={[item.status === 'executed' && { opacity: 0.8 }]}>
             <TouchableOpacity
                 style={{ flex: 1 }}
                 onPress={() => item.status === 'pending' && openEditModal(item)}
                 disabled={item.status === 'executed'}
             >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{item.title}</Text>
+                    <Text style={{ color: vars.text, fontWeight: 'bold', fontSize: 16 }}>{item.title}</Text>
                     {item.status === 'executed' && (
                         <Text style={localStyles.executedBadge}>완료</Text>
                     )}

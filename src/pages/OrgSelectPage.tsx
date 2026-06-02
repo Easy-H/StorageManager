@@ -6,8 +6,8 @@ import { H2, H3 } from '../common/components/ui/react-native/common';
 import OrgList from '../features/org/components/OrgList';
 import { useOrg } from '../features/org/hooks/useOrg';
 import { OrgMembership } from '../features/org/types';
-import { Colors, styles } from '../styles';
 
+import { vars } from '../common/components/ui';
 import OrgActionButtons from '../features/org/components/OrgActionButtons';
 import OrgUserFooter from '../features/org/components/OrgUserFooter';
 import PublicOrgSearchSection from '../features/org/components/PublicOrgSearchSection';
@@ -28,7 +28,7 @@ function OrgSelectPage({ user, userProfile, setCurrentOrg, onLogout, navigate, n
 
 	return (
 		<ScrollView contentContainerStyle={localStyle.orgContainer}>
-			<View style={styles.appHeader}>
+			<View style={{marginBottom: 15}}>
 				<H2>🏢 조직 검색 및 선택</H2>
 				{!user && (
 					<TouchableOpacity onPress={onLogin} style={localStyle.headerLoginBtn}>
@@ -85,7 +85,7 @@ export const localStyle = StyleSheet.create({
 		borderColor: '#eee'
 	} as ViewStyle,
 	headerLoginBtn: {
-		backgroundColor: Colors.primary,
+		backgroundColor: vars.primary,
 		paddingHorizontal: 15,
 		paddingVertical: 8,
 		borderRadius: 8,

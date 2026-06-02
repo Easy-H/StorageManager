@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleProp, ViewStyle, TextStyle, TouchableOpacityProps } from 'react-native';
 import { Button } from "../common";
-import { Colors } from "../../../../../styles";
+import vars from "../../vars";
 
 interface BlueButtonProps extends TouchableOpacityProps {
     style?: StyleProp<ViewStyle | TextStyle>;
@@ -21,10 +21,10 @@ export default function BlueButton({ style, children, ...props }: BlueButtonProp
 const blueButtonStyle: ViewStyle & TextStyle = {
     flex: 1,
     padding: 14,
-    backgroundColor: Colors.primary,
+    backgroundColor: vars.primary,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    color: Colors.white,
+    color: vars.buttonText,
     fontWeight: 'bold',
 };

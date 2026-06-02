@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { TextInput, TextStyle, View, ViewStyle } from 'react-native';
+import { vars } from '../../../common/components/ui';
 import { Button } from '../../../common/components/ui/react-native/common';
 import { BlueButton, GreenButton, LinkButton } from '../../../common/components/ui/react-native/custom';
-import { Colors } from '../../../styles';
 
 type StockControllerProps = {
 	inputQty: number;
@@ -42,8 +42,8 @@ const StockController = ({ inputQty, setInputQty, currentStock, updateStock, ite
 					}}
 					style={{
 						textAlign: 'center', width: 70,
-						color: 'black',
-						fontSize: 24, borderBottomWidth: 2, borderBottomColor: '#ddd'
+						color: vars.text,
+						fontSize: 24, borderBottomWidth: 2, borderBottomColor: vars.surface
 					} as TextStyle}
 				/>
 				<Button onPress={handleIncrease} style={circleQtyBtn}>
@@ -67,7 +67,7 @@ const StockController = ({ inputQty, setInputQty, currentStock, updateStock, ite
 						</GreenButton>
 						<BlueButton
 							onPress={handleOutStock}
-							style={{ backgroundColor: inputQty > currentStock ? '#ccc' : Colors.primary } as ViewStyle}
+							style={{ backgroundColor: inputQty > currentStock ? '#ccc' : vars.primary } as ViewStyle}
 						>
 							출고(-)
 						</BlueButton>
@@ -93,7 +93,9 @@ const circleQtyBtn: ViewStyle & TextStyle = {
 	height: 45,
 	borderRadius: 22.5,
 	borderWidth: 1,
-	borderColor: Colors.borderColor,
+	color: vars.text,
+	backgroundColor: vars.background,
+	borderColor: vars.surface,
 	// @ts-ignore
 	cursor: 'pointer',
 	padding: 0,

@@ -3,6 +3,7 @@ import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native
 import { H2 } from '../../../common/components/ui/react-native/common';
 import { LinkButton } from '../../../common/components/ui/react-native/custom';
 import StockController from './StockController';
+import { vars } from '../../../common/components/ui';
 
 type StockEditorProps = {
 	item: any;
@@ -31,16 +32,16 @@ const StockEditor = ({ item, lastAuditDisplay, onAudit, onEditMode, inputQty, se
                 </View>
             )}
 
-            <View style={{ backgroundColor: '#f5f5f5', borderRadius: 10, padding: 15, alignItems: 'center', gap: 5 } as ViewStyle}>
-                <Text style={{ fontSize: 12, color: '#666' } as TextStyle}>현재 실재고</Text>
+            <View style={{ backgroundColor: vars.background, borderRadius: 10, padding: 15, alignItems: 'center', gap: 5 } as ViewStyle}>
+                <Text style={{ fontSize: 12, color: vars.text } as TextStyle}>현재 실재고</Text>
                 <Text style={{
                     fontSize: 32,
                     fontWeight: 'bold',
-                    color: item.currentStock <= item.safetyStock ? '#ff4d4f' : '#333'
+                    color: item.currentStock <= item.safetyStock ? vars.errorRed : vars.text
                 } as TextStyle}>
                     {item.currentStock}개
                 </Text>
-                <Text style={{ fontSize: 11, color: '#999', textAlign: 'center' } as TextStyle}>
+                <Text style={{ fontSize: 11, color: vars.text, textAlign: 'center' } as TextStyle}>
                     최근 실사: {lastAuditDisplay ? (lastAuditDisplay instanceof Date ? lastAuditDisplay.toLocaleDateString() : new Date(lastAuditDisplay).toLocaleDateString()) : '기록 없음'}
                 </Text>
                 <TouchableOpacity onPress={onAudit}>
@@ -74,9 +75,9 @@ const memoTextStyle: TextStyle = {
 
 const auditBtnStyle: TextStyle & ViewStyle = {
     color: '#4a90e2',
-    backgroundColor: "white",
+    backgroundColor: vars.box,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: vars.surface,
     borderRadius: 20,
     marginTop: 10,
     paddingVertical: 6,

@@ -5,6 +5,7 @@ import { Box } from '../common/components/ui/react-native/custom';
 import { Product } from '../features/product/types';
 import { OrgMembership } from '../features/org/types';
 import { styles, Colors } from '../styles';
+import { vars } from '../common/components/ui';
 
 interface ShopPageProps {
 	products: Product[];
@@ -47,8 +48,8 @@ const localStyle = StyleSheet.create({
 	header: { marginBottom: 20 } as ViewStyle,
 	subtitle: { fontSize: 14, color: '#666', marginTop: 4 } as TextStyle,
 	productCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 } as ViewStyle,
-	productName: { fontSize: 16, fontWeight: 'bold', color: Colors.primary } as TextStyle,
-	price: { fontSize: 14, color: Colors.secondary, fontWeight: '600', marginTop: 2 } as TextStyle,
+	productName: { fontSize: 16, fontWeight: 'bold', color: vars.primary } as TextStyle,
+	price: { fontSize: 14, color: vars.text, fontWeight: '600', marginTop: 2 } as TextStyle,
 	emptyText: { textAlign: 'center', color: '#999', marginTop: 40, fontSize: 14 } as TextStyle,
 });
 

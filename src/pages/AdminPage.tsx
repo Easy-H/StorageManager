@@ -7,6 +7,7 @@ import MemberList from '../features/org/components/MemberList';
 import { useOrgManage } from '../features/org/hooks/useOrgManage';
 import { OrgMembership } from '../features/org/types';
 import { styles } from '../styles';
+import { vars } from '../common/components/ui';
 
 interface AdminPageProps {
     currentOrg: OrgMembership;
@@ -30,7 +31,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
                 {/* 1. 조직 관리 */}
                 <H3>🛠️ 조직 관리</H3>
                 <Box>
-                    <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 8, color: '#444' }}>조직 이름</Text>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 8, color: vars.text }}>조직 이름</Text>
                     <View style={{ flexDirection: 'row', gap: 8, marginBottom: 20 } as ViewStyle}>
                         {/* @ts-ignore - React Native Web 전용 input 태그 사용 */}
                         <input
@@ -45,12 +46,12 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
                         </GreenButton>
                     </View>
 
-                    <View style={{ borderBottomWidth: 1, borderBottomColor: '#eee', marginBottom: 20 }} />
+                    <View style={{ borderBottomWidth: 1, borderBottomColor: vars.surface, marginBottom: 20 }} />
 
-                    <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 12, color: '#444' }}>가입 및 공개 설정</Text>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 12, color: vars.text }}>가입 및 공개 설정</Text>
                     
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 } as ViewStyle}>
-                        <Text style={{ fontSize: 14, color: '#444' }}>승인 없이 즉시 가입 허용</Text>
+                        <Text style={{ fontSize: 14, color: vars.text }}>승인 없이 즉시 가입 허용</Text>
                         <input 
                             type="checkbox" 
                             checked={currentOrg.isAutoJoin || false} 
@@ -60,7 +61,7 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
                     </View>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' } as ViewStyle}>
-                        <Text style={{ fontSize: 14, color: '#444' }}>조직 공개 설정 (검색 허용)</Text>
+                        <Text style={{ fontSize: 14, color: vars.text }}>조직 공개 설정 (검색 허용)</Text>
                         <input 
                             type="checkbox" 
                             checked={currentOrg.isPublic || false} 

@@ -1,6 +1,6 @@
 import React from "react"
 import { TouchableOpacity, ViewStyle, StyleProp, TouchableOpacityProps } from "react-native"
-import { Colors } from "../../../../../styles"
+import vars from "../../vars";
 
 interface ListItemProps extends TouchableOpacityProps {
     style?: StyleProp<ViewStyle>;
@@ -24,8 +24,8 @@ const listItemStyle: ViewStyle = {
     paddingLeft: 18,
     paddingRight: 18,
     borderBottomWidth: 1,
-    borderBottomColor: '#f6f6f6',
-    backgroundColor: Colors.white,
+    borderBottomColor: vars.surface,
+    backgroundColor: vars.box,
     // @ts-ignore - Web 전용 속성
     cursor: 'pointer'
 }
