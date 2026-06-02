@@ -8,7 +8,7 @@ service cloud.firestore {
     }
     
     function isOrgAdmin(orgId) {
-    	return get(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid)).data.level == 100;
+    	return get(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid)).data.level >= 100;
     }
     
     function isOrgMember(orgId) {
@@ -37,8 +37,12 @@ service cloud.firestore {
     match /organizations/{orgId} {
       // 조직 생성 및 조회
       allow create: if request.auth != null;
-      // get/list는 활성 상태인 조직만 허용
-      allow get, list: if request.auth != null && resource.data.isActive == true;
+      // 활성 상태인 조직 중, 공개 조직은 누구나(비로그인 포함) 조회 가능
+      // 비공개 조직은 멤버인 경우에만(로그인 필요) 조회 가능
+      allow get, list: if resource.data.isActive == true && (
+        resource.data.isPublic == true ||
+        (request.auth != null && isOrgMember(orgId))
+      );
       
       // 관리자(level 100)만 조직 정보 수정(isActive 포함) 및 삭제 가능
       allow update, delete: if request.auth != null &&
@@ -55,8 +59,10 @@ service cloud.firestore {
 
       // 하위 데이터 (상품, 로그 등)
       match /products/{productId} {
-        allow read, write: if request.auth != null && isOrgActive(orgId) &&
-          isOrgMember(orgId);
+        allow read: if isOrgActive(orgId) && (
+          isOrgMember(orgId) || resource.data.isForSale == true
+        );
+        allow write: if request.auth != null && isOrgActive(orgId) && isOrgMember(orgId);
       }
 
       match /inventory_logs/{logId} {
@@ -65,7 +71,9 @@ service cloud.firestore {
       }
       
       match /todos/{todoId} {
-      	allow read, write, update, delete;
+        // 조직이 활성 상태이고 멤버인 경우에만 접근 허용
+      	allow read, write: if request.auth != null && isOrgActive(orgId) &&
+          isOrgMember(orgId);
       }
     }
   }

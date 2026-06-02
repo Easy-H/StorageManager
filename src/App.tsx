@@ -1,15 +1,17 @@
-import React, { useMemo, useState } from 'react';
-import { HashRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { View, Text, TouchableOpacity, SafeAreaView, Platform, Alert, StyleSheet, Dimensions } from 'react-native';
+import { FC, useMemo, useState, useEffect } from 'react';
+import { Text, View, SafeAreaView } from 'react-native';
+import { HashRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 
 // 아까 만든 styles.js 임포트
-import { styles, Colors } from './styles';
-import './App.css'
+import './App.css';
+import { styles } from './styles';
 
+import BottomNav from './common/components/BottomNav';
 import Header from './common/components/Header';
-import { useToast } from './common/hooks/useToast';
 import Toast from './common/components/Toast';
+import { useToast } from './common/hooks/useToast';
 
+import { OrgMembership } from './features/org/types';
 // 기존 API 및 훅 (그대로 유지)
 import { FirebaseAuthRepository as AuthAPI } from './features/auth/api/FirebaseAuthRepository';
 import { useAuth } from './features/auth/hooks/useAuth';
@@ -17,28 +19,42 @@ import { useProducts } from './features/product/hooks/useProducts';
 import { TodoProvider } from './features/todo/contexts/TodoContext';
 
 // 페이지 및 컴포넌트
+import AdminPage from './pages/AdminPage';
 import AuthPage from './pages/AuthPage';
+import DashboardPage from './pages/DashboardPage';
 import OrgSelectPage from './pages/OrgSelectPage';
 import StoragePage from './pages/StoragePage';
-import DashboardPage from './pages/DashboardPage';
-import AdminPage from './pages/AdminPage';
+import ShopPage from './pages/ShopPage';
 import TodoPage from './pages/TodoPage';
 
-function AppContent() {
-  const { user, userProfile, loading } = useAuth();
+interface UserProfile {
+  level: number;
+}
+
+const AppContent: FC = () => {
+  const { user, userProfile, loading } = useAuth() as { user: any; userProfile: UserProfile | null; loading: boolean };
   const { toast, showToast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const [currentOrg, setCurrentOrg] = useState(() => {
+  const [showAuth, setShowAuth] = useState(false);
+  const [currentOrg, setCurrentOrg] = useState<OrgMembership | null>(() => {
     const savedOrg = sessionStorage.getItem('currentOrg');
     return savedOrg ? JSON.parse(savedOrg) : null;
   });
 
+  // currentOrg 상태가 변경될 때마다 sessionStorage를 동기화합니다.
+  useEffect(() => {
+    if (currentOrg) {
+      sessionStorage.setItem('currentOrg', JSON.stringify(currentOrg));
+    } else {
+      sessionStorage.removeItem('currentOrg');
+    }
+  }, [currentOrg]);
+
   const products = useProducts(currentOrg?.id);
 
-  const hasAdminAccess = useMemo(() => {
-    return currentOrg?.level >= 100 || userProfile?.level >= 100;
+  const hasAdminAccess = useMemo((): boolean => {
+    return (currentOrg?.level ?? 0) >= 100 || (userProfile?.level ?? 0) >= 100;
   }, [currentOrg, userProfile]);
 
   const handleExitOrg = () => {
@@ -67,30 +83,25 @@ function AppContent() {
   }
 
 
-  // 비로그인 상태
-  if (!user) {
-    return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <AuthPage notice={showToast} />
-        <Toast message={toast.message} show={toast.show} />
-      </SafeAreaView>
-    );
-  }
-
   // 1. 조직 선택 전
   if (!currentOrg) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <>
+        {(showAuth && !user) ? (
+          <AuthPage notice={showToast} onBack={() => setShowAuth(false)} />
+        ) : (
         <OrgSelectPage
           user={user}
           userProfile={userProfile}
           onLogout={handleLogout}
+          onLogin={() => setShowAuth(true)}
           notice={showToast}
           navigate={navigate}
           setCurrentOrg={setCurrentOrg}
         />
+        )}
         <Toast message={toast.message} show={toast.show} />
-      </SafeAreaView>
+      </>
     );
   }
 
@@ -107,15 +118,18 @@ function AppContent() {
           <Route path="/storage" element={
             <StoragePage products={products} currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} />
           } />
+          <Route path="/shop" element={
+            <ShopPage products={products} currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} />
+          } />
           <Route path="/admin" element={
             hasAdminAccess ? (
-              <AdminPage onBack={handleExitOrg} currentOrg={currentOrg} user={user} notice={showToast} onExitOrg={handleExitOrg} setCurrentOrg={setCurrentOrg} />
+              <AdminPage onBack={handleExitOrg} currentOrg={currentOrg} user={user} notice={showToast} setCurrentOrg={setCurrentOrg as any} />
             ) : (
               <Navigate to="/dashboard" replace />
             )
           } />
           <Route path="/todo" element={
-            <TodoProvider orgId={ currentOrg.id }>
+            <TodoProvider orgId={ currentOrg!.id } notice={showToast}>
               <TodoPage currentOrg={currentOrg} onBack={handleExitOrg} notice={showToast} products={products}/>
             </TodoProvider>
             }/>
@@ -124,83 +138,16 @@ function AppContent() {
         </Routes>
       </View>
 
-      {/* 하단 네비게이션 (Bottom Nav) */}
-      <View style={navStyles.bottomNav}>
-        <TabButton
-          active={location.pathname === '/dashboard'}
-          onPress={() => navigate("/dashboard")}
-          icon="📊" label="현황"
-        />
-        <TabButton
-          active={location.pathname === '/storage'}
-          onPress={() => navigate("/storage")}
-          icon="📦" label="재고"
-        />
-        <TabButton
-          active={location.pathname === '/todo'}
-          onPress={() => navigate("/todo")}
-          icon="📦" label="할 일"
-        />
-        {hasAdminAccess && (
-          <TabButton
-            active={location.pathname === '/admin'}
-            onPress={() => navigate("/admin")}
-            icon="⚙️" label="관리"
-          />
-        )}
-      </View>
+      <BottomNav hasAdminAccess={hasAdminAccess} />
 
       <Toast message={toast.message} show={toast.show} />
     </>
   );
 }
 
-/**
- * 탭 버튼 컴포넌트 (RN 스타일)
- */
-const TabButton = ({ active, onPress, icon, label }) => (
-  <TouchableOpacity 
-    onPress={onPress} 
-    style={navStyles.tabButton}
-    activeOpacity={0.7}
-  >
-    <Text style={{ fontSize: 20, marginBottom: 2 }}>{icon}</Text>
-    <Text style={{ 
-      fontSize: 11, 
-      fontWeight: active ? 'bold' : 'normal',
-      color: active ? Colors.primary : '#bbb'
-    }}>
-      {label}
-    </Text>
-  </TouchableOpacity>
-);
-
-// 네비게이션 전용 추가 스타일
-const navStyles = StyleSheet.create({
-  bottomNav: {
-    flexDirection: 'row',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 65,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    // 그림자 효과 (iOS/Android/Web 공통 대응은 styles.js 참고)
-    zIndex: 50,
-  },
-  tabButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  }
-});
-
-function App() {
+const App: FC = () => {
   return (
-    <HashRouter style={{
-      backgroundColor: '#f9f9f9'}}>
+    <HashRouter>
       <AppContent />
     </HashRouter>
   );

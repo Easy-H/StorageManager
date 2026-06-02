@@ -8,9 +8,10 @@ import { styles } from '../styles';
 
 interface AuthPageProps {
 	notice: (msg: string) => void;
+	onBack?: () => void;
 }
 
-const AuthPage = ({ notice }: AuthPageProps) => {
+const AuthPage = ({ notice, onBack }: AuthPageProps) => {
 	const [isSignUp, setIsSignUp] = useState(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -63,6 +64,9 @@ const AuthPage = ({ notice }: AuthPageProps) => {
 			<LinkButton onPress={() => setIsSignUp(!isSignUp)}>
 				{isSignUp ? "로그인으로 이동" : "회원가입 하기"}
 			</LinkButton>
+			{onBack && (
+				<LinkButton onPress={onBack}>← 조직 검색으로 돌아가기</LinkButton>
+			)}
 		</View>
 	);
 };

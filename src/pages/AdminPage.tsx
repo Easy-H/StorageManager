@@ -27,10 +27,11 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
         <>
             <ScrollView contentContainerStyle={ styles.appContent }>
 
-                {/* 1. 조직 정보 수정 */}
-                <H3>🏷️ 조직 이름 변경</H3>
+                {/* 1. 조직 관리 */}
+                <H3>🛠️ 조직 관리</H3>
                 <Box>
-                    <View style={{ flexDirection: 'row', gap: 8 } as ViewStyle}>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 8, color: '#444' }}>조직 이름</Text>
+                    <View style={{ flexDirection: 'row', gap: 8, marginBottom: 20 } as ViewStyle}>
                         {/* @ts-ignore - React Native Web 전용 input 태그 사용 */}
                         <input
                             value={newName}
@@ -43,11 +44,12 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
                             수정
                         </GreenButton>
                     </View>
-                </Box>
 
-                <H3>⚙️ 가입 설정</H3>
-                <Box>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' } as ViewStyle}>
+                    <View style={{ borderBottomWidth: 1, borderBottomColor: '#eee', marginBottom: 20 }} />
+
+                    <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 12, color: '#444' }}>가입 및 공개 설정</Text>
+                    
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 } as ViewStyle}>
                         <Text style={{ fontSize: 14, color: '#444' }}>승인 없이 즉시 가입 허용</Text>
                         <input 
                             type="checkbox" 
@@ -56,7 +58,19 @@ const AdminPage = ({ currentOrg, notice, user, onBack, setCurrentOrg }: AdminPag
                             style={{ width: 20, height: 20 }}
                         />
                     </View>
-                    <Text style={{ fontSize: 11, color: '#888', marginTop: 8 }}>활성화하면 초대된 사용자가 승인 없이 바로 멤버가 됩니다.</Text>
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' } as ViewStyle}>
+                        <Text style={{ fontSize: 14, color: '#444' }}>조직 공개 설정 (검색 허용)</Text>
+                        <input 
+                            type="checkbox" 
+                            checked={currentOrg.isPublic || false} 
+                            onChange={(e: any) => updateOrgSettings({ isPublic: e.target.checked })}
+                            style={{ width: 20, height: 20 }}
+                        />
+                    </View>
+                    <Text style={{ fontSize: 11, color: '#888', marginTop: 8 }}>
+                        공개로 설정하면 다른 사용자가 조직 이름으로 검색하여 참여 신청을 보낼 수 있습니다.
+                    </Text>
                 </Box>
 
                 {/* 2. 멤버 관리 */}

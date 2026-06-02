@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal as M, View, StyleSheet, ViewStyle } from 'react-native';
 import { Colors } from '../../../../../styles';
 
-interface ModalProps {
+type ModalProps = {
   visible?: boolean;
   children: React.ReactNode;
 }

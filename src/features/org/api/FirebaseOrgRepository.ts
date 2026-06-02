@@ -4,9 +4,11 @@ import {
 	getDoc,
 	getDocs,
 	onSnapshot,
+	query,
 	serverTimestamp,
 	Unsubscribe,
 	updateDoc,
+	where,
 	writeBatch
 } from 'firebase/firestore';
 import { db } from '../../../common/api/firebase/firebase';
@@ -27,6 +29,26 @@ export const FirebaseOrgRepository = {
 			} as OrgMembership));
 		} catch (error) {
 			console.error("소속 조직 로드 실패:", error);
+			return [];
+		}
+	},
+
+	/**
+	 * 공개된 조직 검색하기
+	 */
+	async searchPublicOrgs(keyword: string): Promise<OrgMembership[]> {
+		try {
+			// 보안 규칙에 따라 isActive == true 조건이 쿼리에 반드시 포함되어야 합니다.
+			const q = query(
+				collection(db, "organizations"), 
+				where("isPublic", "==", true),
+				where("isActive", "==", true)
+			);
+			const snap = await getDocs(q);
+			const orgs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as OrgMembership));
+			return orgs.filter(org => org.name.toLowerCase().includes(keyword.toLowerCase()));
+		} catch (error) {
+			console.error("공개 조직 검색 실패:", error);
 			return [];
 		}
 	},
@@ -57,6 +79,7 @@ export const FirebaseOrgRepository = {
 				adminEmail: admin.email,
 				adminUid: admin.uid,
 				isAutoJoin: false,
+				isPublic: false,
 				isActive: true,
 				createdAt: serverTimestamp()
 			});
@@ -64,6 +87,8 @@ export const FirebaseOrgRepository = {
 			const userOrgData = {
 				name: name,
 				level: OrgRole.ADMIN,
+				isAutoJoin: false,
+				isPublic: false,
 				joinedAt: serverTimestamp()
 			};
 
@@ -97,6 +122,7 @@ export const FirebaseOrgRepository = {
 		const orgData = orgSnap.data();
 		const orgName = orgData.name;
 		const isAutoJoin = orgData.isAutoJoin === true;
+		const isPublic = orgData.isPublic === true;
 		const userName = userProfile?.name || user.email?.split('@')[0] || 'Unknown';
 
 		const batch = writeBatch(db);
@@ -114,6 +140,8 @@ export const FirebaseOrgRepository = {
 			const commonData = {
 				name: orgName,
 				level: isAutoJoin ? OrgRole.MEMBER : OrgRole.PENDING,
+				isAutoJoin,
+				isPublic,
 				requestedAt: serverTimestamp()
 			};
 
@@ -186,8 +214,19 @@ export const FirebaseOrgRepository = {
 	},
 
 	async updateOrgSettings(orgId: string, settings: Partial<any>): Promise<void> {
+		const batch = writeBatch(db);
+		
+		// 1. 전역 조직 정보 업데이트 (검색용)
 		const orgRef = doc(db, "organizations", orgId);
-		await updateDoc(orgRef, settings);
+		batch.update(orgRef, settings);
+
+		// 2. 소속된 모든 멤버의 membership 정보에도 반영 (사용자 UI 상태 동기화)
+		const membersSnap = await getDocs(collection(db, "organizations", orgId, "members"));
+		membersSnap.forEach((mDoc) => {
+			batch.update(doc(db, "users", mDoc.id, "organizations", orgId), settings);
+		});
+
+		await batch.commit();
 	},
 
 	async updateOrgName(orgId: string, newName: string): Promise<void> {
